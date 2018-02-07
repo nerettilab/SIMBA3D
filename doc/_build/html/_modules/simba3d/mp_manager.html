@@ -1,0 +1,509 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>simba3d.mp_manager &mdash; simba3d 0.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="simba3d 0.0.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">simba3d 0.0.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for simba3d.mp_manager</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">Simplified multi processing wrapper for simba3d</span>
+
+<span class="sd">The mp_handler can be called by inputing a list of tasks and specifying the</span>
+<span class="sd">desired number of cores. Selecting the optimal number of cores can be a bit</span>
+<span class="sd">subjective. Generally, one uses the number of virtual cores available on the</span>
+<span class="sd">system.</span>
+
+<span class="sd">Created on Wed Sep 06 18:59:03 2017</span>
+
+<span class="sd">@author: Michael Rosenthal</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">simba3d.matrixlabish</span> <span class="kn">import</span> <span class="n">significant_figures</span><span class="p">,</span><span class="n">keyboard</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">loadmat</span><span class="p">,</span> <span class="n">savemat</span>
+<span class="c"># A good practice is to use one or the other as a fallback.</span>
+<span class="k">try</span><span class="p">:</span> <span class="kn">import</span> <span class="nn">simplejson</span> <span class="kn">as</span> <span class="nn">json</span> <span class="c"># try to import simplejson</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span> <span class="kn">import</span> <span class="nn">json</span> <span class="c">#otherwise import json</span>
+
+<span class="kn">import</span> <span class="nn">simba3d.optimizer</span> <span class="kn">as</span> <span class="nn">opt</span>
+<span class="c">#import simba3d.plotting_tools as pt</span>
+<span class="kn">import</span> <span class="nn">simba3d.srvf_open_curve_Rn</span> <span class="kn">as</span> <span class="nn">srvf</span>
+<span class="kn">import</span> <span class="nn">simba3d.uuid_check</span> <span class="kn">as</span> <span class="nn">uc</span>
+
+
+<div class="viewcode-block" id="jsonify"><a class="viewcode-back" href="../../simba3d.html#simba3d.mp_manager.jsonify">[docs]</a><span class="k">def</span> <span class="nf">jsonify</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a small serializer for saving output in human readable json format</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="n">serialized_summary</span><span class="o">=</span> <span class="nb">dict</span><span class="p">()</span> 
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+          <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">jsonify</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+          <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+          <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">__module__</span><span class="o">==</span><span class="s">&#39;numpy&#39;</span><span class="p">:</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+          <span class="n">serialized_summary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="n">value</span>    
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">__module__</span><span class="o">==</span><span class="s">&#39;numpy&#39;</span><span class="p">:</span>
+        <span class="n">serialized_summary</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">serialized_summary</span><span class="o">=</span><span class="n">data</span>
+    <span class="k">return</span> <span class="n">serialized_summary</span>
+</div>
+<div class="viewcode-block" id="load_result"><a class="viewcode-back" href="../../simba3d.html#simba3d.mp_manager.load_result">[docs]</a><span class="k">def</span> <span class="nf">load_result</span><span class="p">(</span><span class="n">outputfile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This will load a simba3d result</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results_dir</span><span class="o">=</span><span class="s">&#39;.&#39;</span>
+    <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">outputfile</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">summary</span><span class="o">=</span><span class="p">{}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s">&#39;.npz&#39;</span><span class="p">:</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_dir</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">outputfile</span><span class="p">)))</span>
+            <span class="n">summary</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;summary&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s">&#39;.mat&#39;</span><span class="p">:</span>
+            <span class="n">summary</span><span class="o">=</span><span class="n">loadmat</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_dir</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">outputfile</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s">&#39;.json&#39;</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_dir</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">outputfile</span><span class="p">)),</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">result</span><span class="p">:</span>
+                <span class="n">summary</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">summary</span><span class="o">=</span><span class="p">{}</span>
+    <span class="k">return</span> <span class="n">summary</span></div>
+<div class="viewcode-block" id="save_data"><a class="viewcode-back" href="../../simba3d.html#simba3d.mp_manager.save_data">[docs]</a><span class="k">def</span> <span class="nf">save_data</span><span class="p">(</span><span class="n">outputfilepath</span><span class="p">,</span><span class="n">summary</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This will save a simba3d result</span>
+<span class="sd">    </span>
+<span class="sd">    Summary is the result of the experiment</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ext</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">outputfilepath</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ext</span><span class="o">==</span><span class="s">&#39;.mat&#39;</span><span class="p">:</span>
+        <span class="n">savemat</span><span class="p">(</span><span class="n">outputfilepath</span><span class="p">,</span><span class="n">summary</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outputfilepath</span>        
+    <span class="k">elif</span> <span class="n">ext</span><span class="o">==</span><span class="s">&#39;.json&#39;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputfilepath</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">result</span><span class="p">:</span>
+            <span class="c"># serialize</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">jsonify</span><span class="p">(</span><span class="n">summary</span><span class="p">),</span> <span class="n">result</span><span class="p">,</span><span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">sort_keys</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  
+    <span class="k">elif</span> <span class="n">ext</span><span class="o">==</span><span class="s">&#39;.txt&#39;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputfilepath</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">pprint</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>      
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ext</span> <span class="o">!=</span> <span class="s">&#39;.npz&#39;</span><span class="p">:</span>
+            <span class="n">outputfilepath</span><span class="o">+=</span><span class="s">&#39;.npz&#39;</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">outputfilepath</span><span class="p">,</span><span class="n">summary</span><span class="o">=</span><span class="n">summary</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">outputfilepath</span>         </div>
+<div class="viewcode-block" id="convert"><a class="viewcode-back" href="../../simba3d.html#simba3d.mp_manager.convert">[docs]</a><span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="n">ext_out</span><span class="o">=</span><span class="s">&quot;.npz&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    convert .npz simba3d result into some other supported format</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">summary</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ext_in</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ext_in</span> <span class="o">==</span> <span class="n">ext_out</span><span class="p">):</span>
+            <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">Error input extention matches output extention&quot;</span>
+        <span class="k">elif</span>  <span class="p">(</span><span class="n">ext_in</span><span class="o">!=</span><span class="s">&#39;.npz&#39;</span><span class="p">):</span>
+            <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s"> Only convertion from .npz file is supported&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">summary</span><span class="o">=</span><span class="n">load_result</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">Error loading &quot;</span><span class="o">+</span><span class="n">filename</span>
+    <span class="k">if</span> <span class="n">summary</span><span class="p">:</span>
+        <span class="n">save_data</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">ext_out</span><span class="p">,</span><span class="n">summary</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s"> saving :&quot;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">ext_out</span>
+            <span class="n">save_data</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">ext_out</span><span class="p">,</span><span class="n">summary</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">Error converting &quot;</span><span class="o">+</span><span class="n">filename</span><span class="o">+</span><span class="s">&quot; to &quot;</span><span class="o">+</span><span class="n">ext_out</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">Could not load &quot;</span><span class="o">+</span><span class="n">filename</span></div>
+<div class="viewcode-block" id="get_tag_name"><a class="viewcode-back" href="../../simba3d.html#simba3d.mp_manager.get_tag_name">[docs]</a><span class="k">def</span> <span class="nf">get_tag_name</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Gets a tag name (this may go away in future versions)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">tag</span><span class="o">=</span><span class="s">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">penalty</span> <span class="ow">in</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">][</span><span class="s">&#39;term_weights&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        
+        <span class="n">f</span><span class="o">=</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">][</span><span class="s">&#39;term_weights&#39;</span><span class="p">][</span><span class="n">penalty</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">f</span> <span class="o">!=</span><span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">penalty</span><span class="o">!=</span><span class="s">&#39;data&#39;</span><span class="p">:</span>
+                <span class="n">tag</span><span class="o">+=</span><span class="s">&#39;_&#39;</span><span class="o">+</span><span class="n">penalty</span><span class="o">+</span><span class="s">&#39;&#39;</span><span class="o">+</span><span class="n">significant_figures</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">f</span><span class="o">!=</span><span class="mf">1.0</span><span class="p">:</span>
+                <span class="n">tag</span><span class="o">+=</span><span class="s">&#39;_&#39;</span><span class="o">+</span><span class="n">penalty</span><span class="o">+</span><span class="s">&#39;&#39;</span><span class="o">+</span><span class="n">significant_figures</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s">&#39;seed&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+        <span class="n">tag</span><span class="o">+=</span><span class="s">&#39;_seed&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;seed&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">tag</span> </div>
+<div class="viewcode-block" id="run_tasks"><a class="viewcode-back" href="../../simba3d.html#simba3d.mp_manager.run_tasks">[docs]</a><span class="k">def</span> <span class="nf">run_tasks</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span><span class="n">resume</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>  
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    plural task runner.</span>
+<span class="sd">    </span>
+<span class="sd">    This runs a list of independent tasks and divides the work across multiple</span>
+<span class="sd">    processes if desired.</span>
+<span class="sd">    </span>
+<span class="sd">    Ther resume option tells simba3d to skip over tasks with uuid&#39;s that have</span>
+<span class="sd">    already been ran.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span> <span class="c"># if a dicitonary is passed in, but it in a list so we know the layer</span>
+        <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="n">tasks</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">resume</span><span class="p">:</span>
+        <span class="n">index_remaining</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">check_tasks_index</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span> <span class="c"># find which tasks still need to run</span>
+        <span class="k">print</span> <span class="n">index_remaining</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">index_remaining</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
+    <span class="n">usewarmstarts</span><span class="o">=</span><span class="bp">False</span> <span class="c"># default setting for warmstarts</span>
+
+    <span class="k">if</span> <span class="s">&#39;uuid&#39;</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+      <span class="n">UUID</span><span class="o">=</span><span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;uuid&quot;</span><span class="p">]</span> <span class="c"># if the task has a uuid use that</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">UUID</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span> <span class="c"># generate a uuid</span>
+    <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">index_remaining</span><span class="p">:</span> <span class="c"># loop through remaining tasks</span>
+        <span class="k">if</span> <span class="s">&#39;uuid&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">[</span><span class="n">ii</span><span class="p">]:</span> <span class="c"># make sure the task has a uuid</span>
+          <span class="n">tasks</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="s">&quot;uuid&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">UUID</span><span class="o">+</span><span class="s">&#39;_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> 
+        <span class="k">if</span> <span class="n">ii</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">outputfilepath</span><span class="o">=</span><span class="n">run_task</span><span class="p">(</span><span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>   <span class="c"># run the first task</span>
+        <span class="k">else</span><span class="p">:</span>        
+            <span class="k">if</span> <span class="s">&#39;usewarmstarts&#39;</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">[</span><span class="n">ii</span><span class="p">]:</span>
+                <span class="n">usewarmstarts</span><span class="o">=</span><span class="n">tasks</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="s">&#39;usewarmstarts&#39;</span><span class="p">]</span> <span class="c"># if usewarmstarts parameter is set then use that value</span>
+            <span class="k">if</span> <span class="n">usewarmstarts</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;Using warmstarts sequentially from previous task&quot;</span>
+                <span class="k">if</span> <span class="s">&#39;uuid&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">[</span><span class="n">ii</span><span class="p">]:</span>
+                    <span class="n">tasks</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="s">&quot;uuid&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">UUID</span><span class="o">+</span><span class="s">&#39;_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="c"># make sure the task has a uuid</span>
+                <span class="n">outputfilepath</span><span class="o">=</span><span class="n">get_outputfilepath</span><span class="p">(</span><span class="n">tasks</span><span class="p">[</span><span class="n">ii</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c"># get the outputfile path from the previous run</span>
+                <span class="k">print</span> <span class="n">outputfilepath</span>                
+                <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">                ext=os.path.splitext(outputfilepath)[-1].lower() </span>
+<span class="sd">                if ext==&#39;.mat&#39;:</span>
+<span class="sd">                    data=loadmat(outputfilepath)</span>
+<span class="sd">                else:</span>
+<span class="sd">                    data=np.load(outputfilepath) </span>
+<span class="sd">                summary=data[&#39;summary&#39;].item()</span>
+<span class="sd">                &#39;&#39;&#39;</span>
+                <span class="n">summary</span><span class="o">=</span><span class="n">load_result</span><span class="p">(</span><span class="n">outputfilepath</span><span class="p">)</span>
+                <span class="n">X0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s">&#39;X_evol&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c"># get the last curve from previous run</span>
+                <span class="c"># get dimension of previous run</span>
+                <span class="k">if</span> <span class="s">&#39;d&#39;</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">:</span>
+                    <span class="n">d</span><span class="o">=</span><span class="n">summary</span><span class="p">[</span><span class="s">&#39;d&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">d</span><span class="p">,</span><span class="n">n0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">X0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s">&#39;n&#39;</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">:</span>
+                    <span class="n">n0</span><span class="o">=</span><span class="n">summary</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">d</span><span class="p">,</span><span class="n">n0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">X0</span><span class="p">)</span>
+                <span class="n">X0</span><span class="o">=</span><span class="n">X0</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">d</span><span class="p">,</span><span class="n">n0</span><span class="p">))</span>
+                <span class="c"># get dimension of next run</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">load_data</span><span class="p">(</span><span class="n">tasks</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>
+                <span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">n</span><span class="p">)</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;pairwise_contact_matrix&#39;</span><span class="p">])</span>     
+                <span class="c"># interpolate previous curve to match dimension</span>
+                <span class="n">t0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n0</span><span class="p">)</span>
+                <span class="n">t</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+                <span class="n">initialized_curve</span><span class="o">=</span><span class="n">srvf</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span><span class="n">X0</span><span class="p">,</span><span class="n">t</span><span class="p">)</span>
+                <span class="n">initialized_curve</span><span class="o">=</span><span class="n">srvf</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span><span class="n">X0</span><span class="p">,</span><span class="n">t</span><span class="p">)</span> <span class="c"># interpolate to initialize the next curve</span>
+                <span class="k">if</span> <span class="s">&#39;data&#39;</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">[</span><span class="n">ii</span><span class="p">]:</span>
+                    <span class="n">tasks</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;initialized_curve&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">initialized_curve</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tasks</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;initialized_curve&#39;</span> <span class="p">:</span> <span class="n">initialized_curve</span><span class="p">}</span>          
+            <span class="n">outputfilepath</span><span class="o">=</span><span class="n">run_task</span><span class="p">(</span><span class="n">tasks</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>        </div>
+<div class="viewcode-block" id="run_task"><a class="viewcode-back" href="../../simba3d.html#simba3d.mp_manager.run_task">[docs]</a><span class="k">def</span> <span class="nf">run_task</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>  
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    run a singular task</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">UUID</span><span class="o">=</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="c"># generate a unique task identifier</span>
+    <span class="c"># set defaults</span>
+    <span class="k">if</span> <span class="s">&#39;uuid&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+        <span class="n">task</span><span class="p">[</span><span class="s">&#39;uuid&#39;</span><span class="p">]</span><span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">UUID</span><span class="p">)</span> <span class="c"># a unique identifier to the specific task</span>
+    <span class="k">if</span> <span class="s">&#39;taskname&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+        <span class="n">task</span><span class="p">[</span><span class="s">&#39;taskname&#39;</span><span class="p">]</span><span class="o">=</span> <span class="s">&quot;unnamed task&quot;</span> <span class="c"># give the task a more intuitive name       </span>
+    <span class="k">if</span> <span class="s">&#39;randomize_initialization&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+        <span class="n">task</span><span class="p">[</span><span class="s">&#39;randomize_initialization&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">False</span>
+    <span class="k">if</span>  <span class="s">&#39;check_jacobian&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span> <span class="c"># to animate the iterative energy</span>
+         <span class="n">check_jacobian</span><span class="o">=</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;check_jacobian&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>         
+        <span class="n">check_jacobian</span><span class="o">=</span><span class="bp">False</span> <span class="c"># check analytical gradient with numerical gradient</span>
+        <span class="c">#s= int(np.random.rand()*4294967295)</span>
+    <span class="k">if</span>  <span class="s">&#39;sigma&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span> <span class="c"># to animate the iterative energy</span>
+         <span class="n">sig</span><span class="o">=</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;sigma&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sig</span><span class="o">=.</span><span class="mo">005</span><span class="p">;</span>
+    <span class="k">if</span> <span class="s">&#39;parameters&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+        <span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">]</span><span class="o">=</span> <span class="p">{</span>
+                <span class="s">&#39;a&#39;</span>              <span class="p">:</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">,</span>
+                <span class="s">&#39;b&#39;</span>              <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="c"># not identifiable with unconstrained scale</span>
+                    <span class="p">}</span>
+    <span class="k">if</span> <span class="s">&#39;term_weights&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">]:</span>
+        <span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">][</span><span class="s">&#39;term_weights&#39;</span><span class="p">]</span><span class="o">=</span> <span class="p">{</span>
+                    <span class="s">&#39;data&#39;</span>             <span class="p">:</span> <span class="mf">1.0e0</span><span class="p">,</span>      <span class="c"># weight for the data term</span>
+                    <span class="s">&#39;uniform spacing&#39;</span>  <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="c"># scaled first order penalty</span>
+                    <span class="s">&#39;smoothing&#39;</span>        <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="c"># scaled second order penalty</span>
+                    <span class="s">&#39;population prior&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>    <span class="c"># weight for the population matrix prior</span>
+                    <span class="s">&#39;shape prior&#39;</span>      <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>    <span class="c"># weight for the shape prior                    </span>
+                    <span class="c"># below are unsupported penalties</span>
+                    <span class="c">#&#39;firstroughness&#39;   :0.0e3,   # weight for the fist order roughness</span>
+                    <span class="c">#&#39;secondroughness&#39;  :0.0e-16,   # weight for the second order roughness</span>
+                    <span class="c">#&#39;scaledfirstroughness&#39;  :0.0,   # weight for the scaled second order roughness</span>
+                    <span class="c">#&#39;scaledsecondroughness&#39; :0.0,   # weight for the scaled second order roughness</span>
+                    <span class="c">#&#39;parameterization&#39; :0, # not implemented</span>
+                    <span class="p">}</span>
+    <span class="k">if</span> <span class="s">&#39;store_task&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span> <span class="c"># set default for store_task</span>
+        <span class="n">task</span><span class="p">[</span><span class="s">&#39;store_task&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">True</span> <span class="c"># store the task in the output file</span>
+
+    <span class="n">parameters</span><span class="o">=</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">]</span>
+    <span class="n">term_types</span><span class="o">=</span><span class="n">parameters</span><span class="p">[</span><span class="s">&#39;term_weights&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>        
+    <span class="n">term_weights</span><span class="o">=</span><span class="p">[]</span>             
+    <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">term_types</span><span class="p">:</span>        
+        <span class="n">term_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s">&#39;term_weights&#39;</span><span class="p">][</span><span class="n">term</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s">&#39;inputdir&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">]:</span>
+        <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;inputdir&#39;</span><span class="p">]</span><span class="o">=</span><span class="s">&#39;./&#39;</span>
+    <span class="n">inputdir</span><span class="o">=</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;inputdir&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s">&#39;outputdir&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">]:</span>
+         <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;outputdir&#39;</span><span class="p">]</span><span class="o">=</span><span class="s">&#39;./&#39;</span>
+    <span class="n">outputdir</span><span class="o">=</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;outputdir&#39;</span><span class="p">]</span>   
+    <span class="c"># check that output directory exists and create it is needed</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">outputdir</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;Please make sure the output directory exists&quot;</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="n">outputfilepath</span><span class="o">=</span><span class="n">get_outputfilepath</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+    
+
+    <span class="c"># load data ###############################################################   </span>
+    <span class="n">data</span><span class="o">=</span><span class="n">load_data</span><span class="p">(</span><span class="n">task</span><span class="p">);</span>
+        
+                  
+    <span class="k">if</span> <span class="s">&#39;initialized_curve&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;randomize_initialization&#39;</span><span class="p">]:</span>  
+            <span class="c"># randomize initialized curve with gaussian noise</span>
+            <span class="k">if</span> <span class="s">&#39;seed&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+                <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;seed&#39;</span><span class="p">])</span>
+                <span class="n">data</span><span class="p">[</span><span class="s">&#39;initialized_curve&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;initialized_curve&#39;</span><span class="p">],</span><span class="n">sig</span><span class="p">)</span>     
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="s">&#39;initialized_curve&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;initialized_curve&#39;</span><span class="p">],</span><span class="n">sig</span><span class="p">)</span> 
+    <span class="c"># check that the initialized curve matches dimension of data</span>
+    
+    <span class="k">if</span> <span class="s">&#39;index_parameters&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>      
+        <span class="k">if</span> <span class="s">&#39;missing_rowsum_threshold&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;index_parameters&#39;</span><span class="p">]:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s">&#39;missing_rowsum_threshold&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;index_parameters&#39;</span><span class="p">][</span><span class="s">&#39;missing_rowsum_threshold&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s">&#39;index_mississing&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;index_parameters&#39;</span><span class="p">]:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s">&#39;index_mississing&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;index_parameters&#39;</span><span class="p">][</span><span class="s">&#39;index_mississing&#39;</span><span class="p">]</span>    
+        <span class="k">if</span> <span class="s">&#39;off_diagonal&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;index_parameters&#39;</span><span class="p">]:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s">&#39;off_diagonal&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;index_parameters&#39;</span><span class="p">][</span><span class="s">&#39;off_diagonal&#39;</span><span class="p">]</span>               
+        <span class="k">if</span> <span class="s">&#39;pairwise_combinations&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;index_parameters&#39;</span><span class="p">]:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s">&#39;pairwise_combinations&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;index_parameters&#39;</span><span class="p">][</span><span class="s">&#39;pairwise_combinations&#39;</span><span class="p">]</span>                       
+    <span class="c">#%</span>
+    
+    <span class="k">if</span> <span class="s">&#39;options&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;options&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s">&quot;method&quot;</span><span class="p">:</span> <span class="s">&quot;BFGS&quot;</span><span class="p">,</span> 
+                <span class="s">&quot;display&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> 
+                <span class="s">&quot;maxitr&quot;</span><span class="p">:</span> <span class="mi">100000</span>
+                <span class="p">}</span>
+    
+    <span class="n">start</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                
+    <span class="n">result</span><span class="o">=</span><span class="n">opt</span><span class="o">.</span><span class="n">opt_E</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">parameters</span><span class="p">,</span><span class="n">options</span><span class="p">)</span>     
+    <span class="k">print</span> <span class="s">&quot;Running ...&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">Taskname: &quot;</span><span class="o">+</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;taskname&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s">&#39;uuid&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">UUID: &quot;</span><span class="o">+</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;uuid&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s">&#39;title&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">title: &quot;</span><span class="o">+</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">]</span>        
+    <span class="k">if</span> <span class="s">&#39;description&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">description: &quot;</span><span class="o">+</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;description&#39;</span><span class="p">]</span>             
+    <span class="n">result</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+    <span class="n">end</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>   
+    <span class="n">comptime</span><span class="o">=</span>  <span class="n">end</span><span class="o">-</span><span class="n">start</span>  
+    <span class="k">print</span> <span class="s">&quot;Time ellapse: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">((</span><span class="n">comptime</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">60</span><span class="p">))</span><span class="o">+</span><span class="s">&quot; minutes&quot;</span>
+    <span class="k">if</span> <span class="n">check_jacobian</span><span class="p">:</span>
+        <span class="c"># Check analytical jacobian is correct ########################################</span>
+        <span class="n">jac_error</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">check_jacobian</span><span class="p">()</span> <span class="c"># this should be a small number</span>
+        <span class="c"># Check the correctness of a gradient function by comparing it against a </span>
+        <span class="c"># (forward) finite-difference approximation of the gradient.</span>
+        <span class="k">print</span> <span class="s">&#39;Error between analytical and numerical gradient at initialized curve: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">jac_error</span><span class="p">)</span>
+        <span class="c"># norm of the difference between analytical jacobian and the finite difference approximation of jacobian at initialized curve.</span>
+    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">XK</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">XK</span><span class="o">=</span><span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">estimated_curve</span><span class="p">]</span>
+    
+    <span class="n">summary</span><span class="o">=</span><span class="n">summarize_results</span><span class="p">(</span><span class="n">result</span><span class="p">,</span><span class="n">task</span><span class="p">)</span>
+    
+    <span class="k">print</span> <span class="s">&quot;saving results to file:&quot;</span><span class="o">+</span><span class="n">outputfilepath</span>
+    <span class="k">return</span> <span class="n">save_data</span><span class="p">(</span><span class="n">outputfilepath</span><span class="p">,</span><span class="n">summary</span><span class="p">)</span></div>
+<div class="viewcode-block" id="get_outputfilepath"><a class="viewcode-back" href="../../simba3d.html#simba3d.mp_manager.get_outputfilepath">[docs]</a><span class="k">def</span> <span class="nf">get_outputfilepath</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    returns the output file path of a task</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">outputfilepath</span><span class="o">=</span><span class="bp">None</span>
+    <span class="k">if</span> <span class="s">&#39;outputdir&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">]:</span>
+        <span class="n">outputdir</span><span class="o">=</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;outputdir&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">outputdir</span><span class="o">=</span><span class="s">&#39;.&#39;</span>
+    <span class="k">if</span> <span class="s">&#39;output_filename&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">]:</span>
+        <span class="n">outputfilepath</span><span class="o">=</span><span class="n">outputdir</span><span class="o">+</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;output_filename&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tag</span><span class="o">=</span><span class="n">get_tag_name</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+        <span class="n">output_string</span>   <span class="o">=</span>  <span class="n">task</span><span class="p">[</span><span class="s">&#39;taskname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;_&#39;</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;_&quot;</span><span class="o">+</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;uuid&#39;</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;.npz&#39;</span>
+        <span class="n">outputfilepath</span>  <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputdir</span><span class="p">,</span><span class="n">output_string</span> <span class="p">)</span>   
+    <span class="k">return</span> <span class="n">outputfilepath</span></div>
+<div class="viewcode-block" id="summarize_results"><a class="viewcode-back" href="../../simba3d.html#simba3d.mp_manager.summarize_results">[docs]</a><span class="k">def</span> <span class="nf">summarize_results</span><span class="p">(</span><span class="n">result</span><span class="p">,</span><span class="n">task</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    creates a summary of the result as dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">summary</span><span class="o">=</span><span class="p">{</span>
+            <span class="c">#&#39;Csc&#39;:data[&#39;pairwise_contact_matrix&#39;],</span>
+            <span class="c">#&#39;Cpop&#39;:data[&#39;population_contact_matrix&#39;],</span>
+            <span class="c">#&#39;Xmean&#39;:data[&#39;prior_shape_model&#39;],</span>
+            <span class="s">&#39;n&#39;</span><span class="p">:</span><span class="n">result</span><span class="o">.</span><span class="n">n</span><span class="p">,</span>
+            <span class="s">&#39;d&#39;</span><span class="p">:</span><span class="n">result</span><span class="o">.</span><span class="n">d</span><span class="p">,</span>
+            <span class="s">&#39;a&#39;</span><span class="p">:</span><span class="n">result</span><span class="o">.</span><span class="n">a</span><span class="p">,</span>
+            <span class="s">&#39;b&#39;</span><span class="p">:</span><span class="n">result</span><span class="o">.</span><span class="n">b</span><span class="p">,</span>   
+            <span class="s">&#39;E_evol&#39;</span><span class="p">:</span><span class="n">result</span><span class="o">.</span><span class="n">e</span><span class="p">,</span>
+            <span class="s">&#39;X_evol&#39;</span><span class="p">:</span><span class="n">result</span><span class="o">.</span><span class="n">XK</span><span class="p">,</span>
+            <span class="s">&#39;computation_time&#39;</span><span class="p">:</span><span class="n">result</span><span class="o">.</span><span class="n">computation_time</span><span class="p">,</span>
+            <span class="s">&#39;method&#39;</span><span class="p">:</span><span class="n">result</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+            <span class="s">&#39;initialized_curve&#39;</span><span class="p">:</span><span class="n">result</span><span class="o">.</span><span class="n">initialized_curve</span><span class="p">,</span>
+            <span class="p">}</span>
+    <span class="k">if</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;store_task&#39;</span><span class="p">]:</span>
+        <span class="n">summary</span><span class="p">[</span><span class="s">&#39;json_task&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">task</span>
+    <span class="k">if</span> <span class="s">&#39;uuid&#39;</span><span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+        <span class="n">summary</span><span class="p">[</span><span class="s">&#39;uuid&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;uuid&#39;</span><span class="p">]</span>         
+    <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span>  <span class="n">result</span><span class="o">.</span><span class="n">term_weights</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">summary</span><span class="p">[</span><span class="s">&#39;weight_&#39;</span><span class="o">+</span><span class="n">term</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;_&#39;</span><span class="p">)]</span><span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">term_weights</span><span class="p">[</span><span class="n">term</span><span class="p">]</span>
+        <span class="k">print</span> <span class="n">term</span><span class="o">+</span><span class="s">&#39; = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s">&#39;weight_&#39;</span><span class="o">+</span><span class="n">term</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;_&#39;</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">summary</span>
+    </div>
+<div class="viewcode-block" id="mp_worker"><a class="viewcode-back" href="../../simba3d.html#simba3d.mp_manager.mp_worker">[docs]</a><span class="k">def</span> <span class="nf">mp_worker</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s">&#39;taskname&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+        <span class="n">taskname</span><span class="o">=</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;taskname&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">taskname</span><span class="o">=</span><span class="s">&#39;task&#39;</span>
+    <span class="c">#output_string=taskname+get_tag_name(task)</span>
+    <span class="k">print</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">Process </span><span class="si">%s</span><span class="s"> </span><span class="se">\t</span><span class="s">Started</span><span class="se">\t</span><span class="s"> </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">taskname</span><span class="p">,</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s">%b%Y %H:%M:%S&#39;</span><span class="p">,</span><span class="n">time</span><span class="o">.</span><span class="n">gmtime</span><span class="p">()))</span>
+    <span class="c"># place task here and pass in parameters</span>
+    <span class="n">t</span><span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">run_tasks</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+    <span class="n">elapsed</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t</span>    
+    <span class="k">print</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">Process </span><span class="si">%s</span><span class="s"> </span><span class="se">\t</span><span class="s">Done </span><span class="se">\t</span><span class="s"> </span><span class="si">%s</span><span class="s"> seconds elapsed&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">taskname</span><span class="p">,</span> <span class="n">elapsed</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="load_data"><a class="viewcode-back" href="../../simba3d.html#simba3d.mp_manager.load_data">[docs]</a><span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    </span>
+<span class="sd">    potential problem here, this only loads numpy arrays npy files</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="s">&#39;inputdir&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">]:</span>
+        <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;inputdir&#39;</span><span class="p">]</span><span class="o">=</span><span class="s">&#39;./&#39;</span>
+    <span class="n">inputdir</span><span class="o">=</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;inputdir&#39;</span><span class="p">]</span> 
+    <span class="n">datatypes</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">-</span> <span class="nb">set</span><span class="p">([</span><span class="s">&#39;inputdir&#39;</span><span class="p">,</span><span class="s">&#39;outputdir&#39;</span><span class="p">,</span><span class="s">&#39;output_filename&#39;</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="s">&#39;data&#39;</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">];</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">{};</span>
+    <span class="k">for</span> <span class="n">datatype</span> <span class="ow">in</span> <span class="n">datatypes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">datatype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span> <span class="c"># don&#39;t load it if the user specified the data at startup</span>
+             <span class="c">#print &quot;\nLoading &quot;+ datatype+&#39;\n&#39;</span>
+             <span class="n">data</span><span class="p">[</span><span class="n">datatype</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">inputdir</span><span class="o">+</span><span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="n">datatype</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">data</span> 
+</div>
+<div class="viewcode-block" id="mp_handler"><a class="viewcode-back" href="../../simba3d.html#simba3d.mp_manager.mp_handler">[docs]</a><span class="k">def</span> <span class="nf">mp_handler</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span><span class="n">cores</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This handles the multi processing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">cores</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mp_worker</span><span class="p">,</span> <span class="n">tasks</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+ <span class="c">#%%</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/logo.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">simba3d 0.0.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Author.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

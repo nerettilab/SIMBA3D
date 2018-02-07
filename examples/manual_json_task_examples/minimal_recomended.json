@@ -1,0 +1,31 @@
+[
+    {
+    "taskname":"short descriptive name",
+    "description":"A longer description of the task for posterity",
+    "uuid":"unique-number-or-randomly-generated-string-specific-to-this-task",
+    "file_names": {
+        "inputdir": "./",
+        "outputdir": "./",
+        "pairwise_contact_matrix":"simulated_contact_matrix.npy",
+        "initialized_curve" : "initialized_curve.npy"
+        },
+     "options": {
+            "display": true,
+            "gradient tolerance": 1e-05,
+            "maxitr": 100000,
+            "method": "default",
+            "store": false
+        },
+     "parameters": {
+            "a": -3.0,
+            "b": 1.0,
+            "term_weights": {
+                "data": 1.0,
+                "population prior": 0.0,
+                "shape prior": 0.0,
+                "smoothing": 0.0,
+                "uniform spacing": 0.0
+            }
+        }
+    }
+]

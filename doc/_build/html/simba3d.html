@@ -1,0 +1,1005 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>simba3d Package &mdash; simba3d 0.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="simba3d 0.0.0 documentation" href="index.html" />
+    <link rel="prev" title="setup Module" href="setup.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="setup.html" title="setup Module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">simba3d 0.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="simba3d-package">
+<h1>simba3d Package<a class="headerlink" href="#simba3d-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><a class="reference internal" href="#module-simba3d" title="simba3d"><tt class="xref py py-mod docutils literal"><span class="pre">simba3d</span></tt></a> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-simba3d"></span><p>Structure Inference from Multiscale BAyes in 3 Dimensions (SIMBA3D)</p>
+<p>Python tools for reconstructing 3D architecture from single cell pairwise interaction 
+matrices.</p>
+<dl class="docutils">
+<dt>dependencies:</dt>
+<dd><ul class="first last simple">
+<li>matplotlib</li>
+<li>numpy</li>
+<li>scipy</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="module-simba3d.convertion_tool">
+<span id="convertion-tool-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">convertion_tool</span></tt> Module<a class="headerlink" href="#module-simba3d.convertion_tool" title="Permalink to this headline">¶</a></h2>
+<p>Command line convertion tool for simba3d outputs</p>
+<p>This will convert npz outputs from simba3d to some other outputs</p>
+<p>Created on Tue Jan 16 10:04:17 2018</p>
+<p>&#64;author: Michael Rosenthal</p>
+<dl class="function">
+<dt id="simba3d.convertion_tool.main">
+<tt class="descclassname">simba3d.convertion_tool.</tt><tt class="descname">main</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/convertion_tool.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.convertion_tool.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>main function executing the convertion tool</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.convertion_tool.printhelp">
+<tt class="descclassname">simba3d.convertion_tool.</tt><tt class="descname">printhelp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/simba3d/convertion_tool.html#printhelp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.convertion_tool.printhelp" title="Permalink to this definition">¶</a></dt>
+<dd><p>print the help text for the convertion tool</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simba3d.display_results">
+<span id="display-results-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">display_results</span></tt> Module<a class="headerlink" href="#module-simba3d.display_results" title="Permalink to this headline">¶</a></h2>
+<p>A quick graphical display of a simba3d .npz result</p>
+<p>Created on Thu Sep 14 14:40:13 2017</p>
+<p>&#64;author: Michael Rosenthal</p>
+<dl class="function">
+<dt id="simba3d.display_results.main">
+<tt class="descclassname">simba3d.display_results.</tt><tt class="descname">main</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/display_results.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.display_results.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>main function for the simba3d display command line utility</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.display_results.printhelp">
+<tt class="descclassname">simba3d.display_results.</tt><tt class="descname">printhelp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/simba3d/display_results.html#printhelp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.display_results.printhelp" title="Permalink to this definition">¶</a></dt>
+<dd><p>print the document options for the simba3d display command line utility</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.display_results.result_passes_filter">
+<tt class="descclassname">simba3d.display_results.</tt><tt class="descname">result_passes_filter</tt><big>(</big><em>summary</em>, <em>param_name</em>, <em>param_min</em>, <em>param_max</em><big>)</big><a class="reference internal" href="_modules/simba3d/display_results.html#result_passes_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.display_results.result_passes_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will check if the parameter is between the two specified values</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simba3d.graphical_results">
+<span id="graphical-results-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">graphical_results</span></tt> Module<a class="headerlink" href="#module-simba3d.graphical_results" title="Permalink to this headline">¶</a></h2>
+<p>Display graphical results from simba3d.opt_E object.</p>
+<p>These used to be in the opt_E class itself, but I separated it so that 
+matplotlib is not required to run the optimizer.</p>
+<p>Created on Thu Sep 07 11:40:43 2017</p>
+<p>&#64;author: Michael Rosenthal</p>
+<dl class="function">
+<dt id="simba3d.graphical_results.create_images_from_task">
+<tt class="descclassname">simba3d.graphical_results.</tt><tt class="descname">create_images_from_task</tt><big>(</big><em>task</em><big>)</big><a class="reference internal" href="_modules/simba3d/graphical_results.html#create_images_from_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.graphical_results.create_images_from_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Will load the individual task (if possible) and plot the relavent images</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.graphical_results.plot_energy_evolution">
+<tt class="descclassname">simba3d.graphical_results.</tt><tt class="descname">plot_energy_evolution</tt><big>(</big><em>result</em>, <em>fig=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/graphical_results.html#plot_energy_evolution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.graphical_results.plot_energy_evolution" title="Permalink to this definition">¶</a></dt>
+<dd><p>plot the evolution</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.graphical_results.plot_estimated_curve">
+<tt class="descclassname">simba3d.graphical_results.</tt><tt class="descname">plot_estimated_curve</tt><big>(</big><em>result</em>, <em>ax=None</em>, <em>fig=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/graphical_results.html#plot_estimated_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.graphical_results.plot_estimated_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>plot the estimated curve stored in the instance</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.graphical_results.plot_initialized_curve">
+<tt class="descclassname">simba3d.graphical_results.</tt><tt class="descname">plot_initialized_curve</tt><big>(</big><em>result</em>, <em>ax=None</em>, <em>fig=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/graphical_results.html#plot_initialized_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.graphical_results.plot_initialized_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>plot the curve used to initiailize the gradient ascent algorithm</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simba3d.matrixlabish">
+<span id="matrixlabish-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">matrixlabish</span></tt> Module<a class="headerlink" href="#module-simba3d.matrixlabish" title="Permalink to this headline">¶</a></h2>
+<p>An assortment of low level functions that I use. Some of them resemble functions similiar to a popular matrix laboratory.</p>
+<dl class="function">
+<dt id="simba3d.matrixlabish.cls">
+<tt class="descclassname">simba3d.matrixlabish.</tt><tt class="descname">cls</tt><big>(</big><big>)</big><a class="headerlink" href="#simba3d.matrixlabish.cls" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="simba3d.matrixlabish.differencematrix">
+<tt class="descclassname">simba3d.matrixlabish.</tt><tt class="descname">differencematrix</tt><big>(</big><em>p0</em>, <em>p1=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#differencematrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.differencematrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>given two sets of points p0 (mX2 array) and p1 (nX2 array), compute the pairwise differance matrixes xdiff,ydiff (mXn arrays)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.matrixlabish.distancematrix">
+<tt class="descclassname">simba3d.matrixlabish.</tt><tt class="descname">distancematrix</tt><big>(</big><em>p0</em>, <em>p1=None</em>, <em>getangles=False</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#distancematrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.distancematrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>given two sets of points p0 (mX2 array) and p1 (nX2 array), compute the pairwise distance matrix D (mXn arra)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.matrixlabish.file_len">
+<tt class="descclassname">simba3d.matrixlabish.</tt><tt class="descname">file_len</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#file_len"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.file_len" title="Permalink to this definition">¶</a></dt>
+<dd><p>This counts the length of a file. Just got threwn in here because it is low level</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.matrixlabish.float_range">
+<tt class="descclassname">simba3d.matrixlabish.</tt><tt class="descname">float_range</tt><big>(</big><em>start</em>, <em>step</em>, <em>stop</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#float_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.float_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that mimics the start:step:stop</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="simba3d.matrixlabish.getlines">
+<em class="property">class </em><tt class="descclassname">simba3d.matrixlabish.</tt><tt class="descname">getlines</tt><big>(</big><em>fig</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#getlines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.getlines" title="Permalink to this definition">¶</a></dt>
+<dd><p>like getpts, but with line in between</p>
+<dl class="method">
+<dt id="simba3d.matrixlabish.getlines.on_click">
+<tt class="descname">on_click</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#getlines.on_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.getlines.on_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simba3d.matrixlabish.getlines.on_key">
+<tt class="descname">on_key</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#getlines.on_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.getlines.on_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="simba3d.matrixlabish.getpts">
+<em class="property">class </em><tt class="descclassname">simba3d.matrixlabish.</tt><tt class="descname">getpts</tt><big>(</big><em>fig</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#getpts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.getpts" title="Permalink to this definition">¶</a></dt>
+<dd><p>like getpts</p>
+<dl class="method">
+<dt id="simba3d.matrixlabish.getpts.on_click">
+<tt class="descname">on_click</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#getpts.on_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.getpts.on_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simba3d.matrixlabish.getpts.on_key">
+<tt class="descname">on_key</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#getpts.on_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.getpts.on_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="simba3d.matrixlabish.getptstk">
+<em class="property">class </em><tt class="descclassname">simba3d.matrixlabish.</tt><tt class="descname">getptstk</tt><big>(</big><em>fig</em>, <em>tk</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#getptstk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.getptstk" title="Permalink to this definition">¶</a></dt>
+<dd><p>like getpts</p>
+<dl class="method">
+<dt id="simba3d.matrixlabish.getptstk.on_click">
+<tt class="descname">on_click</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#getptstk.on_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.getptstk.on_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simba3d.matrixlabish.getptstk.on_key">
+<tt class="descname">on_key</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#getptstk.on_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.getptstk.on_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.matrixlabish.keyboard">
+<tt class="descclassname">simba3d.matrixlabish.</tt><tt class="descname">keyboard</tt><big>(</big><em>banner=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#keyboard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.keyboard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that mimics the keyboard command</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.matrixlabish.significant_figures">
+<tt class="descclassname">simba3d.matrixlabish.</tt><tt class="descname">significant_figures</tt><big>(</big><em>x</em>, <em>sig=4</em><big>)</big><a class="reference internal" href="_modules/simba3d/matrixlabish.html#significant_figures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.matrixlabish.significant_figures" title="Permalink to this definition">¶</a></dt>
+<dd><p>create string without decimal points for file names</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.matrixlabish.whos">
+<tt class="descclassname">simba3d.matrixlabish.</tt><tt class="descname">whos</tt><big>(</big><big>)</big><a class="headerlink" href="#simba3d.matrixlabish.whos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-simba3d.mp_manager">
+<span id="mp-manager-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">mp_manager</span></tt> Module<a class="headerlink" href="#module-simba3d.mp_manager" title="Permalink to this headline">¶</a></h2>
+<p>Simplified multi processing wrapper for simba3d</p>
+<p>The mp_handler can be called by inputing a list of tasks and specifying the
+desired number of cores. Selecting the optimal number of cores can be a bit
+subjective. Generally, one uses the number of virtual cores available on the
+system.</p>
+<p>Created on Wed Sep 06 18:59:03 2017</p>
+<p>&#64;author: Michael Rosenthal</p>
+<dl class="function">
+<dt id="simba3d.mp_manager.convert">
+<tt class="descclassname">simba3d.mp_manager.</tt><tt class="descname">convert</tt><big>(</big><em>filename</em>, <em>ext_out='.npz'</em><big>)</big><a class="reference internal" href="_modules/simba3d/mp_manager.html#convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.mp_manager.convert" title="Permalink to this definition">¶</a></dt>
+<dd><p>convert .npz simba3d result into some other supported format</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.mp_manager.get_outputfilepath">
+<tt class="descclassname">simba3d.mp_manager.</tt><tt class="descname">get_outputfilepath</tt><big>(</big><em>task</em><big>)</big><a class="reference internal" href="_modules/simba3d/mp_manager.html#get_outputfilepath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.mp_manager.get_outputfilepath" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the output file path of a task</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.mp_manager.get_tag_name">
+<tt class="descclassname">simba3d.mp_manager.</tt><tt class="descname">get_tag_name</tt><big>(</big><em>task</em><big>)</big><a class="reference internal" href="_modules/simba3d/mp_manager.html#get_tag_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.mp_manager.get_tag_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a tag name (this may go away in future versions)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.mp_manager.jsonify">
+<tt class="descclassname">simba3d.mp_manager.</tt><tt class="descname">jsonify</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/simba3d/mp_manager.html#jsonify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.mp_manager.jsonify" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a small serializer for saving output in human readable json format</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.mp_manager.load_data">
+<tt class="descclassname">simba3d.mp_manager.</tt><tt class="descname">load_data</tt><big>(</big><em>task</em><big>)</big><a class="reference internal" href="_modules/simba3d/mp_manager.html#load_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.mp_manager.load_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>potential problem here, this only loads numpy arrays npy files</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.mp_manager.load_result">
+<tt class="descclassname">simba3d.mp_manager.</tt><tt class="descname">load_result</tt><big>(</big><em>outputfile</em><big>)</big><a class="reference internal" href="_modules/simba3d/mp_manager.html#load_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.mp_manager.load_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will load a simba3d result</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.mp_manager.mp_handler">
+<tt class="descclassname">simba3d.mp_manager.</tt><tt class="descname">mp_handler</tt><big>(</big><em>tasks</em>, <em>cores</em><big>)</big><a class="reference internal" href="_modules/simba3d/mp_manager.html#mp_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.mp_manager.mp_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>This handles the multi processing</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.mp_manager.mp_worker">
+<tt class="descclassname">simba3d.mp_manager.</tt><tt class="descname">mp_worker</tt><big>(</big><em>task</em><big>)</big><a class="reference internal" href="_modules/simba3d/mp_manager.html#mp_worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.mp_manager.mp_worker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="simba3d.mp_manager.run_task">
+<tt class="descclassname">simba3d.mp_manager.</tt><tt class="descname">run_task</tt><big>(</big><em>task</em><big>)</big><a class="reference internal" href="_modules/simba3d/mp_manager.html#run_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.mp_manager.run_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>run a singular task</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.mp_manager.run_tasks">
+<tt class="descclassname">simba3d.mp_manager.</tt><tt class="descname">run_tasks</tt><big>(</big><em>tasks</em>, <em>resume=True</em><big>)</big><a class="reference internal" href="_modules/simba3d/mp_manager.html#run_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.mp_manager.run_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>plural task runner.</p>
+<p>This runs a list of independent tasks and divides the work across multiple
+processes if desired.</p>
+<p>Ther resume option tells simba3d to skip over tasks with uuid&#8217;s that have
+already been ran.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.mp_manager.save_data">
+<tt class="descclassname">simba3d.mp_manager.</tt><tt class="descname">save_data</tt><big>(</big><em>outputfilepath</em>, <em>summary</em><big>)</big><a class="reference internal" href="_modules/simba3d/mp_manager.html#save_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.mp_manager.save_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will save a simba3d result</p>
+<p>Summary is the result of the experiment</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.mp_manager.summarize_results">
+<tt class="descclassname">simba3d.mp_manager.</tt><tt class="descname">summarize_results</tt><big>(</big><em>result</em>, <em>task</em><big>)</big><a class="reference internal" href="_modules/simba3d/mp_manager.html#summarize_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.mp_manager.summarize_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates a summary of the result as dict</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simba3d.optimizer">
+<span id="optimizer-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">optimizer</span></tt> Module<a class="headerlink" href="#module-simba3d.optimizer" title="Permalink to this headline">¶</a></h2>
+<p>Optimization tools are are defined here.</p>
+<p>A ptyhon class called opt_E manages the scipy optimize options and creates a 
+friendlier user interface.</p>
+<p>Created on Thu Apr 20 10:26:05 2017</p>
+<p>&#64;author: Michael Rosenthal</p>
+<dl class="function">
+<dt id="simba3d.optimizer.analytical_data_gradient">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">analytical_data_gradient</tt><big>(</big><em>curve</em>, <em>pairwise_contact_matrix</em>, <em>a</em>, <em>b</em>, <em>offdiag=1</em>, <em>idxmiss=None</em>, <em>idxlist=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#analytical_data_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.analytical_data_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute log-likelihood gradient analytically</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.analytical_data_gradient0">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">analytical_data_gradient0</tt><big>(</big><em>curve</em>, <em>pairwise_contact_matrix</em>, <em>a</em>, <em>b</em>, <em>index</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#analytical_data_gradient0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.analytical_data_gradient0" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute log-likelihood gradient analytically</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.analytical_roughness_gradient">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">analytical_roughness_gradient</tt><big>(</big><em>curve</em>, <em>S</em>, <em>term_weights</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#analytical_roughness_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.analytical_roughness_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>analytically compute the gradient of the roughness using the sparce S 
+matrix.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.compute_pairwise_distance">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">compute_pairwise_distance</tt><big>(</big><em>curve</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#compute_pairwise_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.compute_pairwise_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the pairwise distance matrix of a parametrized curve</p>
+<p>This function assumes that the longer dimension is the dimension of the 
+parameterization. The reason for this is to avoid errors caused by 
+transposing the matrix.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.create_S1">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">create_S1</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#create_S1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.create_S1" title="Permalink to this definition">¶</a></dt>
+<dd><p>create sparce matrix to quickly compute first order roughness gradient</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.create_S2">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">create_S2</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#create_S2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.create_S2" title="Permalink to this definition">¶</a></dt>
+<dd><p>create sparce matrix to quickly compute second order roughness gradient</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.dif">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">dif</tt><big>(</big><em>x1</em>, <em>x2</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#dif"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.dif" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.energy_roughness">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">energy_roughness</tt><big>(</big><em>curve</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#energy_roughness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.energy_roughness" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute roughness 1rst and 2nd order measure</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.energy_scale_invariant_first_roughness_gradient">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">energy_scale_invariant_first_roughness_gradient</tt><big>(</big><em>curve</em>, <em>S=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#energy_scale_invariant_first_roughness_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.energy_scale_invariant_first_roughness_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>scale invariant roughness penalty gradient</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.energy_scale_invariant_second_roughness_gradient">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">energy_scale_invariant_second_roughness_gradient</tt><big>(</big><em>curve</em>, <em>S=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#energy_scale_invariant_second_roughness_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.energy_scale_invariant_second_roughness_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>scale invariant roughness penalty gradient</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.energy_shape_prior">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">energy_shape_prior</tt><big>(</big><em>curve</em>, <em>shape_model</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#energy_shape_prior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.energy_shape_prior" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute energy and gradient of the shape prior</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.h1penalty">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">h1penalty</tt><big>(</big><em>curve</em>, <em>S1</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#h1penalty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.h1penalty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the h1 penalty and its gradient.</p>
+<p>The penalty can be interpreted as the sample variance of the normalized 
+curve</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.h2penalty">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">h2penalty</tt><big>(</big><em>curve</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#h2penalty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.h2penalty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the h2 penalty and its gradient.</p>
+<p>the average cos(   heta_i), where  heta_i is the angle between the 
+triplet (x_{i-1},x_i,x_{i+1}).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.listIndices">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">listIndices</tt><big>(</big><em>n</em>, <em>offdiag</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#listIndices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.listIndices" title="Permalink to this definition">¶</a></dt>
+<dd><p>List the pairs of index values (i,j) that indicate the upper triangular 
+entries of an n x n matrix.</p>
+<dl class="docutils">
+<dt>Inputs: </dt>
+<dd>n - The size of the square matrix. 
+offdiag - An integer value indicating the first off-diagonal to contain 
+usable data in the matrix C (usually offdiag = 1).</dd>
+<dt>Outputs: </dt>
+<dd>idx - An nchoosek(n,2) x 2 matrix consisting of the (i,j) index 
+combinations such that i&lt;j.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.loglikelihood_Varoquaux">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">loglikelihood_Varoquaux</tt><big>(</big><em>pairwise_distance_matrix</em>, <em>a</em>, <em>b</em>, <em>pairwise_contact_matrix</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#loglikelihood_Varoquaux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.loglikelihood_Varoquaux" title="Permalink to this definition">¶</a></dt>
+<dd><p>the loglikelihood function using the poisson model proposed in the 
+Varoquaux paper.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="simba3d.optimizer.opt_E">
+<em class="property">class </em><tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">opt_E</tt><big>(</big><em>data</em>, <em>parameters=None</em>, <em>options=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#opt_E"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.opt_E" title="Permalink to this definition">¶</a></dt>
+<dd><p>Primary optimization manager for simba3d</p>
+<p>This class manages defaults and data storage for the results. Basically,
+it is a wraper for the scipy optimizer, but it stores results and manages
+input parameters.</p>
+<dl class="method">
+<dt id="simba3d.optimizer.opt_E.accelerate_gradient_ascent_algorithm">
+<tt class="descname">accelerate_gradient_ascent_algorithm</tt><big>(</big><em>cbfun=None</em>, <em>options=None</em>, <em>delta0=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#opt_E.accelerate_gradient_ascent_algorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.opt_E.accelerate_gradient_ascent_algorithm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simba3d.optimizer.opt_E.callback">
+<tt class="descname">callback</tt><big>(</big><em>xk</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#opt_E.callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.opt_E.callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>lightweight callback without storing iterative result or printing iterative value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simba3d.optimizer.opt_E.callbackdisp">
+<tt class="descname">callbackdisp</tt><big>(</big><em>xk</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#opt_E.callbackdisp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.opt_E.callbackdisp" title="Permalink to this definition">¶</a></dt>
+<dd><p>display iteration during callback</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simba3d.optimizer.opt_E.callbackdispstore">
+<tt class="descname">callbackdispstore</tt><big>(</big><em>xk</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#opt_E.callbackdispstore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.opt_E.callbackdispstore" title="Permalink to this definition">¶</a></dt>
+<dd><p>display iteration during callback and store iterative result</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simba3d.optimizer.opt_E.callbackstore">
+<tt class="descname">callbackstore</tt><big>(</big><em>xk</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#opt_E.callbackstore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.opt_E.callbackstore" title="Permalink to this definition">¶</a></dt>
+<dd><p>store iterative result without displaying during iterations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simba3d.optimizer.opt_E.check_jacobian">
+<tt class="descname">check_jacobian</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#opt_E.check_jacobian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.opt_E.check_jacobian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simba3d.optimizer.opt_E.energy_jacobian">
+<tt class="descname">energy_jacobian</tt><big>(</big><em>curve</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#opt_E.energy_jacobian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.opt_E.energy_jacobian" title="Permalink to this definition">¶</a></dt>
+<dd><p>analytically compute energy and jacobian energy</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simba3d.optimizer.opt_E.get_data">
+<tt class="descname">get_data</tt><big>(</big><em>i</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#opt_E.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.opt_E.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>get_data function call for creating animation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simba3d.optimizer.opt_E.just_energy">
+<tt class="descname">just_energy</tt><big>(</big><em>curve</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#opt_E.just_energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.opt_E.just_energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simba3d.optimizer.opt_E.just_gradient">
+<tt class="descname">just_gradient</tt><big>(</big><em>curve</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#opt_E.just_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.opt_E.just_gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simba3d.optimizer.opt_E.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#opt_E.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.opt_E.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="simba3d.optimizer.opt_E.t">
+<tt class="descname">t</tt><em class="property"> = None</em><a class="headerlink" href="#simba3d.optimizer.opt_E.t" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>index is no longer used, it has been replaced with pairwise_combinations</dt>
+<dd><p class="first"># index of contact matrix to use in calculation of log-likelihood term
+if &#8216;index&#8217; not in data:</p>
+<blockquote class="last">
+<div>data[&#8216;index&#8217;]=np.triu(np.ones((self.n,self.n)),1)==1
+#print &#8220;No index provided for log-likelihood term!</div></blockquote>
+</dd>
+</dl>
+<p>&#8220;</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.parametrization_error">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">parametrization_error</tt><big>(</big><em>curve</em>, <em>true_square_root_speed=None</em>, <em>t=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#parametrization_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.parametrization_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Error of the curve parameterization given a square roor speed.</p>
+<p>If the true square root speed is not specified, then uniform speed is used 
+by default.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.penalized_log_likelihood">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">penalized_log_likelihood</tt><big>(</big><em>curve</em>, <em>t</em>, <em>pairwise_contact_matrix</em>, <em>a</em>, <em>b</em>, <em>term_weights</em>, <em>square_root_speed=None</em>, <em>pairwise_distance_matrix=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#penalized_log_likelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.penalized_log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>penalized log likelihood</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.optimizer.scale_initialized_curve">
+<tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">scale_initialized_curve</tt><big>(</big><em>curve</em>, <em>pairwise_contact_matrix</em>, <em>a</em>, <em>b</em>, <em>index</em>, <em>idxmiss</em><big>)</big><a class="reference internal" href="_modules/simba3d/optimizer.html#scale_initialized_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.scale_initialized_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>optimally scale the curve to the data for fewer iterations</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="simba3d.optimizer.stop_optimizing_exception">
+<em class="property">exception </em><tt class="descclassname">simba3d.optimizer.</tt><tt class="descname">stop_optimizing_exception</tt><a class="reference internal" href="_modules/simba3d/optimizer.html#stop_optimizing_exception"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.optimizer.stop_optimizing_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simba3d.plotting_tools">
+<span id="plotting-tools-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">plotting_tools</span></tt> Module<a class="headerlink" href="#module-simba3d.plotting_tools" title="Permalink to this headline">¶</a></h2>
+<p>I created some wrapers using matplotlib to make it feel more like a matrix 
+laboratory.</p>
+<p>Created on Fri Apr 21 12:36:46 2017</p>
+<p>&#64;author: Michael Rosenthal</p>
+<dl class="function">
+<dt id="simba3d.plotting_tools.matshow">
+<tt class="descclassname">simba3d.plotting_tools.</tt><tt class="descname">matshow</tt><big>(</big><em>matrix</em>, <em>fig=None</em>, <em>cmap='pink_r'</em><big>)</big><a class="reference internal" href="_modules/simba3d/plotting_tools.html#matshow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.plotting_tools.matshow" title="Permalink to this definition">¶</a></dt>
+<dd><p>plot a matrix as an image</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.plotting_tools.plot_curve">
+<tt class="descclassname">simba3d.plotting_tools.</tt><tt class="descname">plot_curve</tt><big>(</big><em>curve</em>, <em>t=None</em>, <em>ax=None</em>, <em>fig=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/plotting_tools.html#plot_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.plotting_tools.plot_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>plot a 2D or 3d parametrized curve</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.plotting_tools.plot_curves">
+<tt class="descclassname">simba3d.plotting_tools.</tt><tt class="descname">plot_curves</tt><big>(</big><em>curves</em>, <em>t=None</em>, <em>ax=None</em>, <em>fig=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/plotting_tools.html#plot_curves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.plotting_tools.plot_curves" title="Permalink to this definition">¶</a></dt>
+<dd><p>plot a list of 2D or 3d parametrized curves</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.plotting_tools.plot_pts">
+<tt class="descclassname">simba3d.plotting_tools.</tt><tt class="descname">plot_pts</tt><big>(</big><em>curve</em>, <em>t=None</em>, <em>ax=None</em>, <em>fig=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/plotting_tools.html#plot_pts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.plotting_tools.plot_pts" title="Permalink to this definition">¶</a></dt>
+<dd><p>plot a 2D or 3d parametrized curve</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.plotting_tools.set_axis_equal">
+<tt class="descclassname">simba3d.plotting_tools.</tt><tt class="descname">set_axis_equal</tt><big>(</big><em>ax</em>, <em>xlimit=None</em>, <em>ylimit=None</em>, <em>zlimit=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/plotting_tools.html#set_axis_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.plotting_tools.set_axis_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>set axis equal</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simba3d.print_result_summary">
+<span id="print-result-summary-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">print_result_summary</span></tt> Module<a class="headerlink" href="#module-simba3d.print_result_summary" title="Permalink to this headline">¶</a></h2>
+<p>command line tool to print parts of a simba3d output report file</p>
+<p>Created on Tue Jan 16 13:11:09 2018</p>
+<p>&#64;author: Michael Rosenthal</p>
+<dl class="function">
+<dt id="simba3d.print_result_summary.main">
+<tt class="descclassname">simba3d.print_result_summary.</tt><tt class="descname">main</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/print_result_summary.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.print_result_summary.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>main function call for the simba3d print utility</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.print_result_summary.printhelp">
+<tt class="descclassname">simba3d.print_result_summary.</tt><tt class="descname">printhelp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/simba3d/print_result_summary.html#printhelp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.print_result_summary.printhelp" title="Permalink to this definition">¶</a></dt>
+<dd><p>print the document options for the simba3d print utility</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simba3d.simba3d_taskrun">
+<span id="simba3d-taskrun-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">simba3d_taskrun</span></tt> Module<a class="headerlink" href="#module-simba3d.simba3d_taskrun" title="Permalink to this headline">¶</a></h2>
+<p>This contains the command line interface for simba3d.</p>
+<p>Created on Thu Sep 07 06:48:42 2017</p>
+<p>&#64;author: Michael Rosenthal</p>
+<dl class="function">
+<dt id="simba3d.simba3d_taskrun.main">
+<tt class="descclassname">simba3d.simba3d_taskrun.</tt><tt class="descname">main</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/simba3d_taskrun.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.simba3d_taskrun.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>main simba3d task run call</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.simba3d_taskrun.printhelp">
+<tt class="descclassname">simba3d.simba3d_taskrun.</tt><tt class="descname">printhelp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/simba3d/simba3d_taskrun.html#printhelp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.simba3d_taskrun.printhelp" title="Permalink to this definition">¶</a></dt>
+<dd><p>print document options for the simba3d taskrun command</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simba3d.simba3d_taskrun0">
+<span id="simba3d-taskrun0-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">simba3d_taskrun0</span></tt> Module<a class="headerlink" href="#module-simba3d.simba3d_taskrun0" title="Permalink to this headline">¶</a></h2>
+<p>This contains the command line interface for simba3d.</p>
+<p>I was asked to make command line options for all the inputs, so this is what
+the command line looked like before that change took place.</p>
+<p>Created on Thu Sep 07 06:48:42 2017</p>
+<p>&#64;author: Michael Rosenthal</p>
+<dl class="function">
+<dt id="simba3d.simba3d_taskrun0.main">
+<tt class="descclassname">simba3d.simba3d_taskrun0.</tt><tt class="descname">main</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/simba3d_taskrun0.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.simba3d_taskrun0.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="simba3d.simba3d_taskrun0.printhelp">
+<tt class="descclassname">simba3d.simba3d_taskrun0.</tt><tt class="descname">printhelp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/simba3d/simba3d_taskrun0.html#printhelp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.simba3d_taskrun0.printhelp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-simba3d.srvf_open_curve_Rn">
+<span id="srvf-open-curve-rn-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">srvf_open_curve_Rn</span></tt> Module<a class="headerlink" href="#module-simba3d.srvf_open_curve_Rn" title="Permalink to this headline">¶</a></h2>
+<p>Square Root Velocity Function tools for open curve in R^n</p>
+<p>Incomplete module</p>
+<p>&#64;author: Michael Rosenthal</p>
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.InnerProd_Q">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">InnerProd_Q</tt><big>(</big><em>q1</em>, <em>q2</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#InnerProd_Q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.InnerProd_Q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inner product in the Q space</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.center_curve">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">center_curve</tt><big>(</big><em>curve</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#center_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.center_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>center the curve to the origin</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.curve_to_psi">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">curve_to_psi</tt><big>(</big><em>curve</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#curve_to_psi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.curve_to_psi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Curve to square root speed function</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.curve_to_q">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">curve_to_q</tt><big>(</big><em>curve</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#curve_to_q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.curve_to_q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert function from square root velocity space back to the original function space</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.extrap">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">extrap</tt><big>(</big><em>x</em>, <em>xp</em>, <em>yp</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#extrap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.extrap" title="Permalink to this definition">¶</a></dt>
+<dd><p>np.interp with linear extrapolation</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.find_best_ortho">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">find_best_ortho</tt><big>(</big><em>curve1</em>, <em>curve2</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#find_best_ortho"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.find_best_ortho" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimally rotate or reflect the second curve to the first curve</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.find_best_rotation">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">find_best_rotation</tt><big>(</big><em>curve1</em>, <em>curve2</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#find_best_rotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.find_best_rotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimally rotate the second curve to the first curve</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.gradient">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">gradient</tt><big>(</big><em>curve</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>row-wise gradient for unifromly sampled curve</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.interp">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">interp</tt><big>(</big><em>t</em>, <em>X</em>, <em>tnew=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#interp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.interp" title="Permalink to this definition">¶</a></dt>
+<dd><p>interpolation with linear extrapoltion</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.length">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">length</tt><big>(</big><em>curve</em>, <em>t=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the length of a parametrized curve</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.q_to_curve">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">q_to_curve</tt><big>(</big><em>q</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#q_to_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.q_to_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert function from square root velocity space back to the original function space</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.resample_curve">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">resample_curve</tt><big>(</big><em>curve</em>, <em>N</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#resample_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.resample_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>resample a parametrized curve uniformly at N time points</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.roughness2">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">roughness2</tt><big>(</big><em>curve</em>, <em>t=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#roughness2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.roughness2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the first (same as length) and second order roughness measure of a 
+parametrized curve</p>
+<p>The first and second order gradient are computed numerically, and the 
+roughness measure is simply the Frobenious norm of first and second order
+gradients.</p>
+<p>If the temperal parametrization t is not specified then the curve is 
+assumed to be parametrized uniformly over the interval [0,1]</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.scale_curve">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">scale_curve</tt><big>(</big><em>curve</em>, <em>t=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#scale_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.scale_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale a curve to unit length</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.standardize_curves">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">standardize_curves</tt><big>(</big><em>curves</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#standardize_curves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.standardize_curves" title="Permalink to this definition">¶</a></dt>
+<dd><p>First removes translation and scale, and then rotates the remaining curves to first curve.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_open_curve_Rn.standarize_curve">
+<tt class="descclassname">simba3d.srvf_open_curve_Rn.</tt><tt class="descname">standarize_curve</tt><big>(</big><em>curve</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_open_curve_Rn.html#standarize_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_open_curve_Rn.standarize_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>center the curve to the origin</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simba3d.srvf_pointcloud_Rn">
+<span id="srvf-pointcloud-rn-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">srvf_pointcloud_Rn</span></tt> Module<a class="headerlink" href="#module-simba3d.srvf_pointcloud_Rn" title="Permalink to this headline">¶</a></h2>
+<p>Square Root Velocity Function tools for landmark based point clouds</p>
+<p>Incomplete module</p>
+<p>&#64;author: Michael Rosenthal</p>
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.InnerProd_Q">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">InnerProd_Q</tt><big>(</big><em>q1</em>, <em>q2</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#InnerProd_Q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.InnerProd_Q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inner product in the Q space</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.center_curve">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">center_curve</tt><big>(</big><em>curve</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#center_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.center_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>center the curve to the origin</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.curve_to_psi">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">curve_to_psi</tt><big>(</big><em>curve</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#curve_to_psi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.curve_to_psi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Curve to square root speed function</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.curve_to_q">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">curve_to_q</tt><big>(</big><em>curve</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#curve_to_q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.curve_to_q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert function from square root velocity space back to the original function space</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.extrap">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">extrap</tt><big>(</big><em>x</em>, <em>xp</em>, <em>yp</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#extrap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.extrap" title="Permalink to this definition">¶</a></dt>
+<dd><p>np.interp with linear extrapolation</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.find_best_ortho">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">find_best_ortho</tt><big>(</big><em>curve1</em>, <em>curve2</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#find_best_ortho"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.find_best_ortho" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimally orthogonally transformation the second curve to the first curve</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.find_best_rotation">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">find_best_rotation</tt><big>(</big><em>curve1</em>, <em>curve2</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#find_best_rotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.find_best_rotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimally rotate the second curve to the first curve</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.gradient">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">gradient</tt><big>(</big><em>curve</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>row-wise gradient for unifromly sampled curve</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.interp">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">interp</tt><big>(</big><em>t</em>, <em>X</em>, <em>tnew=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#interp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.interp" title="Permalink to this definition">¶</a></dt>
+<dd><p>interpolation with linear extrapoltion</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.length">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">length</tt><big>(</big><em>curve</em>, <em>t=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the length of a parametrized curve</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.q_to_curve">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">q_to_curve</tt><big>(</big><em>q</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#q_to_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.q_to_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert function from square root velocity space back to the original function space</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.resample_curve">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">resample_curve</tt><big>(</big><em>curve</em>, <em>N</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#resample_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.resample_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>resample a parametrized curve uniformly at N time points</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.roughness2">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">roughness2</tt><big>(</big><em>curve</em>, <em>t=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#roughness2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.roughness2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the first (same as length) and second order roughness measure of a 
+parametrized curve</p>
+<p>The first and second order gradient are computed numerically, and the 
+roughness measure is simply the Frobenious norm of first and second order
+gradients.</p>
+<p>If the temperal parametrization t is not specified then the curve is 
+assumed to be parametrized uniformly over the interval [0,1]</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.scale_curve">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">scale_curve</tt><big>(</big><em>curve</em>, <em>t=None</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#scale_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.scale_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale a curve to unit length</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.standardize_curves">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">standardize_curves</tt><big>(</big><em>curves</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#standardize_curves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.standardize_curves" title="Permalink to this definition">¶</a></dt>
+<dd><p>First removes translation and scale, and then rotates the remaining curves to first curve.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.srvf_pointcloud_Rn.standarize_curve">
+<tt class="descclassname">simba3d.srvf_pointcloud_Rn.</tt><tt class="descname">standarize_curve</tt><big>(</big><em>curve</em><big>)</big><a class="reference internal" href="_modules/simba3d/srvf_pointcloud_Rn.html#standarize_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.srvf_pointcloud_Rn.standarize_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>center the curve to the origin and scale it</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-simba3d.uuid_check">
+<span id="uuid-check-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">uuid_check</span></tt> Module<a class="headerlink" href="#module-simba3d.uuid_check" title="Permalink to this headline">¶</a></h2>
+<p>Tools for checking if a file with a specific uuid already exists</p>
+<p>Created on Tue Oct  3 08:51:56 2017</p>
+<p>&#64;author: Michael Rosenthal</p>
+<dl class="function">
+<dt id="simba3d.uuid_check.check_status">
+<tt class="descclassname">simba3d.uuid_check.</tt><tt class="descname">check_status</tt><big>(</big><em>tasks</em><big>)</big><a class="reference internal" href="_modules/simba3d/uuid_check.html#check_status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.uuid_check.check_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks each task in a list of task has not already been completed.</p>
+<p>returns the number of task finish and the total number of task for each
+subtask</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.uuid_check.check_tasks">
+<tt class="descclassname">simba3d.uuid_check.</tt><tt class="descname">check_tasks</tt><big>(</big><em>tasks</em><big>)</big><a class="reference internal" href="_modules/simba3d/uuid_check.html#check_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.uuid_check.check_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks each task in a list of task has not already been completed</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.uuid_check.check_tasks_index">
+<tt class="descclassname">simba3d.uuid_check.</tt><tt class="descname">check_tasks_index</tt><big>(</big><em>tasks</em><big>)</big><a class="reference internal" href="_modules/simba3d/uuid_check.html#check_tasks_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.uuid_check.check_tasks_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks each task in a list of task has not already been completed and returns integer index of remaining tasks</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.uuid_check.check_tasks_indexs">
+<tt class="descclassname">simba3d.uuid_check.</tt><tt class="descname">check_tasks_indexs</tt><big>(</big><em>tasks</em><big>)</big><a class="reference internal" href="_modules/simba3d/uuid_check.html#check_tasks_indexs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.uuid_check.check_tasks_indexs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks each task in a list of task has not already been completed and returns integer index of remaining tasks</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.uuid_check.get_remaining_tasks">
+<tt class="descclassname">simba3d.uuid_check.</tt><tt class="descname">get_remaining_tasks</tt><big>(</big><em>taskfilepath</em>, <em>results_dir</em><big>)</big><a class="reference internal" href="_modules/simba3d/uuid_check.html#get_remaining_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.uuid_check.get_remaining_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find tasks in the taskfilepath that are not in the results_dir directory.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.uuid_check.get_uuid_from_directory">
+<tt class="descclassname">simba3d.uuid_check.</tt><tt class="descname">get_uuid_from_directory</tt><big>(</big><em>results_dir</em><big>)</big><a class="reference internal" href="_modules/simba3d/uuid_check.html#get_uuid_from_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.uuid_check.get_uuid_from_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>load all the files in the specified results directory and extract the uuid.</p>
+<p>This is useful for determining which files have already been run.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.uuid_check.get_uuid_from_tasklist">
+<tt class="descclassname">simba3d.uuid_check.</tt><tt class="descname">get_uuid_from_tasklist</tt><big>(</big><em>taskfilepath</em><big>)</big><a class="reference internal" href="_modules/simba3d/uuid_check.html#get_uuid_from_tasklist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.uuid_check.get_uuid_from_tasklist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a tasklist and get all the uuid</p>
+<p>This is useful for determining which files have already been run.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.uuid_check.get_uuid_from_tasks">
+<tt class="descclassname">simba3d.uuid_check.</tt><tt class="descname">get_uuid_from_tasks</tt><big>(</big><em>tasks</em><big>)</big><a class="reference internal" href="_modules/simba3d/uuid_check.html#get_uuid_from_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.uuid_check.get_uuid_from_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find uuid of tasks in the already load list of tasks</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simba3d.uuid_check.get_uuid_remaining_tasks">
+<tt class="descclassname">simba3d.uuid_check.</tt><tt class="descname">get_uuid_remaining_tasks</tt><big>(</big><em>taskfilepath</em>, <em>results_dir</em><big>)</big><a class="reference internal" href="_modules/simba3d/uuid_check.html#get_uuid_remaining_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simba3d.uuid_check.get_uuid_remaining_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find uuid of tasks in the taskfilepath that are not in the
+results_dir directory.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">simba3d Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">simba3d</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-simba3d.convertion_tool"><tt class="docutils literal"><span class="pre">convertion_tool</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-simba3d.display_results"><tt class="docutils literal"><span class="pre">display_results</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-simba3d.graphical_results"><tt class="docutils literal"><span class="pre">graphical_results</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-simba3d.matrixlabish"><tt class="docutils literal"><span class="pre">matrixlabish</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-simba3d.mp_manager"><tt class="docutils literal"><span class="pre">mp_manager</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-simba3d.optimizer"><tt class="docutils literal"><span class="pre">optimizer</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-simba3d.plotting_tools"><tt class="docutils literal"><span class="pre">plotting_tools</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-simba3d.print_result_summary"><tt class="docutils literal"><span class="pre">print_result_summary</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-simba3d.simba3d_taskrun"><tt class="docutils literal"><span class="pre">simba3d_taskrun</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-simba3d.simba3d_taskrun0"><tt class="docutils literal"><span class="pre">simba3d_taskrun0</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-simba3d.srvf_open_curve_Rn"><tt class="docutils literal"><span class="pre">srvf_open_curve_Rn</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-simba3d.srvf_pointcloud_Rn"><tt class="docutils literal"><span class="pre">srvf_pointcloud_Rn</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-simba3d.uuid_check"><tt class="docutils literal"><span class="pre">uuid_check</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="setup.html"
+                        title="previous chapter">setup Module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/simba3d.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="setup.html" title="setup Module"
+             >previous</a> |</li>
+        <li><a href="index.html">simba3d 0.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Author.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

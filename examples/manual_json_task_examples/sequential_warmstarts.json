@@ -1,0 +1,64 @@
+[
+    [
+      {
+      "usewarmstarts":true,
+      "taskname":"first sequential warmstart task",
+      "description":"first subtask of the sequence",
+      "uuid":"aegysrheyuw35asytsj5-0",
+      "file_names": {
+          "inputdir": "./",
+          "outputdir": "./",
+          "pairwise_contact_matrix":"simulated_contact_matrix.npy",
+          "initialized_curve" : "initialized_curve.npy"
+          },
+       "options": {
+              "display": true,
+              "gradient tolerance": 1e-05,
+              "maxitr": 100000,
+              "method": "default",
+              "store": false
+          },
+       "parameters": {
+              "a": -3.0,
+              "b": 1.0,
+              "term_weights": {
+                  "data": 1.0,
+                  "population prior": 0.0,
+                  "shape prior": 0.0,
+                  "smoothing": 1.0,
+                  "uniform spacing": 1.0
+              }
+          }
+      },
+      {
+      "usewarmstarts":true,
+      "taskname":"second sequential warmstart task",
+      "description":"second subtask of the sequence to be finished after the first is done",
+      "uuid":"aegysrheyuw35asytsj5-1",
+      "file_names": {
+          "inputdir": "./",
+          "outputdir": "./",
+          "pairwise_contact_matrix":"simulated_contact_matrix.npy",
+          "initialized_curve" : "initialized_curve.npy"
+          },
+       "options": {
+              "display": true,
+              "gradient tolerance": 1e-05,
+              "maxitr": 100000,
+              "method": "default",
+              "store": false
+          },
+       "parameters": {
+              "a": -3.0,
+              "b": 1.0,
+              "term_weights": {
+                  "data": 1.0,
+                  "population prior": 0.0,
+                  "shape prior": 0.0,
+                  "smoothing": 1.0,
+                  "uniform spacing": 0.0
+              }
+          }
+      }
+    ]
+]

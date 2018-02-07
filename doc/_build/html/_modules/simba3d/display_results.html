@@ -1,0 +1,254 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>simba3d.display_results &mdash; simba3d 0.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="simba3d 0.0.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">simba3d 0.0.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for simba3d.display_results</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A quick graphical display of a simba3d .npz result</span>
+
+<span class="sd">Created on Thu Sep 14 14:40:13 2017</span>
+
+<span class="sd">@author: Michael Rosenthal</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">loadmat</span><span class="p">,</span> <span class="n">savemat</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s">&#39;TkAgg&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="kn">import</span> <span class="nn">simba3d.plotting_tools</span> <span class="kn">as</span> <span class="nn">pt</span>
+<span class="kn">import</span> <span class="nn">simba3d.srvf_open_curve_Rn</span> <span class="kn">as</span> <span class="nn">srvf</span>
+<span class="kn">import</span> <span class="nn">simba3d.mp_manager</span> <span class="kn">as</span> <span class="nn">mp</span>
+<span class="kn">from</span> <span class="nn">simba3d.matrixlabish</span> <span class="kn">import</span> <span class="n">significant_figures</span><span class="p">,</span><span class="n">keyboard</span>
+
+
+<span class="c">#%%</span>
+<div class="viewcode-block" id="printhelp"><a class="viewcode-back" href="../../simba3d.html#simba3d.display_results.printhelp">[docs]</a><span class="k">def</span> <span class="nf">printhelp</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    print the document options for the simba3d display command line utility</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span> <span class="s">&#39;Graphically display results collected by simba3d&#39;</span>
+    <span class="k">print</span> <span class="s">&#39;simba3d-disp [options] -i &lt;result files&gt;&#39;</span>
+    <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">-i or --input-files  &lt;result files&gt; &#39;</span>
+    <span class="k">print</span> <span class="s">&#39;[Options]&#39;</span>
+    <span class="k">print</span> <span class="s">&#39;-c or --center-to &lt;result filename to center plots to&gt;&#39;</span>
+    <span class="c">#print &#39;-f or --filter &lt;string parameter name&gt; &lt;minimum value&gt; &lt;maximum value&gt;&#39;</span></div>
+<div class="viewcode-block" id="result_passes_filter"><a class="viewcode-back" href="../../simba3d.html#simba3d.display_results.result_passes_filter">[docs]</a><span class="k">def</span> <span class="nf">result_passes_filter</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span><span class="n">param_name</span><span class="p">,</span><span class="n">param_min</span><span class="p">,</span><span class="n">param_max</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This will check if the parameter is between the two specified values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">passes_filter</span><span class="o">=</span><span class="bp">True</span>
+    <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">param_name</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">param_name</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">:</span>
+            <span class="n">passes_filter</span><span class="o">*=</span><span class="n">summary</span><span class="p">[</span><span class="n">param_name</span><span class="p">[</span><span class="n">ii</span><span class="p">]]</span><span class="o">&gt;=</span><span class="n">param_min</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+            <span class="n">passes_filter</span><span class="o">*=</span><span class="n">summary</span><span class="p">[</span><span class="n">param_name</span><span class="p">[</span><span class="n">ii</span><span class="p">]]</span><span class="o">&lt;=</span><span class="n">param_max</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">passes_filter</span></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../simba3d.html#simba3d.display_results.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    main function for the simba3d display command line utility</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+       <span class="n">args</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[:]</span>
+    <span class="n">ii</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+    <span class="n">param_name</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">param_min</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">param_max</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">center_to_filename</span><span class="o">=</span><span class="bp">None</span><span class="p">;</span>
+    <span class="k">while</span> <span class="n">ii</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;-h&#39;</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--help&#39;</span><span class="p">):</span>
+           <span class="n">printhelp</span><span class="p">()</span>
+           <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;-f&#39;</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--filter&#39;</span><span class="p">):</span> 
+            <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span> 
+            <span class="n">param_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]))</span>
+            <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span> 
+            <span class="n">param_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]))</span>
+            <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span> 
+            <span class="n">param_max</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>   <span class="p">)</span>      
+        <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;-c&#39;</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--center-to&#39;</span><span class="p">):</span> 
+            <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span> 
+            <span class="n">center_to_filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>      
+        <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;-i&#39;</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--input-files&#39;</span><span class="p">):</span>           
+           <span class="n">inputfiles</span><span class="o">=</span><span class="p">[]</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="k">while</span> <span class="n">ii</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+               <span class="n">inputfiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>
+               <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>  
+
+        <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+    <span class="c">#print inputfiles</span>
+    <span class="n">curves</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">scurves</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">length</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">energy</span><span class="o">=</span><span class="p">[]</span>    
+    
+    <span class="c"># specify the file all the other figures will rotate to</span>
+    <span class="k">if</span> <span class="n">center_to_filename</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">center_to_filename</span><span class="o">=</span><span class="n">inputfiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">summary</span><span class="o">=</span><span class="n">mp</span><span class="o">.</span><span class="n">load_result</span><span class="p">(</span><span class="n">center_to_filename</span><span class="p">)</span>
+    <span class="n">X0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s">&#39;X_evol&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c"># get the last curve</span>
+    <span class="c"># get dimension</span>
+    <span class="k">if</span> <span class="s">&#39;d&#39;</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">:</span>
+        <span class="n">d</span><span class="o">=</span><span class="n">summary</span><span class="p">[</span><span class="s">&#39;d&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">d</span><span class="p">,</span><span class="n">n0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">X0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s">&#39;n&#39;</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">:</span>
+        <span class="n">n</span><span class="o">=</span><span class="n">summary</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">d</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">X0</span><span class="p">)</span>
+    <span class="n">X0</span><span class="o">=</span><span class="n">X0</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">d</span><span class="p">,</span><span class="n">n</span><span class="p">))</span> <span class="c"># correct dimensions</span>
+    <span class="n">center_curve</span><span class="p">,</span><span class="n">mu</span><span class="o">=</span><span class="n">srvf</span><span class="o">.</span><span class="n">center_curve</span><span class="p">(</span><span class="n">X0</span><span class="p">)</span>
+    <span class="n">scenter_curve</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="n">srvf</span><span class="o">.</span><span class="n">scale_curve</span><span class="p">(</span><span class="n">center_curve</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">inputfile</span> <span class="ow">in</span> <span class="n">inputfiles</span><span class="p">:</span>
+        <span class="n">summary</span><span class="o">=</span><span class="n">mp</span><span class="o">.</span><span class="n">load_result</span><span class="p">(</span><span class="n">inputfile</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result_passes_filter</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span><span class="n">param_name</span><span class="p">,</span><span class="n">param_min</span><span class="p">,</span><span class="n">param_max</span><span class="p">):</span>
+            <span class="c">#print summary.keys()</span>
+            <span class="k">if</span> <span class="s">&#39;uuid&#39;</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">:</span>
+              <span class="k">print</span> <span class="n">summary</span><span class="p">[</span><span class="s">&#39;uuid&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s">&#39;E_evol&#39;</span><span class="ow">in</span> <span class="n">summary</span><span class="p">:</span>
+                <span class="n">energy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s">&#39;E_evol&#39;</span><span class="p">])</span>
+                <span class="c">#print summary.keys()</span>
+            <span class="k">if</span> <span class="s">&#39;X_evol&#39;</span><span class="ow">in</span> <span class="n">summary</span><span class="p">:</span>
+                <span class="n">X0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s">&#39;X_evol&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c"># get the last curve</span>
+                <span class="c"># get dimension</span>
+                <span class="k">if</span> <span class="s">&#39;d&#39;</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">:</span>
+                    <span class="n">d</span><span class="o">=</span><span class="n">summary</span><span class="p">[</span><span class="s">&#39;d&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">d</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">X0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s">&#39;n&#39;</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">:</span>
+                    <span class="n">n</span><span class="o">=</span><span class="n">summary</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">d</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">X0</span><span class="p">)</span>
+                <span class="n">X0</span><span class="o">=</span><span class="n">X0</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">d</span><span class="p">,</span><span class="n">n</span><span class="p">))</span> <span class="c"># correct dimensions</span>
+                <span class="n">curves</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X0</span><span class="p">)</span>
+                <span class="n">length</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                
+                <span class="n">curve</span><span class="p">,</span><span class="n">mu</span><span class="o">=</span><span class="n">srvf</span><span class="o">.</span><span class="n">center_curve</span><span class="p">(</span><span class="n">curves</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">scurve</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="n">srvf</span><span class="o">.</span><span class="n">scale_curve</span><span class="p">(</span><span class="n">curves</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">scurves</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scurve</span><span class="p">)</span>
+                <span class="n">scurve</span><span class="p">,</span><span class="n">rot</span><span class="o">=</span><span class="n">srvf</span><span class="o">.</span><span class="n">find_best_rotation</span><span class="p">(</span><span class="n">scenter_curve</span><span class="p">,</span><span class="n">scurve</span><span class="p">)</span>
+                <span class="n">scurves</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">scurve</span>    
+                
+   
+    <span class="c">#plt.subplots_adjust(left=0.0,right=1.0,bottom=0.0,top=1.0,wspace=0.0,hspace=0.0) </span>
+    <span class="k">if</span> <span class="n">energy</span><span class="p">:</span>
+        <span class="n">fig1</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span> 
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">energy</span><span class="p">)):</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">fig1</span><span class="o">.</span><span class="n">number</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">energy</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>
+        
+        <span class="n">fig2</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>    
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span><span class="n">right</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span><span class="n">bottom</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span><span class="n">top</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span><span class="n">wspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="c">#fig2.tight_layout()</span>
+        <span class="n">ax2</span><span class="o">=</span><span class="n">fig2</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span><span class="n">projection</span><span class="o">=</span><span class="s">&#39;3d&#39;</span><span class="p">)</span>        
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>  
+        <span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">n</span><span class="p">)</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">scurves</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">t</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">pt</span><span class="o">.</span><span class="n">plot_curves</span><span class="p">(</span><span class="n">scurves</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span><span class="n">fig</span><span class="o">=</span><span class="n">fig2</span><span class="p">)</span>
+        <span class="c">#pt.plot_pts(summary[&#39;X_evol&#39;][-1],t,ax=ax2,fig=fig2)</span>
+        <span class="c">#print summary.keys()  </span>
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">scurves</span><span class="p">)):</span>
+            <span class="n">pt</span><span class="o">.</span><span class="n">plot_pts</span><span class="p">(</span><span class="n">scurves</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span><span class="n">t</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span><span class="n">fig</span><span class="o">=</span><span class="n">fig2</span><span class="p">)</span>   
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">fig2</span><span class="o">.</span><span class="n">number</span><span class="p">)</span>            
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;No file specified matches filter requirements&quot;</span></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+   <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/logo.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">simba3d 0.0.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Author.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

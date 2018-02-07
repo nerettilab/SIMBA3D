@@ -1,0 +1,20 @@
+[
+    {
+    "file_names": {
+       "inputdir":"data/",
+       "pairwise_contact_matrix":"simulated_contact_matrix.npy",
+       "outputdir":"results/"
+      },
+     "parameters": {
+            "a": -3.0,
+            "b": 1.0,
+            "term_weights": {
+                "data": 1.0,
+                "population prior": 0.0,
+                "shape prior": 0.0,
+                "smoothing": 1.0,
+                "uniform spacing": 1.0
+            }
+        }
+    }
+]

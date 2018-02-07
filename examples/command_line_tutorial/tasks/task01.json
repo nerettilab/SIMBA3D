@@ -1,0 +1,9 @@
+[
+    {
+    "file_names": {
+       "inputdir":"data/",
+       "pairwise_contact_matrix":"simulated_contact_matrix.npy",
+       "outputdir":"results/"
+      }
+    }
+]

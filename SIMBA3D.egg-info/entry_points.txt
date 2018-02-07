@@ -1,0 +1,6 @@
+[console_scripts]
+simba3d = simba3d.simba3d_taskrun:main
+simba3d-disp = simba3d.display_results:main
+simba3d-convertion = simba3d.convertion_tool:main
+simba3d-print = simba3d.print_result_summary:main
+

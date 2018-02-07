@@ -1,0 +1,352 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>simba3d.simba3d_taskrun &mdash; simba3d 0.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="simba3d 0.0.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">simba3d 0.0.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for simba3d.simba3d_taskrun</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This contains the command line interface for simba3d.</span>
+
+<span class="sd">Created on Thu Sep 07 06:48:42 2017</span>
+
+<span class="sd">@author: Michael Rosenthal</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c"># import simplejson or json</span>
+<span class="c">#</span>
+<span class="c"># This is useful because the syntax is pythonic, it&#39;s human readable, and it</span>
+<span class="c"># can be read by other programs in other languages.</span>
+<span class="c">#</span>
+<span class="c"># json is potentially and older version of simplejson which is updated more </span>
+<span class="c"># frequently than Python</span>
+<span class="c">#</span>
+<span class="c"># A good practice is to use one or the other as a fallback.</span>
+<span class="k">try</span><span class="p">:</span> <span class="kn">import</span> <span class="nn">simplejson</span> <span class="kn">as</span> <span class="nn">json</span> <span class="c"># try to import simplejson</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span> <span class="kn">import</span> <span class="nn">json</span> <span class="c">#otherwise import json</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">simba3d.mp_manager</span> <span class="kn">as</span> <span class="nn">mp</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">simba3d.matrixlabish</span> <span class="kn">import</span> <span class="n">significant_figures</span><span class="p">,</span><span class="n">keyboard</span>
+
+<span class="c">#print &#39;Number of arguments:&#39;, len(sys.argv), &#39;arguments.&#39;</span>
+<span class="c">#print &#39;Argument List:&#39;, str(sys.argv)</span>
+
+<span class="c">#%%</span>
+<div class="viewcode-block" id="printhelp"><a class="viewcode-back" href="../../simba3d.html#simba3d.simba3d_taskrun.printhelp">[docs]</a><span class="k">def</span> <span class="nf">printhelp</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    print document options for the simba3d taskrun command</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">print</span> <span class="s">&#39;To apply multiprocessing to a list of tasks specify # of cores and a json tasklist&#39;</span>
+    <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">-c &lt;number_of_cores&gt; &#39;</span>
+    <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">-r &lt;json_tasklist_file&gt;&#39;</span>
+    <span class="k">print</span> <span class="s">&#39;&#39;</span>
+    <span class="k">print</span> <span class="s">&#39;Alternatively, to specify a single run, specify file and parameter options:&#39;</span>    
+    <span class="n">filename_option_descriptions</span><span class="o">=</span><span class="p">{</span>   
+            <span class="s">&#39;--inputdir&#39;</span><span class="p">:</span>
+                <span class="s">&#39;local dircetory for data input files (for simplier relative paths)&#39;</span><span class="p">,</span>
+            <span class="s">&#39;--outputdir&#39;</span>  <span class="p">:</span>   
+                <span class="s">&#39;local dircetory for data output files (for simplier relative paths)&#39;</span><span class="p">,</span>
+            <span class="s">&#39;--cm_file or --pairwise_contact_matrix&#39;</span><span class="p">:</span>  
+                <span class="s">&#39;contact matrix file (currently supports mat and npy files)&#39;</span><span class="p">,</span>
+            <span class="s">&#39;--population_contact_matrix&#39;</span><span class="p">:</span>
+                <span class="s">&#39;popullation data contact matrix file (currently supports mat and npy files)&#39;</span><span class="p">,</span>
+            <span class="s">&#39;--init_structure_file --initialized_curve&#39;</span><span class="p">:</span>
+                <span class="s">&#39;initialized 3D structure file (currently supports mat and npy files)&#39;</span><span class="p">,</span>
+            <span class="s">&#39;--o or --output_filename&#39;</span><span class="p">:</span>
+                <span class="s">&#39;The output filename&#39;</span><span class="p">,</span>
+            <span class="s">&#39;--override-output_filename&#39;</span><span class="p">:</span>
+                <span class="s">&#39;overide the output file if the file already exists (otherwise it will skip it&#39;</span>
+            <span class="p">}</span>
+    <span class="n">parameter_option_descriptions</span><span class="o">=</span><span class="p">{</span>   
+            <span class="s">&#39;--lambda_1_value or --term_weight_uniform_spacing &lt;value&gt;&#39;</span><span class="p">:</span>
+                <span class="s">&#39;set value weight for the uniform spacing penalty&#39;</span><span class="p">,</span>
+            <span class="s">&#39;--lambda_2_value or --term_weight_smoothing &lt;value&gt;&#39;</span><span class="p">:</span>
+                <span class="s">&#39;set value weight for the uniform smoothing penalty&#39;</span><span class="p">,</span>
+            <span class="s">&#39;--lambda_3_value or --term_weight_population_prior &lt;value&gt;&#39;</span><span class="p">:</span>   
+                <span class="s">&#39;set value weight for the population prior penalty&#39;</span>
+                <span class="p">}</span>
+    <span class="k">print</span> <span class="s">&#39;File and Directory options:&#39;</span>
+    <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">filename_option_descriptions</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="o">+</span><span class="n">option</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t\t</span><span class="s">&#39;</span><span class="o">+</span><span class="n">filename_option_descriptions</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+    <span class="k">print</span> <span class="s">&#39;Parameter options:&#39;</span>
+    <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">parameter_option_descriptions</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>        
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="o">+</span><span class="n">option</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t\t</span><span class="s">&#39;</span><span class="o">+</span><span class="n">parameter_option_descriptions</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>   
+<span class="c">#%%    </span></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../simba3d.html#simba3d.simba3d_taskrun.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+   <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   main simba3d task run call</span>
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+       <span class="n">args</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[:]</span>
+       <span class="c">#print args</span>
+   <span class="n">inputfile</span> <span class="o">=</span> <span class="bp">None</span>
+   <span class="n">cores</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+   <span class="n">ii</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+   <span class="n">override_output_filename</span><span class="o">=</span><span class="bp">False</span>
+   <span class="n">UUID</span><span class="o">=</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span>
+   <span class="n">task</span><span class="o">=</span><span class="p">{</span>
+            <span class="c"># task parameters        </span>
+            <span class="s">&#39;taskname&#39;</span>  <span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">UUID</span><span class="p">),</span>
+            <span class="s">&#39;uuid&#39;</span>  <span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">UUID</span><span class="p">),</span><span class="c">#  assign a unique identifier to resume tasklists</span>
+            <span class="c"># initialization settings        </span>
+            <span class="s">&#39;randomize_initialization&#39;</span>  <span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="c"># Randomize the initialized curve</span>
+            <span class="c">#&#39;seed&#39;                      : int(np.random.rand()*4294967295),   # fixed seed for randomizing inititialization</span>
+            
+            <span class="c"># debug options</span>
+            <span class="s">&#39;check_jacobian&#39;</span>    <span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="c"># check analytical gradient with numerical gradient 9</span>
+            
+             <span class="c"># data file names to load</span>
+            <span class="s">&#39;file_names&#39;</span>  <span class="p">:</span>
+                <span class="p">{</span>
+                <span class="s">&#39;inputdir&#39;</span>  <span class="p">:</span> <span class="s">&#39;./&#39;</span><span class="p">,</span> <span class="c"># location of data input files</span>
+                <span class="s">&#39;outputdir&#39;</span> <span class="p">:</span> <span class="s">&#39;./&#39;</span><span class="p">,</span> <span class="c"># directory where to output results</span>
+                <span class="c"># the following are relative to the inputdir directory</span>
+                <span class="c">#&quot;initialized_curve&quot;         : &#39;&#39;,</span>
+                <span class="c">#&quot;pairwise_contact_matrix&quot;   : &#39;&#39;,</span>
+                <span class="c">#&quot;population_contact_matrix&quot; : &#39;&#39;,   </span>
+                <span class="c">#&quot;prior_shape_model&quot;         : &#39;prior_shape_model.npy&#39;,           </span>
+                <span class="s">&quot;output_filename&quot;</span>           <span class="p">:</span>  <span class="nb">str</span><span class="p">(</span><span class="n">UUID</span><span class="p">),</span>
+                <span class="p">},</span>
+            
+            <span class="c"># data </span>
+            <span class="c"># if all the tasks use the same data, it may be better to load it once                    </span>
+            <span class="s">&#39;data&#39;</span>  <span class="p">:</span>
+                <span class="p">{</span>
+                <span class="c">#&#39;initialized_curve&#39;         : initialized_curve,</span>
+                <span class="c">#&#39;t&#39;                         : t,   # optional</span>
+                <span class="c">#&#39;pairwise_contact_matrix&#39;   : [],</span>
+                <span class="c">#&#39;index&#39;                     : index,</span>
+                <span class="c">#&#39;population_contact_matrix&#39; : pairwise_contact_pop,</span>
+                <span class="c">#&#39;prior_shape_model&#39;         : prior_shape_model,</span>
+                <span class="p">},</span>
+          
+        
+            <span class="c"># parameter settings</span>
+            <span class="s">&#39;parameters&#39;</span>    <span class="p">:</span>
+                <span class="p">{</span>
+                <span class="s">&#39;a&#39;</span>              <span class="p">:</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">,</span>
+                <span class="s">&#39;b&#39;</span>              <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="c"># not identifiable with unconstrained scale</span>
+                <span class="s">&#39;term_weights&#39;</span>   <span class="p">:</span>  
+                    <span class="p">{</span>
+                    <span class="s">&#39;data&#39;</span>             <span class="p">:</span> <span class="mf">1.0e0</span><span class="p">,</span>      <span class="c"># weight for the data term</span>
+                    <span class="s">&#39;uniform spacing&#39;</span>  <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="c"># scaled first order penalty</span>
+                    <span class="s">&#39;smoothing&#39;</span>        <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="c"># scaled second order penalty</span>
+                    <span class="s">&#39;population prior&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>    <span class="c"># weight for the population matrix prior</span>
+                    <span class="s">&#39;shape prior&#39;</span>      <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>    <span class="c"># weight for the shape prior</span>
+                    
+                    <span class="c"># below are unsupported penalties</span>
+                    <span class="c">#&#39;firstroughness&#39;   :0.0e3,   # weight for the fist order roughness</span>
+                    <span class="c">#&#39;secondroughness&#39;  :0.0e-16,   # weight for the second order roughness</span>
+                    <span class="c">#&#39;scaledfirstroughness&#39;  :0.0,   # weight for the scaled second order roughness</span>
+                    <span class="c">#&#39;scaledsecondroughness&#39; :0.0,   # weight for the scaled second order roughness</span>
+                    <span class="c">#&#39;parameterization&#39; :0, # not implemented</span>
+                    <span class="p">},</span>
+                <span class="p">},</span>
+            <span class="c"># options</span>
+            <span class="s">&#39;options&#39;</span>   <span class="p">:</span>   
+                <span class="p">{</span>   
+                <span class="s">&#39;maxitr&#39;</span>    <span class="p">:</span> <span class="mi">100000</span><span class="p">,</span> <span class="c"># set maximum number of iterations</span>
+                <span class="s">&#39;display&#39;</span>   <span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="c"># display function values at each iteration</span>
+                <span class="s">&#39;store&#39;</span>     <span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="c"># store iterative curves</span>
+                <span class="s">&#39;method&#39;</span>    <span class="p">:</span><span class="s">&#39;BFGS&#39;</span><span class="p">,</span><span class="c"># Broyden, Fletcher, Goldfarb, and Shanno (quasi-Newton, only first derivatives are used)</span>
+                <span class="c">#&#39;method&#39;    :&#39;Nelder-Mead&#39;,# robust but slow numerical approach</span>
+                <span class="c">#&#39;method&#39;    :&#39;CG&#39;,# nonlinear conjugate gradient algorithm by Polak and Ribiere (only first derivatives are used)</span>
+                <span class="c">#&#39;method&#39;    :&#39;Newton-CG&#39;,# (truncated Newton method)</span>
+                <span class="p">},</span>
+            <span class="p">}</span> 
+   <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+       <span class="n">printhelp</span><span class="p">()</span>
+       <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+   <span class="k">while</span> <span class="n">ii</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+       <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;-h&#39;</span><span class="p">:</span>
+           <span class="n">printhelp</span><span class="p">()</span>
+           <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;-c&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">cores</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="p">)</span>     
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;-r&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">inputfile</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+       <span class="c">#FILE SETTINGS</span>
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--inputdir&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;inputdir&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--outputdir&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;outputdir&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>           
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--cm_file&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;pairwise_contact_matrix&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--pairwise_contact_matrix&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;pairwise_contact_matrix&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>           
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--population_contact_matrix&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;population_contact_matrix&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--init_structure_file&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;initialized_curve&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>    
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--initialized_curve&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;initialized_curve&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>            
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--o&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;output_filename&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>   
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--output_filename&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;file_names&#39;</span><span class="p">][</span><span class="s">&#39;output_filename&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>   
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;--override-output_filename&#39;</span><span class="p">:</span>
+           <span class="n">override_output_filename</span><span class="o">=</span><span class="bp">True</span>
+       <span class="c">#PARAMETER SETTINGS</span>
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--param_a&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">][</span><span class="s">&#39;a&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>  <span class="p">)</span>      
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--param_b&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">][</span><span class="s">&#39;b&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>  <span class="p">)</span>   
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--term_weight_data&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">][</span><span class="s">&#39;term_weights&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="p">)</span>
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--lambda_1_value&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">][</span><span class="s">&#39;term_weights&#39;</span><span class="p">][</span><span class="s">&#39;uniform spacing&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="p">)</span>             
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--term_weight_uniform_spacing&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">][</span><span class="s">&#39;term_weights&#39;</span><span class="p">][</span><span class="s">&#39;uniform spacing&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>   
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--lambda_2_value&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">][</span><span class="s">&#39;term_weights&#39;</span><span class="p">][</span><span class="s">&#39;smoothing&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="p">)</span>             
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--term_weight_smoothing&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">][</span><span class="s">&#39;term_weights&#39;</span><span class="p">][</span><span class="s">&#39;smoothing&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="p">)</span> 
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--lambda_3_value&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">][</span><span class="s">&#39;term_weights&#39;</span><span class="p">][</span><span class="s">&#39;population prior&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>              
+       <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">==</span> <span class="s">&#39;--term_weight_population_prior&#39;</span><span class="p">:</span>
+           <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+           <span class="n">task</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">][</span><span class="s">&#39;term_weights&#39;</span><span class="p">][</span><span class="s">&#39;population prior&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>   <span class="p">)</span>          
+       <span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+   <span class="k">print</span> <span class="s">&#39;Input file is &#39;</span><span class="p">,</span> <span class="n">inputfile</span>
+   <span class="k">print</span> <span class="s">&#39;number of cores&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cores</span><span class="p">)</span>
+   <span class="k">if</span> <span class="n">inputfile</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+       <span class="c"># check that the file already exist</span>
+
+       <span class="k">if</span> <span class="n">override_output_filename</span><span class="p">:</span>
+           <span class="n">mp</span><span class="o">.</span><span class="n">run_task</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+       <span class="k">else</span><span class="p">:</span>
+           <span class="n">outputfilepath</span><span class="o">=</span><span class="n">mp</span><span class="o">.</span><span class="n">get_outputfilepath</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+           <span class="n">ext</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">outputfilepath</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+           <span class="k">if</span> <span class="p">(</span><span class="n">ext</span> <span class="o">!=</span> <span class="s">&#39;.npz&#39;</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">ext</span><span class="o">==</span><span class="s">&#39;.mat&#39;</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">ext</span><span class="o">==</span><span class="s">&#39;.json&#39;</span><span class="p">):</span>
+               <span class="n">outputfilepath</span><span class="o">+=</span><span class="s">&#39;.npz&#39;</span>
+           <span class="k">if</span> <span class="ow">not</span> <span class="n">mp</span><span class="o">.</span><span class="n">load_result</span><span class="p">(</span><span class="n">outputfilepath</span><span class="p">):</span>
+               <span class="n">mp</span><span class="o">.</span><span class="n">run_task</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+           <span class="k">else</span><span class="p">:</span>
+               <span class="k">print</span> <span class="s">&quot;Skipping task with same output file&quot;</span>
+   <span class="k">else</span><span class="p">:</span>
+       <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">inputfile</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tasklist</span><span class="p">:</span>
+           <span class="n">tasks</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tasklist</span><span class="p">)</span>
+           <span class="n">t</span><span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+           <span class="n">mp</span><span class="o">.</span><span class="n">mp_handler</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span><span class="n">cores</span><span class="p">)</span>
+           <span class="n">elapsed</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t</span>
+           <span class="k">print</span> <span class="s">&#39;Total </span><span class="si">%s</span><span class="s"> seconds elapsed&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">elapsed</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+   <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/logo.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">simba3d 0.0.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Author.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

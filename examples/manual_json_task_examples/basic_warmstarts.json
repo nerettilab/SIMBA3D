@@ -1,0 +1,92 @@
+[
+    [
+      {
+      "usewarmstarts":true,
+      "taskname":"first sequential task",
+      "description":"first subtask of the sequence",
+      "uuid":"3r1yrawheasgj",
+      "file_names": {
+          "inputdir": "./",
+          "outputdir": "./",
+          "pairwise_contact_matrix":"simulated_contact_matrix.npy",
+          "initialized_curve" : "initialized_curve.npy"
+          },
+       "options": {
+              "display": true,
+              "gradient tolerance": 1e-05,
+              "maxitr": 100000,
+              "method": "default",
+              "store": false
+          },
+       "parameters": {
+              "a": -3.0,
+              "b": 1.0,
+              "term_weights": {
+                  "data": 1.0,
+                  "population prior": 0.0,
+                  "shape prior": 0.0,
+                  "smoothing": 1.0,
+                  "uniform spacing": 1.0
+              }
+          }
+      },
+      {
+      "taskname":"second sequential task",
+      "description":"second subtask of the sequence to be finished after the first is done",
+      "uuid":"52yh8q930gawehd8-9",
+      "file_names": {
+          "inputdir": "./",
+          "outputdir": "./",
+          "pairwise_contact_matrix":"simulated_contact_matrix.npy",
+          "initialized_curve" : "initialized_curve.npy"
+          },
+       "options": {
+              "display": true,
+              "gradient tolerance": 1e-05,
+              "maxitr": 100000,
+              "method": "default",
+              "store": false
+          },
+       "parameters": {
+              "a": -3.0,
+              "b": 1.0,
+              "term_weights": {
+                  "data": 1.0,
+                  "population prior": 0.0,
+                  "shape prior": 0.0,
+                  "smoothing": 1.0,
+                  "uniform spacing": 0.0
+              }
+          }
+      }
+    ],
+    {
+    "taskname":"independent task",
+    "description":"can run independently of the previous task with two subtasks",
+    "uuid":"52yh8q930gawehd8-9",
+    "file_names": {
+        "inputdir": "./",
+        "outputdir": "./",
+        "pairwise_contact_matrix":"simulated_contact_matrix.npy",
+        "initialized_curve" : "initialized_curve.npy"
+        },
+     "options": {
+            "display": true,
+            "gradient tolerance": 1e-05,
+            "maxitr": 100000,
+            "method": "default",
+            "store": false
+        },
+     "parameters": {
+            "a": -3.0,
+            "b": 1.0,
+            "term_weights": {
+                "data": 1.0,
+                "population prior": 0.0,
+                "shape prior": 0.0,
+                "smoothing": 1.0,
+                "uniform spacing": 0.0
+            }
+        }
+    }
+]
