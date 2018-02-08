@@ -12,7 +12,7 @@ This also makes it easier to create more complicated file structures so that
 thousands of results do not flood the working directory.
 
 With this approach, first a python script is run to create a json tasklist, and
-then the <'simba3d'> command is run on that tasklist.
+then the `simba3d` command is run on that tasklist.
 
 It is recomended that simplejson is installed since it is more likely to be
 updated than the standard json package.
