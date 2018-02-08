@@ -35,7 +35,7 @@ simba3d can either be used as a python module or as a command line interface.
 Using it as a python module has the advantage that a long and tedious sequence 
 list of tasks can be generated using python. The command line interface has
 the appeal of being easy to run from different directories, so that the user
-can create a JSON tasklist in any directory and run it with the `<simba3d>`
+can create a JSON tasklist in any directory and run it with the `simba3d`
 command.
 
 simba3d can also be run locally, but this can limit the file structure 
