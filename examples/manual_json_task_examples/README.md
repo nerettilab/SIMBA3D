@@ -15,7 +15,7 @@ To run the tasklist use the following command
 > simba3d -r minimal.json
 
 Each time you run the command above, simba3d will create a random uuid for the 
-task. The uuid is a unique string which is specific to a task. PLEASE will 
+task. The uuid is a unique string which is specific to a task. SIMBA3D will 
 search the output directory for task and if it finds one with the same uuid it
 will skip over it because it is presumed to be already ran. This is useful for 
 resuming long tasklists. Since no uuid is provided, simba3d will almost 
