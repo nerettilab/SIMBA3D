@@ -54,8 +54,8 @@ After installing simba3d, the simba3d command should be available.
 For help type:
 > simba3d -h
 
-If you are using a local install you can also use <'python run_simba3d.py'> just 
-like the <'simba3d'> command. For example, to get help you can type:
+If you are using a local install you can also use `python run_simba3d.py` just 
+like the `simba3d` command. For example, to get help you can type:
 > python run_simba3d.py -h
 
 The help documentation will tell the user that there are two ways to pass in
@@ -148,7 +148,7 @@ it is easier to load into python and convert to some other format if desired.
 
 A convertion tool has been packaged with simba3d to assist in converting
 from .npz to some other desirable format. This convertion tool can be called
-from the <'simba3d-convertion'> command.
+from the `simba3d-convertion` command.
 
 For more information on using the convertion tool type
 > simba3d-convertion -h
@@ -162,11 +162,11 @@ Several examples can be seen in the examples directory.
 
 simba3d has several tools to aid in summarizing the results collected.
 
-The <'simba3d-print'> command can be used to get print out specific key data
+The `simba3d-print` command can be used to get print out specific key data
 values stored in the results file. 
 
 If the matplotlib module is installed, then simba3d also has a graphical
-summary command which can be called by <'simba3d-disp'>
+summary command which can be called by `simba3d-disp`
 
 This command will display the final curve and the energy of selected results.
 
