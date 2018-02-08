@@ -3,18 +3,18 @@
 The simba3d package comes with serveral command line tools to assist in 
 managing and looking at results. 
 
-* <'simba3d'> for running simba3d 
-* <'simba3d-print'> for viewing specific information from output results
-* <'simba3d-disp'> for graphically viewing output results
-* <'simba3d-convertion'> for converting from .npz to some other supported format
+* `simba3d` for running simba3d 
+* `simba3d-print` for viewing specific information from output results
+* `simba3d-disp` for graphically viewing output results
+* `simba3d-convertion` for converting from .npz to some other supported format
 
 There is also a python script for each command which can be ran for local 
 installs.
 
-* <'python run_simba3d.py'> same as <'simba3d'>
-* <'python run_simba3d_print.py'> same as <'simba3d-print'>
-* <'python run_simba3d_disp.py'> same as <'simba3d-disp'>
-* <'python run_simba3d_convertion.py'> same as <'simba3d-convertion'>
+* `python run_simba3d.py` same as `simba3d`
+* `python run_simba3d_print.py` same as `simba3d-print`
+* `python run_simba3d_disp.py` same as `simba3d-disp`
+* `python run_simba3d_convertion.py` same as `simba3d-convertion`
 
 Each command has a command line help option which can be accessed by typing
 -h after the command.
@@ -56,7 +56,7 @@ but these files can be loaded into python fairly easily using the numpy module.
 
 It is recommended the results be saved in the.npz since it is more likely to 
 load correctly in python. Other output formates can then be converted later 
-using the <'simba3d-convertion'> tool.
+using the `simba3d-convertion` tool.
 
 To convert all the .npz files into .mat (MatLab Mat-File format) in the results
 directory, type the following command:
@@ -74,7 +74,7 @@ unlikely that data is overwritten because the same name was picked twice. This
 however makes it difficult to distringuish between which output was from which
 run.
 
-One way to see the task settings is to use the <'simba3d-print'> command.
+One way to see the task settings is to use the `simba3d-print` command.
 
 To get a list of input keys stored in the file type the following command:
 > simba3d-print -i results/output.npz 
@@ -101,7 +101,7 @@ also get the task information
 
 simba3d also come with a graphing tool, if the user has matplotlib installed.
 
-The <'simba3d-disp'> command can be used to display a single result or multiple
+The `simba3d-disp` command can be used to display a single result or multiple
 results together.
 
 To graph together all the .npz results stored in the results directory use the 
