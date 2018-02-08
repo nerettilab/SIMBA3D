@@ -162,7 +162,7 @@ Several examples can be seen in the examples directory.
 
 simba3d has several tools to aid in summarizing the results collected.
 
-The <'please-print'> command can be used to get print out specific key data
+The <'simba3d-print'> command can be used to get print out specific key data
 values stored in the results file. 
 
 If the matplotlib module is installed, then simba3d also has a graphical
