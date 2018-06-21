@@ -171,3 +171,7 @@ summary command which can be called by `simba3d-disp`
 This command will display the final curve and the energy of selected results.
 
 Several examples can be seen in the examples directory.
+
+# to do
+
+currently has only been used for python2.7, but porting should not be difficult.
