@@ -119,6 +119,8 @@ def plot_curves(curves,t=None,ax=None,fig=None):
         if d==3:# if the curve is 3 dimensional
             ax=fig.add_subplot(111,projection='3d')
     n=len(curves)
+    if t is None:
+        t=np.linspace(0,1,len(curves[ii]))
     for ii in range(n):    
         plot_curve(curves[ii],t,ax,fig);
     set_axis_equal(ax)

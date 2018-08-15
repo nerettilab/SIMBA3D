@@ -1,0 +1,299 @@
+[
+    {
+        "check_jacobian": false,
+        "data": {},
+        "file_names": {
+            "initialized_curve": "initialized_curve.npy",
+            "inputdir": "data/",
+            "output_filename": "aed936bc-66d3-4f71-85c3-21ec632195da.npy",
+            "outputdir": "results/",
+            "pairwise_contact_matrix": "simulated_contact_matrix_0_35.npy"
+        },
+        "options": {
+            "display": true,
+            "gradient tolerance": 1e-05,
+            "maxitr": 100000,
+            "method": "BFGS",
+            "store": false
+        },
+        "parameters": {
+            "a": -3.0,
+            "b": 1.0,
+            "term_weights": {
+                "data": 1.0,
+                "population prior": 0.0,
+                "shape prior": 0.0,
+                "smoothing": 0.5,
+                "uniform spacing": 0.5
+            }
+        },
+        "randomize_initialization": false,
+        "taskname": "aed936bc-66d3-4f71-85c3-21ec632195da",
+        "usewarmstarts": true,
+        "uuid": "aed936bc-66d3-4f71-85c3-21ec632195da"
+    },
+    {
+        "check_jacobian": false,
+        "data": {},
+        "file_names": {
+            "initialized_curve": "initialized_curve.npy",
+            "inputdir": "data/",
+            "output_filename": "aed936bc-66d3-4f71-85c3-21ec632195da.npy",
+            "outputdir": "results/",
+            "pairwise_contact_matrix": "simulated_contact_matrix_34_45.npy"
+        },
+        "options": {
+            "display": true,
+            "gradient tolerance": 1e-05,
+            "maxitr": 100000,
+            "method": "BFGS",
+            "store": false
+        },
+        "parameters": {
+            "a": -3.0,
+            "b": 1.0,
+            "term_weights": {
+                "data": 1.0,
+                "population prior": 0.0,
+                "shape prior": 0.0,
+                "smoothing": 0.5,
+                "uniform spacing": 0.5
+            }
+        },
+        "randomize_initialization": false,
+        "taskname": "aed936bc-66d3-4f71-85c3-21ec632195da",
+        "usewarmstarts": true,
+        "uuid": "aed936bc-66d3-4f71-85c3-21ec632195da"
+    },
+    {
+        "check_jacobian": false,
+        "data": {},
+        "file_names": {
+            "initialized_curve": "initialized_curve.npy",
+            "inputdir": "data/",
+            "output_filename": "aed936bc-66d3-4f71-85c3-21ec632195da.npy",
+            "outputdir": "results/",
+            "pairwise_contact_matrix": "simulated_contact_matrix_44_80.npy"
+        },
+        "options": {
+            "display": true,
+            "gradient tolerance": 1e-05,
+            "maxitr": 100000,
+            "method": "BFGS",
+            "store": false
+        },
+        "parameters": {
+            "a": -3.0,
+            "b": 1.0,
+            "term_weights": {
+                "data": 1.0,
+                "population prior": 0.0,
+                "shape prior": 0.0,
+                "smoothing": 0.5,
+                "uniform spacing": 0.5
+            }
+        },
+        "randomize_initialization": false,
+        "taskname": "aed936bc-66d3-4f71-85c3-21ec632195da",
+        "usewarmstarts": true,
+        "uuid": "aed936bc-66d3-4f71-85c3-21ec632195da"
+    },
+    {
+        "check_jacobian": false,
+        "data": {},
+        "file_names": {
+            "initialized_curve": "initialized_curve.npy",
+            "inputdir": "data/",
+            "output_filename": "3e4a90c0-0d52-4682-be85-2515836b9d67.npy",
+            "outputdir": "results/",
+            "pairwise_contact_matrix": "simulated_contact_matrix_0_35.npy"
+        },
+        "options": {
+            "display": true,
+            "gradient tolerance": 1e-05,
+            "maxitr": 100000,
+            "method": "BFGS",
+            "store": false
+        },
+        "parameters": {
+            "a": -3.0,
+            "b": 1.0,
+            "term_weights": {
+                "data": 1.0,
+                "population prior": 0.0,
+                "shape prior": 0.0,
+                "smoothing": 0.5,
+                "uniform spacing": 0.5
+            }
+        },
+        "randomize_initialization": false,
+        "taskname": "3e4a90c0-0d52-4682-be85-2515836b9d67",
+        "usewarmstarts": true,
+        "uuid": "3e4a90c0-0d52-4682-be85-2515836b9d67"
+    },
+    {
+        "check_jacobian": false,
+        "data": {},
+        "file_names": {
+            "initialized_curve": "initialized_curve.npy",
+            "inputdir": "data/",
+            "output_filename": "28291c88-4a3e-41db-9e03-5ed654b6d263.npy",
+            "outputdir": "results/",
+            "pairwise_contact_matrix": "simulated_contact_matrix_34_45.npy"
+        },
+        "options": {
+            "display": true,
+            "gradient tolerance": 1e-05,
+            "maxitr": 100000,
+            "method": "BFGS",
+            "store": false
+        },
+        "parameters": {
+            "a": -3.0,
+            "b": 1.0,
+            "term_weights": {
+                "data": 1.0,
+                "population prior": 0.0,
+                "shape prior": 0.0,
+                "smoothing": 0.5,
+                "uniform spacing": 0.5
+            }
+        },
+        "randomize_initialization": false,
+        "taskname": "28291c88-4a3e-41db-9e03-5ed654b6d263",
+        "usewarmstarts": true,
+        "uuid": "28291c88-4a3e-41db-9e03-5ed654b6d263"
+    },
+    {
+        "check_jacobian": false,
+        "data": {},
+        "file_names": {
+            "initialized_curve": "initialized_curve.npy",
+            "inputdir": "data/",
+            "output_filename": "8431d93e-da66-430c-a62f-c2b59bb7ec85.npy",
+            "outputdir": "results/",
+            "pairwise_contact_matrix": "simulated_contact_matrix_44_80.npy"
+        },
+        "options": {
+            "display": true,
+            "gradient tolerance": 1e-05,
+            "maxitr": 100000,
+            "method": "BFGS",
+            "store": false
+        },
+        "parameters": {
+            "a": -3.0,
+            "b": 1.0,
+            "term_weights": {
+                "data": 1.0,
+                "population prior": 0.0,
+                "shape prior": 0.0,
+                "smoothing": 0.5,
+                "uniform spacing": 0.5
+            }
+        },
+        "randomize_initialization": false,
+        "taskname": "8431d93e-da66-430c-a62f-c2b59bb7ec85",
+        "usewarmstarts": true,
+        "uuid": "8431d93e-da66-430c-a62f-c2b59bb7ec85"
+    },
+    {
+        "check_jacobian": false,
+        "data": {},
+        "file_names": {
+            "initialized_curve": "initialized_curve.npy",
+            "inputdir": "data/",
+            "output_filename": "a259a948-72e0-4144-a7d0-bd99a3675210.npz",
+            "outputdir": "results/",
+            "pairwise_contact_matrix": "simulated_contact_matrix_0_35.npy"
+        },
+        "options": {
+            "display": true,
+            "gradient tolerance": 1e-05,
+            "maxitr": 100000,
+            "method": "BFGS",
+            "store": false
+        },
+        "parameters": {
+            "a": -3.0,
+            "b": 1.0,
+            "term_weights": {
+                "data": 1.0,
+                "population prior": 0.0,
+                "shape prior": 0.0,
+                "smoothing": 0.5,
+                "uniform spacing": 0.5
+            }
+        },
+        "randomize_initialization": false,
+        "taskname": "a259a948-72e0-4144-a7d0-bd99a3675210",
+        "usewarmstarts": true,
+        "uuid": "a259a948-72e0-4144-a7d0-bd99a3675210"
+    },
+    {
+        "check_jacobian": false,
+        "data": {},
+        "file_names": {
+            "initialized_curve": "initialized_curve.npy",
+            "inputdir": "data/",
+            "output_filename": "eb395c14-2909-4cb6-9559-8948daa40ee7.npz",
+            "outputdir": "results/",
+            "pairwise_contact_matrix": "simulated_contact_matrix_34_45.npy"
+        },
+        "options": {
+            "display": true,
+            "gradient tolerance": 1e-05,
+            "maxitr": 100000,
+            "method": "BFGS",
+            "store": false
+        },
+        "parameters": {
+            "a": -3.0,
+            "b": 1.0,
+            "term_weights": {
+                "data": 1.0,
+                "population prior": 0.0,
+                "shape prior": 0.0,
+                "smoothing": 0.5,
+                "uniform spacing": 0.5
+            }
+        },
+        "randomize_initialization": false,
+        "taskname": "eb395c14-2909-4cb6-9559-8948daa40ee7",
+        "usewarmstarts": true,
+        "uuid": "eb395c14-2909-4cb6-9559-8948daa40ee7"
+    },
+    {
+        "check_jacobian": false,
+        "data": {},
+        "file_names": {
+            "initialized_curve": "initialized_curve.npy",
+            "inputdir": "data/",
+            "output_filename": "cbe61afd-bd26-4d62-bcf5-52486de96975.npz",
+            "outputdir": "results/",
+            "pairwise_contact_matrix": "simulated_contact_matrix_44_80.npy"
+        },
+        "options": {
+            "display": true,
+            "gradient tolerance": 1e-05,
+            "maxitr": 100000,
+            "method": "BFGS",
+            "store": false
+        },
+        "parameters": {
+            "a": -3.0,
+            "b": 1.0,
+            "term_weights": {
+                "data": 1.0,
+                "population prior": 0.0,
+                "shape prior": 0.0,
+                "smoothing": 0.5,
+                "uniform spacing": 0.5
+            }
+        },
+        "randomize_initialization": false,
+        "taskname": "cbe61afd-bd26-4d62-bcf5-52486de96975",
+        "usewarmstarts": true,
+        "uuid": "cbe61afd-bd26-4d62-bcf5-52486de96975"
+    }
+]

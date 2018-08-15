@@ -3,7 +3,7 @@
 Structure Inference from Multiscale BAyes in 3 Dimensions (SIMBA3D)
 
 This tool was primarily developed to study the 3D structure Chromatin. It 
-includes analytically derived gradients for a variety of penalty functions to
+include analytically derived gradients for a variety of penalty functions to
 estimate 3D architecture from pairwise interaction matrices.
 
 
@@ -35,7 +35,7 @@ simba3d can either be used as a python module or as a command line interface.
 Using it as a python module has the advantage that a long and tedious sequence 
 list of tasks can be generated using python. The command line interface has
 the appeal of being easy to run from different directories, so that the user
-can create a JSON tasklist in any directory and run it with the `simba3d`
+can create a JSON tasklist in any directory and run it with the `<simba3d>`
 command.
 
 simba3d can also be run locally, but this can limit the file structure 
@@ -54,8 +54,8 @@ After installing simba3d, the simba3d command should be available.
 For help type:
 > simba3d -h
 
-If you are using a local install you can also use `python run_simba3d.py` just 
-like the `simba3d` command. For example, to get help you can type:
+If you are using a local install you can also use <'python run_simba3d.py'> just 
+like the <'simba3d'> command. For example, to get help you can type:
 > python run_simba3d.py -h
 
 The help documentation will tell the user that there are two ways to pass in
@@ -77,8 +77,8 @@ the task look complicated at first. There are defaults set for many of the
 keys (which are shown in square brackets below).
 
 The individual tasks are dictionaries with the following keys:
-* 'taskname' (optional) name of the task [unamed_task]
-* 'uuid' (recommended) unique identifier specific to the task [...randomly generated...]
+* 'taskname' (optional) name of the task [uuid]
+* 'uuid' (recommended) unique identifier specific to the task [randomly generated]
 * 'store_task' (optional) store the task in the output [True] 
 * 'randomize_initialization' (optional) should we randomize the initialized curve? [False]
 * 'seed' (optional) integer between 0 and 4294967295 to fixed seed for randomizing inititialization
@@ -125,9 +125,11 @@ To read a json file with these parameters set, use the following command
 
 Warmstarts is a technique where the final result from the previous setting is
 used to initialized the next run with different settings. This is useful for
-parameter tuning because it can lower the total computation time.
+parameter tuning because it can lower the total computation time. It can also
+limit space of curves you can converge to, which may not always be ideal since
+the previous setting may trap the curve in a local solution.
 
-The usewarmstarts key must be set to true within a sequentially
+In any case, the usewarmstarts key must be set to true within a sequentially
 ordered task. To create a sequence of task which are to be done in a specific 
 order, simply nest them inside an array. In each task inside the array, set
 the usewarmstarts to true so that simba3d will know that it should initialize 
@@ -148,7 +150,7 @@ it is easier to load into python and convert to some other format if desired.
 
 A convertion tool has been packaged with simba3d to assist in converting
 from .npz to some other desirable format. This convertion tool can be called
-from the `simba3d-convertion` command.
+from the <'simba3d-convertion'> command.
 
 For more information on using the convertion tool type
 > simba3d-convertion -h
@@ -156,22 +158,14 @@ For more information on using the convertion tool type
 This can also be called on a local install using the command
 > python run_simba3d_convertion.py -h
 
-Several examples can be seen in the examples directory.
-
 # Veiwing Results
 
 simba3d has several tools to aid in summarizing the results collected.
 
-The `simba3d-print` command can be used to get print out specific key data
+The <'please-print'> command can be used to get print out specific key data
 values stored in the results file. 
 
 If the matplotlib module is installed, then simba3d also has a graphical
-summary command which can be called by `simba3d-disp`
+summary command which can be called by <'simba3d-disp'>
 
-This command will display the final curve and the energy of selected results.
-
-Several examples can be seen in the examples directory.
-
-# to do
-
-currently has only been used for python2.7, but porting should not be difficult.
+This command will display the final curve and the energy of selected results
