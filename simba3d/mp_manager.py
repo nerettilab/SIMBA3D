@@ -29,6 +29,74 @@ import simba3d.optimizer as opt
 import simba3d.srvf_open_curve_Rn as srvf
 import simba3d.uuid_check as uc
 
+def create_downsampled_matrices(data):
+    """
+    This takes a matrix and returns a list of downsampled matrixes that recursively
+    reduces the dimension of the matrix in roughly half each time
+
+    Each time, the matrix is zero-padded to make the number of entries even, then 
+    entries in the added together in groups of 4.
+
+    It assumes the matrix is square, and that the diagonal entries are ignored.
+    """
+    n,m=np.shape(data)
+    data[np.eye(n)==1]=0
+    C=[]
+    C.append(data)
+    k=0
+    while n>=8: # keep going until the dimension of the data is less than 8
+        if np.mod(n,2)==1:
+            C[k]=np.concatenate((C[k],np.zeros((1,n))),axis=0)
+            C[k]=np.concatenate((C[k],np.zeros((n+1,1))),axis=1)
+            n+=1
+        
+        n=int(n/2.0);
+        C.append(np.zeros((n,n)))
+        for i in range(n-1):
+            for j in range(i+1,n):
+                C[k+1][i,j]=C[k][2*i,2*j]
+                C[k+1][i,j]+=C[k][2*i,2*j+1]
+                C[k+1][i,j]+=C[k][2*i+1,2*j]
+                C[k+1][i,j]+=C[k][2*i+1,2*j+1]
+        A=np.triu(C[k+1],1)
+        C[k+1]= C[k+1]+A.T
+        k=k+1
+    return C;
+    
+def save_matrices(inputdir,data_matrix_file,outputdir=None):
+    """
+    This saves a downsampled versions of a matrix npy file.
+
+    You tell it the directory and the name of the file, and this will create the 
+    down sampled matrix files for the multiresolution warm-starts.
+    """
+    if (outputdir==None):
+      """
+      if the user does not specify the outputdir, assume the ouput and input 
+      directory are the same.
+      """
+      outputdir=inputdir
+    # load the data matrix to down sample
+    data=np.load(os.path.join(inputdir,data_matrix_file))
+    # create the down sampled matrices
+    Crev=create_downsampled_matrices(data)
+    multires_filenames=[]
+    res=[]
+    reversed_index=list(reversed(range(len(Crev))))
+    C=[]
+    # loop through the downsampled matrices in reverse order
+    for ii in range(len(Crev)):
+        C.append(Crev[reversed_index[ii]])
+        # store the resolutions for automating the tasklist generation
+        res.append(len(C[ii]))
+        file_name,file_extension=os.path.splitext(data_matrix_file)
+        # store the file names for automating the tasklist generation
+        multires_filenames.append(file_name+'_'+str(res[ii])+'x'+str(res[ii])+file_extension)
+        # save the multiresolution matrices to the desired directory
+        print('Saving '+multires_filenames[ii])
+        np.save(os.path.join(outputdir,multires_filenames[ii]),C[ii])
+    return res,multires_filenames
+
 
 def jsonify(data):
     """
@@ -58,6 +126,10 @@ def load_result(outputfile):
     extension = os.path.splitext(outputfile)[1]
     summary={}
     try:
+        
+        if extension == '.npy':
+            data=np.load( os.path.join(results_dir,str(outputfile)))
+            summary=data['summary'].item()
         if extension == '.npz':
             data=np.load( os.path.join(results_dir,str(outputfile)))
             summary=data['summary'].item()
@@ -281,12 +353,16 @@ def run_task(task):
     
     if 'index_parameters' in task:      
         if 'missing_rowsum_threshold' in task['index_parameters']:
+            # specifies a threshold matrix row sum to treat an entry as missing data (missing nodes are ignored in the optimization)
             data['missing_rowsum_threshold']=task['index_parameters']['missing_rowsum_threshold']
         if 'index_mississing' in task['index_parameters']:
+            # specifies which entries are treated as missing (missing nodes are ignored in the optimization)
             data['index_mississing']=task['index_parameters']['index_mississing']    
         if 'off_diagonal' in task['index_parameters']:
+            # offset off of the diagonal entries which is treated as missing (and ignored)
             data['off_diagonal']=task['index_parameters']['off_diagonal']               
         if 'pairwise_combinations' in task['index_parameters']:
+            # optionally specify specific pairwise combination to use
             data['pairwise_combinations']=task['index_parameters']['pairwise_combinations']                       
     #%
     

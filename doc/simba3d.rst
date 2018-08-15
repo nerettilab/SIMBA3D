@@ -89,6 +89,14 @@ simba3d Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`simba3d_taskrun_SOLO` Module
+----------------------------------
+
+.. automodule:: simba3d.simba3d_taskrun_SOLO
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`srvf_open_curve_Rn` Module
 --------------------------------
 

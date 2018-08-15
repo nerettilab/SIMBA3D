@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # simba3d documentation build configuration file, created by
-# sphinx-quickstart on Tue Feb  6 15:36:27 2018.
+# sphinx-quickstart on Tue Aug 14 13:57:36 2018.
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #
