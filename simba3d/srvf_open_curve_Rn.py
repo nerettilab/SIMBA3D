@@ -44,7 +44,7 @@ def interp(t,X,tnew=None):
         return Xnew.T
     else:
         return Xnew        
-        
+
 def gradient(curve):
     '''
     row-wise gradient for unifromly sampled curve
@@ -238,13 +238,12 @@ def find_best_rotation(curve1,curve2):
     '''
     Optimally rotate the second curve to the first curve
     '''
-    [n,T]=np.shape(curve1)
-
+    [T,n]=np.shape(curve1)
+    
     transpose=False;
-    if T<n:
+    if T>n:
         curve1=curve1.T
         curve2=curve2.T
-        [n,T] = np.shape(curve1)  
         transpose=True
     [T,n1] = np.shape(curve1)  
     [T,n2] = np.shape(curve2) 
@@ -255,11 +254,15 @@ def find_best_rotation(curve1,curve2):
         t=np.linspace(0,1,n)
         recurve1=interp(t1,curve1,t)   
         recurve2=interp(t2,curve2,t)
+        print np.shape(recurve1)
+        print np.shape(recurve2)
         A=np.matrix(recurve1)*np.matrix(recurve2.T)
+        print np.shape(A)
     else:        
         A=np.matrix(curve1)*np.matrix(curve2.T)
     U,S,V=npla.svd(A)
-    S=np.eye(n)
+    
+    S=np.eye(T)
     if (npla.det(A)<0):
         S[:,-1]=-S[:,-1]
     R=U*S*V
@@ -268,13 +271,12 @@ def find_best_rotation(curve1,curve2):
         return (Rcurve2.T,R)
     else:
         return (Rcurve2,R)
-        
+
 def find_best_ortho(curve1,curve2):
     '''
     Optimally rotate or reflect the second curve to the first curve
     '''
-
-    [n,T]=np.shape(curve1)
+    [T,n]=np.shape(curve1)
     transpose=False;
     if T<n:
         curve1=curve1.T
@@ -299,7 +301,7 @@ def find_best_ortho(curve1,curve2):
         return (Rcurve2.T,R)
     else:
         return (Rcurve2,R) 
-        
+
 def standardize_curves(curves):
     '''
     First removes translation and scale, and then rotates the remaining curves to first curve.

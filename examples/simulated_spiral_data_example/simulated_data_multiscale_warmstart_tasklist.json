@@ -1,0 +1,144 @@
+[
+    [
+        {
+            "animate": false,
+            "check_jacobian": false,
+            "data": {},
+            "file_names": {
+                "inputdir": "data/",
+                "output_filename": "simulated_data_b7b1fe84-8b80-4bb4-9af8-8f0f9e7aa3b7_50.npz",
+                "outputdir": "results/",
+                "pairwise_contact_matrix": "simulate_data_400_50x50.npy"
+            },
+            "index_parameters": {
+                "offdiagonal": 1
+            },
+            "options": {
+                "display": true,
+                "maxitr": 100000,
+                "method": "BFGS",
+                "store": false
+            },
+            "parameters": {
+                "a": -3.0,
+                "b": 1.0,
+                "term_weights": {
+                    "data": 1.0,
+                    "shape prior": 0.0,
+                    "smoothing": 0.1,
+                    "uniform spacing": 0.1
+                }
+            },
+            "plotfigs": false,
+            "randomize_initialization": false,
+            "taskname": "run on 50x50",
+            "usewarmstarts": true,
+            "uuid": "b7b1fe84-8b80-4bb4-9af8-8f0f9e7aa3b7_3"
+        },
+        {
+            "animate": false,
+            "check_jacobian": false,
+            "data": {},
+            "file_names": {
+                "inputdir": "data/",
+                "output_filename": "simulated_data_b7b1fe84-8b80-4bb4-9af8-8f0f9e7aa3b7_100.npz",
+                "outputdir": "results/",
+                "pairwise_contact_matrix": "simulate_data_400_100x100.npy"
+            },
+            "index_parameters": {
+                "offdiagonal": 1
+            },
+            "options": {
+                "display": true,
+                "maxitr": 100000,
+                "method": "BFGS",
+                "store": false
+            },
+            "parameters": {
+                "a": -3.0,
+                "b": 1.0,
+                "term_weights": {
+                    "data": 1.0,
+                    "shape prior": 0.0,
+                    "smoothing": 0.1,
+                    "uniform spacing": 0.1
+                }
+            },
+            "plotfigs": false,
+            "randomize_initialization": false,
+            "taskname": "run on 100x100",
+            "usewarmstarts": true,
+            "uuid": "b7b1fe84-8b80-4bb4-9af8-8f0f9e7aa3b7_4"
+        },
+        {
+            "animate": false,
+            "check_jacobian": false,
+            "data": {},
+            "file_names": {
+                "inputdir": "data/",
+                "output_filename": "simulated_data_b7b1fe84-8b80-4bb4-9af8-8f0f9e7aa3b7_200.npz",
+                "outputdir": "results/",
+                "pairwise_contact_matrix": "simulate_data_400_200x200.npy"
+            },
+            "index_parameters": {
+                "offdiagonal": 1
+            },
+            "options": {
+                "display": true,
+                "maxitr": 100000,
+                "method": "BFGS",
+                "store": false
+            },
+            "parameters": {
+                "a": -3.0,
+                "b": 1.0,
+                "term_weights": {
+                    "data": 1.0,
+                    "shape prior": 0.0,
+                    "smoothing": 0.1,
+                    "uniform spacing": 0.1
+                }
+            },
+            "plotfigs": false,
+            "randomize_initialization": false,
+            "taskname": "run on 200x200",
+            "usewarmstarts": true,
+            "uuid": "b7b1fe84-8b80-4bb4-9af8-8f0f9e7aa3b7_5"
+        },
+        {
+            "animate": false,
+            "check_jacobian": false,
+            "data": {},
+            "file_names": {
+                "inputdir": "data/",
+                "output_filename": "simulated_data_b7b1fe84-8b80-4bb4-9af8-8f0f9e7aa3b7_400.npz",
+                "outputdir": "results/",
+                "pairwise_contact_matrix": "simulate_data_400_400x400.npy"
+            },
+            "index_parameters": {
+                "offdiagonal": 1
+            },
+            "options": {
+                "display": true,
+                "maxitr": 100000,
+                "method": "BFGS",
+                "store": false
+            },
+            "parameters": {
+                "a": -3.0,
+                "b": 1.0,
+                "term_weights": {
+                    "data": 1.0,
+                    "shape prior": 0.0,
+                    "smoothing": 0.1,
+                    "uniform spacing": 0.1
+                }
+            },
+            "plotfigs": false,
+            "randomize_initialization": false,
+            "taskname": "run on 400x400",
+            "usewarmstarts": true,
+            "uuid": "b7b1fe84-8b80-4bb4-9af8-8f0f9e7aa3b7_6"
+        }
+    ]
+]
