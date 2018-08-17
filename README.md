@@ -6,6 +6,9 @@ This tool was primarily developed to study the 3D structure Chromatin. It
 include analytically derived gradients for a variety of penalty functions to
 estimate 3D architecture from pairwise interaction matrices.
 
+For more details see our biorxiv paper.
+
+https://www.biorxiv.org/content/early/2018/05/07/316265
 
 # Dependencies
 ## Required Packages
