@@ -29,15 +29,15 @@ outputdir='results/' # directory where the files will be outputed
 #% write the down sampled matrices to file
 
 # create the downsampled population matrices
-res,population_contact_matricies=mp.save_matrices(inputdir,'population_mESC_M19_a.npy')
+#res,population_contact_matricies=mp.save_matrices(inputdir,'population_mESC_M19_a.npy')
 
 # create the downsampled single cell matrices
-res,pairwise_contact_matricies=mp.save_matrices(inputdir,'cell1_mESC_M19_a.npy')
+res,pairwise_contact_matricies=mp.save_matrices(inputdir,'simulate_data_400.npy')
 
 # specify the matrix index range
 number_of_resampled_datasets=len(pairwise_contact_matricies)
-# use the four highest resolution resampled matrices (YOU! make sure you does get out of index range)
-downsampled_matrix_index=range(number_of_resampled_datasets-4,number_of_resampled_datasets)
+# use the six highest resolution resampled matrices (YOU! make sure you does get out of index range)
+downsampled_matrix_index=range(number_of_resampled_datasets-6,number_of_resampled_datasets)
 # manually enter which downsample matrices you want to use
 # downsampled_matrix_index=[4,5,6,7]
 #%% create the task list
@@ -63,7 +63,7 @@ for jj in range(1):
               # debug options
               'check_jacobian'    : False, # check analytical gradient with numerical gradient 9
               
-               # data 15file names to load
+               # data file names to load
               'file_names'  :
                   {
                   'inputdir'  : inputdir, # location of data input files
@@ -71,9 +71,9 @@ for jj in range(1):
                   # the following are relative to the inputdir directory
                   "pairwise_contact_matrix"   : pairwise_contact_matricies[ii],
                   #"initialized_curve"         : 'initialization.npy',
-                  "population_contact_matrix" : population_contact_matricies[ii],   
+                  #"population_contact_matrix" : population_contact_matricies[ii],   
                   #"prior_shape_model"         : 'prior_shape_model.npy',       
-                  'output_filename':"add_a_tag_name_here_"+UUID+'_'+str(res[ii])+'.npz' # manually assign name to output file
+                  'output_filename':"simulated_data_"+UUID+'_'+str(res[ii])+'.npz' # manually assign name to output file
                   },
               'index_parameters' : # specify which matrix indices are included in optimization
                   { 
@@ -104,9 +104,9 @@ for jj in range(1):
                   'term_weights'   :  
                       {
                       'data'             : 1.0,      # weight for the data term
-                      'uniform spacing'  : 0.5, # scaled first order penalty
-                      'smoothing'        : 1.0, # scaled second order penalty
-                      'population prior' : 0.1,    # weight for the population matrix prior
+                      'uniform spacing'  : 0.1, # scaled first order penalty
+                      'smoothing'        : 0.1, # scaled second order penalty
+                       #  'population prior' : 0.0,    # weight for the population matrix prior
                       'shape prior'      : 0.0,    # weight for the shape prior
                       
                       # below are unsupported penalties
@@ -142,7 +142,7 @@ for jj in range(1):
 
 
 #%% Use JSON to write the tasklist to file
-taskfilepath='multiscale_warmstart_tasklist.json'
+taskfilepath='simulated_data_multiscale_warmstart_tasklist.json'
 with open(taskfilepath, 'w') as tasklist:
     json.dump(taskss, tasklist,indent=4,sort_keys=True) # pretty print the JSON to make it human readible
     #json.dump(tasks, tasklist) # if you don't care about pretty printing the JSON just dump it this way

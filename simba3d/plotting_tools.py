@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.colors import SymLogNorm,Normalize
 
+
 def set_axis_equal(ax,xlimit=None,ylimit=None,zlimit=None):
     '''
     set axis equal
@@ -45,8 +46,11 @@ def plot_curve(curve,t=None,ax=None,fig=None):
     '''
     plot a 2D or 3d parametrized curve
     '''
-
     [d,n] = np.shape(curve)
+    if (t is not None):
+      if (len(t) != len(curve)):
+        # the curves might have different dimensions
+        t= np.linspace(0,1,n)
     if d>n:
         curve=curve.T
         [d,n] = np.shape(curve)

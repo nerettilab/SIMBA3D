@@ -129,7 +129,10 @@ def load_result(outputfile):
         
         if extension == '.npy':
             data=np.load( os.path.join(results_dir,str(outputfile)))
-            summary=data['summary'].item()
+            if 'summary' in data:
+              summary=data['summary'].item()
+            else:
+              summary={'X_evol':[data]}
         if extension == '.npz':
             data=np.load( os.path.join(results_dir,str(outputfile)))
             summary=data['summary'].item()
