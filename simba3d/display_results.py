@@ -57,30 +57,31 @@ def main(args=None):
         if (args[ii]== '-h')|(args[ii]== '--help'):
            printhelp()
            sys.exit()
-        if (args[ii]== '-f')|(args[ii]== '--filter'): 
-            ii+=1 
+        if (args[ii]== '-f')|(args[ii]== '--filter'):
+            ii+=1
             param_name.append(str(args[ii]))
-            ii+=1 
+            ii+=1
             param_min.append(np.float(args[ii]))
-            ii+=1 
-            param_max.append(np.float(args[ii])   )      
-        if (args[ii]== '-c')|(args[ii]== '--center-to'): 
-            ii+=1 
-            center_to_filename=str(args[ii])      
-        if (args[ii]== '-i')|(args[ii]== '--input-files'):           
+            ii+=1
+            param_max.append(np.float(args[ii])   )
+        if (args[ii]== '-c')|(args[ii]== '--center-to'):
+            ii+=1
+            center_to_filename=str(args[ii])
+        if (args[ii]== '-i')|(args[ii]== '--input-files'):
            inputfiles=[]
            ii+=1
            while ii < len(args):
                inputfiles.append(args[ii])
-               ii+=1  
+               ii+=1
 
         ii+=1
     #print inputfiles
     curves=[]
     scurves=[]
+    scurves_init=[]
     length=[]
-    energy=[]    
-    
+    energy=[]
+
     # specify the file all the other figures will rotate to
     if center_to_filename is None:
         center_to_filename=inputfiles[0]
@@ -98,7 +99,7 @@ def main(args=None):
     X0=X0.reshape((d,n)) # correct dimensions
     center_curve,mu=srvf.center_curve(X0)
     scenter_curve,scale=srvf.scale_curve(center_curve)
-    
+
     for inputfile in inputfiles:
         summary=mp.load_result(inputfile)
         if result_passes_filter(summary,param_name,param_min,param_max):
@@ -122,35 +123,77 @@ def main(args=None):
                 X0=X0.reshape((d,n)) # correct dimensions
                 curves.append(X0)
                 length.append(n)
-                
-                curve,mu=srvf.center_curve(curves[-1])
-                scurve,scale=srvf.scale_curve(curves[-1])
+
+                curve,mu=srvf.center_curve(X0)
+                scurve,scale=srvf.scale_curve(curve)
                 scurves.append(scurve)
                 scurve,rot=srvf.find_best_rotation(scenter_curve,scurve)
-                scurves[-1]=scurve    
-                
-   
-    #plt.subplots_adjust(left=0.0,right=1.0,bottom=0.0,top=1.0,wspace=0.0,hspace=0.0) 
+                scurves[-1]=scurve
+            if 'initialized_curve'in summary:
+                X0=np.array(summary['initialized_curve']) # get the last curve
+                #keyboard()
+                # get dimension
+                if 'd' in summary:
+                    d=summary['d']
+                else:
+                    d,n=np.shape(X0)
+                if 'n' in summary:
+                    n=summary['n']
+                else:
+                    d,n=np.shape(X0)
+                X0=X0.reshape((d,n)) # correct dimensions
+                curves.append(X0)
+                length.append(n)
+
+                curve,mu=srvf.center_curve(X0)
+                scurve,scale=srvf.scale_curve(curve)
+                scurves_init.append(scurve)
+                scurve,rot=srvf.find_best_rotation(scenter_curve,scurve)
+                scurves_init[-1]=scurve
+
+
+    #plt.subplots_adjust(left=0.0,right=1.0,bottom=0.0,top=1.0,wspace=0.0,hspace=0.0)
     if energy:
-        fig1=plt.figure() 
+        fig1=plt.figure()
         for ii in range(len(energy)):
             plt.figure(fig1.number)
             plt.plot(energy[ii])
-        
-        fig2=plt.figure()    
+        plt.title("Energy Evolution")
+
+        fig3=plt.figure()
         plt.subplots_adjust(left=0.0,right=1.0,bottom=0.0,top=1.0,wspace=0.0,hspace=0.0)
         #fig2.tight_layout()
-        ax2=fig2.add_subplot(111,projection='3d')        
-        ax2.set_axis_off()  
+        ax3=fig3.add_subplot(111,projection='3d')
+        ax3.set_axis_off()
+        (m,n)= np.shape(scurves_init[-1])
+        t=np.linspace(0,1,n)
+        pt.plot_curves(scurves_init,t,ax=ax3,fig=fig3)
+        #pt.plot_pts(summary['X_evol'][-1],t,ax=ax2,fig=fig2)
+        #print summary.keys()
+        for ii in range(len(scurves_init)):
+            pt.plot_pts(scurves_init[ii],t,ax=ax3,fig=fig3)
+        plt.title("Initialized Curve")
+        plt.figure(fig3.number)
+
+        fig2=plt.figure()
+        plt.subplots_adjust(left=0.0,right=1.0,bottom=0.0,top=1.0,wspace=0.0,hspace=0.0)
+        #fig2.tight_layout()
+        ax2=fig2.add_subplot(111,projection='3d')
+        ax2.set_axis_off()
         (m,n)= np.shape(scurves[-1])
         t=np.linspace(0,1,n)
         pt.plot_curves(scurves,t,ax=ax2,fig=fig2)
         #pt.plot_pts(summary['X_evol'][-1],t,ax=ax2,fig=fig2)
-        #print summary.keys()  
+        #print summary.keys()
         for ii in range(len(scurves)):
-            pt.plot_pts(scurves[ii],t,ax=ax2,fig=fig2)   
-        plt.figure(fig2.number)            
+            pt.plot_pts(scurves[ii],t,ax=ax2,fig=fig2)
+        plt.figure(fig2.number)
+        plt.title("Estimated Curve")
+
+
+
         plt.show(block=True)
+
     else:
         print "No file specified matches filter requirements"
 if __name__ == "__main__":

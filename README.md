@@ -6,9 +6,6 @@ This tool was primarily developed to study the 3D structure Chromatin. It
 include analytically derived gradients for a variety of penalty functions to
 estimate 3D architecture from pairwise interaction matrices.
 
-For more details see our biorxiv paper.
-
-https://www.biorxiv.org/content/early/2018/05/07/316265
 
 # Dependencies
 ## Required Packages
@@ -33,6 +30,14 @@ If pip is installed, then it can be installed from this directory using
 Pip results in a cleaner install, and it is easier to remove if desired
 
 > pip uninstall simba3d
+
+If you do not have root access you can do an install using the user scheme
+
+pip install . --user
+
+This is probably safer to use in general. Installing using root privelges could
+potentially create os issues in some cases. It is unlikely that the os uses
+numpy or scipy or any other packages simba3d may want updated.
 
 simba3d can either be used as a python module or as a command line interface.
 Using it as a python module has the advantage that a long and tedious sequence 
@@ -89,8 +94,10 @@ The individual tasks are dictionaries with the following keys:
 * 'input_file_names' manage file names
     * 'inputdir' parent directory for the input files ['.']
     * "pairwise_contact_matrix"  the pairwise interacation matrix file (path relative to inputdir )
+    * "sparse_pairwise_contact_matrix"  the pairwise interacation matrix file in a sparse format (path relative to inputdir )
     * "initialized_curve" (optional) file to import initialized curve (path relative to inputdir )
     * "population_contact_matrix" (optional) the pairwise interacation matrix file from poptulation data (path relative to inputdir )
+    * "sparse_population_contact_matrix" (optional) the pairwise interacation matrix file from population data in a sparse format (path relative to inputdir )
     * "prior_shape_model" (optional) shape prior curve file (path relative to inputdir )
     * 'outputdir' parent directory for the output files ['.']
     * 'output_filename' (optional) the file name to output the result it (.mat or .npz) [uuid.npz]
@@ -108,6 +115,11 @@ The individual tasks are dictionaries with the following keys:
     * 'display' (optional) display function values at each iteration? [True]
     * 'store'   (optional) store the iterative curves? [False]
     * 'method'  (optional) optimizer option 'BFGS'[default],'AGM','Nelder-Mead','CG','Newton-CG'
+* 'index_parameters'
+    * 'missing_rowsum_threshold'   (optional) specifies a threshold matrix row sum to treat an entry as missing data (missing nodes are ignored in the optimization)
+    * 'index_missing'              (optional) specifies which entries are treated as missing (missing nodes are ignored in the optimization)
+    * 'off_diagonal'               (optional) offset off of the diagonal entries which is treated as missing (and ignored)
+    * 'pairwise_combinations'      (optional) optionally specify specific pairwise combination to use
 
 You can either write a script to create a list of tasks with the desired 
 settings and then pass them into the optimzer, or you can create a JSON file
@@ -142,33 +154,15 @@ Several examples can be seen in the examples directory.
 
 # Output File Formats
 
-Currently, can create reports in the following output formats:
-* '.npz'  zipped NumPy array file
-* '.mat'  MatLab Mat-File file
-* '.txt' text file
-* '.json' text file
+The default format is no longer '.npz'. The python2 and python3 binaries are not compatable.
+The default output is now '.json'.
 
-The default format is '.npz' and it is recommended to use this output because
-it is easier to load into python and convert to some other format if desired.
+# Sparse Input File Formats
 
-A convertion tool has been packaged with simba3d to assist in converting
-from .npz to some other desirable format. This convertion tool can be called
-from the <'simba3d-convertion'> command.
+Currently there is a json input format where you specify the row index, column index, and count values 
+as arrays. This is a very new feature. The previous output formats still work, and are left untouched.
+See the sparse example for details.
 
-For more information on using the convertion tool type
-> simba3d-convertion -h
+(coming soon) I am working on a comma delimited input format as well. 
 
-This can also be called on a local install using the command
-> python run_simba3d_convertion.py -h
-
-# Veiwing Results
-
-simba3d has several tools to aid in summarizing the results collected.
-
-The <'please-print'> command can be used to get print out specific key data
-values stored in the results file. 
-
-If the matplotlib module is installed, then simba3d also has a graphical
-summary command which can be called by <'simba3d-disp'>
-
-This command will display the final curve and the energy of selected results
+I am still working on the documentation for this (much harder than just coding it).

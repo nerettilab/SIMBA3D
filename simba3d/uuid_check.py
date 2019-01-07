@@ -6,28 +6,57 @@ Created on Tue Oct  3 08:51:56 2017
 
 @author: Michael Rosenthal
 """
+
 from simba3d.matrixlabish import significant_figures,keyboard
 import numpy as np
 import os
 import scipy.io
+
 # import simplejson or json
 #
 # This is useful because the syntax is pythonic, it's human readable, and it
 # can be read by other programs in other languages.
 #
-# json is potentially and older version of simplejson which is updated more 
+# json is potentially and older version of simplejson which is updated more
 # frequently than Python
 #
 # A good practice is to use one or the other as a fallback.
 try: import simplejson as json # try to import simplejson
 except ImportError: import json #otherwise import json
 
+def load_result(outputfile):
+    """
+    This will load a simba3d result
+    """
+    results_dir='.'
+    extension = os.path.splitext(outputfile)[1]
+    summary={}
+    try:
 
+        if extension == '.npy':
+            data=np.load( os.path.join(results_dir,str(outputfile)))
+            if 'summary' in data:
+              summary=data['summary'].item()
+            else:
+              summary={'X_evol':[data]}
+        if extension == '.npz':
+            data=np.load( os.path.join(results_dir,str(outputfile)))
+            summary=data['summary'].item()
+        if extension == '.mat':
+            summary=loadmat(os.path.join(results_dir,str(outputfile)))
+        if extension == '.json':
+            with open(os.path.join(results_dir,str(outputfile)),'r') as result:
+                summary=dict(json.load(result))
+            summary['X_evol']=[np.array(X) for X in summary['X_evol']]
+            summary['initialized_curve']=np.array(summary['initialized_curve'])
+    except:
+        summary={}
+    return summary
 
 def get_uuid_from_directory(results_dir):
     '''
     load all the files in the specified results directory and extract the uuid.
-    
+
     This is useful for determining which files have already been run.
     '''
     files=os.listdir(results_dir)
@@ -35,15 +64,9 @@ def get_uuid_from_directory(results_dir):
     for filename in files:
         extension = os.path.splitext(filename)[1]
         try:
-            if extension == '.npz':
-                data=np.load( os.path.join(results_dir,str(filename)))
-                summary=data['summary'].item()
-                if 'uuid' in summary:
-                    uuid.append(summary['uuid'])
-            if extension == '.mat':
-                summary=data['summary'].item()
-                if 'uuid' in summary:
-                    uuid.append(summary['uuid'])
+            summary=load_result(os.path.join(results_dir,str(filename)))
+            if 'uuid' in summary:
+                uuid.append(summary['uuid'])
         except:
             '''
             '''
@@ -51,7 +74,7 @@ def get_uuid_from_directory(results_dir):
 def get_uuid_from_tasklist(taskfilepath):
     '''
     Load a tasklist and get all the uuid
-    
+
     This is useful for determining which files have already been run.
     '''
     with open(taskfilepath,'r') as tasklist:
@@ -60,7 +83,7 @@ def get_uuid_from_tasklist(taskfilepath):
     for task in tasks:
         if 'uuid' in task:
             uuid.append(task['uuid'])
-    return uuid;    
+    return uuid;
 def get_uuid_remaining_tasks(taskfilepath,results_dir):
     '''
     Find uuid of tasks in the taskfilepath that are not in the
@@ -82,7 +105,7 @@ def get_uuid_from_tasks(tasks):
     for task in tasks:
         if 'uuid' in task:
             uuid.append(task['uuid'])
-    return uuid  
+    return uuid
 def get_remaining_tasks(taskfilepath,results_dir):
     '''
     Find tasks in the taskfilepath that are not in the results_dir directory.
@@ -96,8 +119,8 @@ def get_remaining_tasks(taskfilepath,results_dir):
             if task['uuid'] not in uuid_finished_tasks:
                 print task['uuid']
                 tasks_remaining.append(task)
-    return tasks_remaining   
-    
+    return tasks_remaining
+
 def check_tasks(tasks):
     '''
     Checks each task in a list of task has not already been completed
@@ -109,7 +132,7 @@ def check_tasks(tasks):
         results_dir='.'
         if 'outputdir' in task['file_names']:
             results_dir= os.path.join(results_dir,task['file_names']['outputdir'])
-        if results_dir not in results_dirs:            
+        if results_dir not in results_dirs:
             results_dirs.append(results_dir)
             local_finished_tasks=get_uuid_from_directory(results_dir)
             uuid_finished_tasks.extend(local_finished_tasks)
@@ -133,7 +156,7 @@ def check_tasks_index(tasks):
         results_dir='.'
         if 'outputdir' in task['file_names']:
             results_dir= os.path.join(results_dir,task['file_names']['outputdir'])
-        if results_dir not in results_dirs:            
+        if results_dir not in results_dirs:
             results_dirs.append(results_dir)
             local_finished_tasks=get_uuid_from_directory(results_dir)
             uuid_finished_tasks.extend(local_finished_tasks)
@@ -142,11 +165,11 @@ def check_tasks_index(tasks):
         if 'uuid' in task:
             if task['uuid'] not in uuid_finished_tasks:
                 print task['uuid']+' Not found'
-                index.append(ii)  
+                index.append(ii)
         else:
-            index.append(ii)  
+            index.append(ii)
         ii+=1;
-    
+
     print 'Progress: '+str(len(tasks)-len(index))+' of '+str(len(tasks))+' tasks are completed'
     return index
 def check_tasks_indexs(tasks):
@@ -163,7 +186,7 @@ def check_tasks_indexs(tasks):
         results_dir='.'
         if 'outputdir' in task['file_names']:
             results_dir= os.path.join(results_dir,task['file_names']['outputdir'])
-        if results_dir not in results_dirs:            
+        if results_dir not in results_dirs:
             results_dirs.append(results_dir)
             local_finished_tasks=get_uuid_from_directory(results_dir)
             uuid_finished_tasks.extend(local_finished_tasks)
@@ -172,19 +195,19 @@ def check_tasks_indexs(tasks):
         if 'uuid' in task:
             if task['uuid'] not in uuid_finished_tasks:
                 #print task['uuid']+' Not found'
-                index.append(ii)            
+                index.append(ii)
         ii+=1;
     #print 'Progress: '+str(len(tasks)-len(index))+' of '+str(len(tasks))+' tasks are completed'
-    return index         
+    return index
 def check_status(tasks):
     '''
     Checks each task in a list of task has not already been completed.
-    
+
     returns the number of task finish and the total number of task for each
-    subtask    
+    subtask
     '''
     uuid_finished_tasks=[]
-    results_dirs=[]   
+    results_dirs=[]
     if type(tasks)==dict:
         tasks=[tasks]
     lengths=np.zeros(len(tasks))
