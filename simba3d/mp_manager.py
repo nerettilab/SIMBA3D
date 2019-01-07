@@ -19,6 +19,7 @@ import multiprocessing
 import time
 import uuid
 import numpy as np
+import scipy
 from scipy.io import loadmat, savemat
 # A good practice is to use one or the other as a fallback.
 try: import simplejson as json # try to import simplejson
@@ -27,14 +28,14 @@ except ImportError: import json #otherwise import json
 import simba3d.optimizer as opt
 #import simba3d.plotting_tools as pt
 import simba3d.srvf_open_curve_Rn as srvf
-import simba3d.uuid_check as uc
+from simba3d.uuid_check import check_tasks_index, load_result
 
 def create_downsampled_matrices(data):
     """
     This takes a matrix and returns a list of downsampled matrixes that recursively
     reduces the dimension of the matrix in roughly half each time
 
-    Each time, the matrix is zero-padded to make the number of entries even, then 
+    Each time, the matrix is zero-padded to make the number of entries even, then
     entries in the added together in groups of 4.
 
     It assumes the matrix is square, and that the diagonal entries are ignored.
@@ -49,7 +50,7 @@ def create_downsampled_matrices(data):
             C[k]=np.concatenate((C[k],np.zeros((1,n))),axis=0)
             C[k]=np.concatenate((C[k],np.zeros((n+1,1))),axis=1)
             n+=1
-        
+
         n=int(n/2.0);
         C.append(np.zeros((n,n)))
         for i in range(n-1):
@@ -62,17 +63,49 @@ def create_downsampled_matrices(data):
         C[k+1]= C[k+1]+A.T
         k=k+1
     return C;
-    
+
+def load_sparse_matrix(inputfile):
+    ext=inputfile.split('.')[-1]
+    sparce_rep=dict()
+    iii=[]
+    jjj=[]
+    vvv=[]
+    row_dim=0
+    col_dim=0
+    if ext=='mat':
+        sparce_rep=loadmat(inputfile)
+        iii=sparce_rep['row_index'][0].tolist()
+        jjj=sparce_rep['column_index'][0].tolist()
+        vvv=sparce_rep['count'][0].tolist()
+        row_dim=sparce_rep['row_dimension'][0][0]
+        col_dim=sparce_rep['column_dimension'][0][0]
+    else:
+        with open(inputfile, 'r') as jsonfile:
+            sparce_rep=json.load(jsonfile)
+        iii=sparce_rep['row_index']
+        jjj=sparce_rep['column_index']
+        vvv=sparce_rep['count']
+        row_dim=sparce_rep['row_dimension']
+        col_dim=sparce_rep['column_dimension']
+        n=max([row_dim,col_dim])
+    interactions=sp.coo_matrix((vvv,(iii,jjj)),shape=(n,n))
+    ''' to convert into a dense matrix'''
+    #data=interactions.toarray()
+    #data=data+data.transpose()
+    #return data
+    return interactions
+
+
 def save_matrices(inputdir,data_matrix_file,outputdir=None):
     """
     This saves a downsampled versions of a matrix npy file.
 
-    You tell it the directory and the name of the file, and this will create the 
+    You tell it the directory and the name of the file, and this will create the
     down sampled matrix files for the multiresolution warm-starts.
     """
     if (outputdir==None):
       """
-      if the user does not specify the outputdir, assume the ouput and input 
+      if the user does not specify the outputdir, assume the ouput and input
       directory are the same.
       """
       outputdir=inputdir
@@ -103,7 +136,7 @@ def jsonify(data):
     This is a small serializer for saving output in human readable json format
     """
     if isinstance(data,dict):
-        serialized_summary= dict() 
+        serialized_summary= dict()
         for key,value in data.iteritems():
           if isinstance(value, list):
             value = [jsonify(item) for item in value]
@@ -111,61 +144,48 @@ def jsonify(data):
             value = jsonify(value)
           elif type(value).__module__=='numpy':
             value=value.tolist()
-          serialized_summary[key]=value    
+          else:
+              if isinstance(value, dict):
+                  for key2,value2 in value.iteritems():
+                      value[key2]=jsonify(value2)
+              if isinstance(value,scipy.sparse.coo.coo_matrix):
+                  value="not serializable"
+          serialized_summary[key]=value
     elif type(data).__module__=='numpy':
         serialized_summary=data.tolist()
-    else: 
+    else:
         serialized_summary=data
     return serialized_summary
 
-def load_result(outputfile):
-    """
-    This will load a simba3d result
-    """
-    results_dir='.'
-    extension = os.path.splitext(outputfile)[1]
-    summary={}
-    try:
-        
-        if extension == '.npy':
-            data=np.load( os.path.join(results_dir,str(outputfile)))
-            if 'summary' in data:
-              summary=data['summary'].item()
-            else:
-              summary={'X_evol':[data]}
-        if extension == '.npz':
-            data=np.load( os.path.join(results_dir,str(outputfile)))
-            summary=data['summary'].item()
-        if extension == '.mat':
-            summary=loadmat(os.path.join(results_dir,str(outputfile)))
-        if extension == '.json':
-            with open(os.path.join(results_dir,str(outputfile)),'r') as result:
-                summary=dict(json.load(result))
-    except:
-        summary={}
-    return summary
+
+import scipy.sparse as sp
+
+
+
+
 def save_data(outputfilepath,summary):
     """
     This will save a simba3d result
-    
+
     Summary is the result of the experiment
     """
     ext=os.path.splitext(outputfilepath)[-1].lower()
     if ext=='.mat':
         savemat(outputfilepath,summary)
-        return outputfilepath        
+        return outputfilepath
     elif ext=='.json':
         with open(outputfilepath, 'w') as result:
             # serialize
-            json.dump(jsonify(summary), result,indent=4,sort_keys=True)  
+            serialized_summary=jsonify(summary)
+            json.dump(serialized_summary, result,indent=4,sort_keys=True)
     elif ext=='.txt':
         with open(outputfilepath, 'w') as result:
-            pprint(summary, result)      
+            pprint(summary, result)
     else:
         if ext != '.npz':
             outputfilepath+='.npz'
-        np.savez(outputfilepath,summary=summary) 
-    return outputfilepath         
+        np.savez(outputfilepath,summary=summary)
+    return outputfilepath
 def convert(filename,ext_out=".npz"):
     """
     convert .npz simba3d result into some other supported format
@@ -196,7 +216,7 @@ def get_tag_name(task):
     '''
     tag=''
     for penalty in task['parameters']['term_weights'].keys():
-        
+
         f=task['parameters']['term_weights'][penalty]
         if f !=0.0:
             if penalty!='data':
@@ -205,21 +225,22 @@ def get_tag_name(task):
                 tag+='_'+penalty+''+significant_figures(f)
     if 'seed' in task:
         tag+='_seed'+str(task['seed'])
-    return tag 
-def run_tasks(tasks,resume=True):  
+    return tag
+def run_tasks(tasks,resume=True):
     '''
     plural task runner.
-    
+
     This runs a list of independent tasks and divides the work across multiple
     processes if desired.
-    
+
     Ther resume option tells simba3d to skip over tasks with uuid's that have
     already been ran.
     '''
+
     if type(tasks) is dict: # if a dicitonary is passed in, but it in a list so we know the layer
         tasks=[tasks]
     if resume:
-        index_remaining=uc.check_tasks_index(tasks) # find which tasks still need to run
+        index_remaining=check_tasks_index(tasks) # find which tasks still need to run
         print index_remaining
     else:
         index_remaining=range(len(tasks))
@@ -231,24 +252,25 @@ def run_tasks(tasks,resume=True):
       UUID=str(uuid.uuid4()) # generate a uuid
     for ii in index_remaining: # loop through remaining tasks
         if 'uuid' not in tasks[ii]: # make sure the task has a uuid
-          tasks[ii]["uuid"]=UUID+'_'+str(ii) 
+          tasks[ii]["uuid"]=UUID+'_'+str(ii)
         if ii==0:
-            outputfilepath=run_task(tasks[0])   # run the first task
-        else:        
+          outputfilepath=run_task(tasks[0])   # run the first task
+        else:
             if 'usewarmstarts' in tasks[ii]:
+
                 usewarmstarts=tasks[ii]['usewarmstarts'] # if usewarmstarts parameter is set then use that value
             if usewarmstarts:
                 print "Using warmstarts sequentially from previous task"
                 if 'uuid' not in tasks[ii]:
                     tasks[ii]["uuid"]=UUID+'_'+str(ii) # make sure the task has a uuid
                 outputfilepath=get_outputfilepath(tasks[ii-1]) # get the outputfile path from the previous run
-                print outputfilepath                
+                print outputfilepath
                 '''
-                ext=os.path.splitext(outputfilepath)[-1].lower() 
+                ext=os.path.splitext(outputfilepath)[-1].lower()
                 if ext=='.mat':
                     data=loadmat(outputfilepath)
                 else:
-                    data=np.load(outputfilepath) 
+                    data=np.load(outputfilepath)
                 summary=data['summary'].item()
                 '''
                 summary=load_result(outputfilepath)
@@ -265,7 +287,10 @@ def run_tasks(tasks,resume=True):
                 X0=X0.reshape((d,n0))
                 # get dimension of next run
                 data=load_data(tasks[ii])
-                (m,n)=np.shape( data['pairwise_contact_matrix'])     
+                if 'pairwise_contact_matrix' in data:
+                    (m,n)=np.shape( data['pairwise_contact_matrix'])
+                else:
+                    (m,n)=np.shape( data['sparse_pairwise_contact_matrix'])
                 # interpolate previous curve to match dimension
                 t0=np.linspace(0,1,n0)
                 t=np.linspace(0,1,n)
@@ -274,9 +299,9 @@ def run_tasks(tasks,resume=True):
                 if 'data' in tasks[ii]:
                     tasks[ii]['data']['initialized_curve']=initialized_curve
                 else:
-                    tasks[ii]['data']={'initialized_curve' : initialized_curve}          
-            outputfilepath=run_task(tasks[ii])        
-def run_task(task):  
+                    tasks[ii]['data']={'initialized_curve' : initialized_curve}
+            outputfilepath=run_task(tasks[ii])
+def run_task(task):
     """
     run a singular task
     """
@@ -285,12 +310,12 @@ def run_task(task):
     if 'uuid' not in task:
         task['uuid']= str(UUID) # a unique identifier to the specific task
     if 'taskname' not in task:
-        task['taskname']= "unnamed task" # give the task a more intuitive name       
+        task['taskname']= "unnamed task" # give the task a more intuitive name
     if 'randomize_initialization' not in task:
         task['randomize_initialization']=False
     if  'check_jacobian' in task: # to animate the iterative energy
          check_jacobian= task['check_jacobian']
-    else:         
+    else:
         check_jacobian=False # check analytical gradient with numerical gradient
         #s= int(np.random.rand()*4294967295)
     if  'sigma' in task: # to animate the iterative energy
@@ -308,7 +333,7 @@ def run_task(task):
                     'uniform spacing'  : 0.0, # scaled first order penalty
                     'smoothing'        : 0.0, # scaled second order penalty
                     'population prior' : 0.0,    # weight for the population matrix prior
-                    'shape prior'      : 0.0,    # weight for the shape prior                    
+                    'shape prior'      : 0.0,    # weight for the shape prior
                     # below are unsupported penalties
                     #'firstroughness'   :0.0e3,   # weight for the fist order roughness
                     #'secondroughness'  :0.0e-16,   # weight for the second order roughness
@@ -320,16 +345,16 @@ def run_task(task):
         task['store_task']=True # store the task in the output file
 
     parameters=task['parameters']
-    term_types=parameters['term_weights'].keys()        
-    term_weights=[]             
-    for term in term_types:        
+    term_types=parameters['term_weights'].keys()
+    term_weights=[]
+    for term in term_types:
         term_weights.append(np.array(parameters['term_weights'][term],dtype=np.double))
     if 'inputdir' not in task['file_names']:
         task['file_names']['inputdir']='./'
     inputdir=task['file_names']['inputdir']
     if 'outputdir' not in task['file_names']:
          task['file_names']['outputdir']='./'
-    outputdir=task['file_names']['outputdir']   
+    outputdir=task['file_names']['outputdir']
     # check that output directory exists and create it is needed
     directory = os.path.dirname(outputdir)
     try:
@@ -338,73 +363,71 @@ def run_task(task):
         print "Please make sure the output directory exists"
         return 0
     outputfilepath=get_outputfilepath(task)
-    
 
-    # load data ###############################################################   
+
+    # load data ###############################################################
     data=load_data(task);
-        
-                  
-    if 'initialized_curve' in data: 
-        if task['randomize_initialization']:  
+    if 'initialized_curve' in data:
+        if task['randomize_initialization']:
             # randomize initialized curve with gaussian noise
             if 'seed' in task:
                 rng=np.random.RandomState(task['seed'])
-                data['initialized_curve']=rng.normal(data['initialized_curve'],sig)     
+                data['initialized_curve']=rng.normal(data['initialized_curve'],sig)
             else:
-                data['initialized_curve']=np.random.normal(data['initialized_curve'],sig) 
+                data['initialized_curve']=np.random.normal(data['initialized_curve'],sig)
     # check that the initialized curve matches dimension of data
-    
-    if 'index_parameters' in task:      
+
+    if 'index_parameters' in task:
         if 'missing_rowsum_threshold' in task['index_parameters']:
             # specifies a threshold matrix row sum to treat an entry as missing data (missing nodes are ignored in the optimization)
             data['missing_rowsum_threshold']=task['index_parameters']['missing_rowsum_threshold']
         if 'index_mississing' in task['index_parameters']:
             # specifies which entries are treated as missing (missing nodes are ignored in the optimization)
-            data['index_mississing']=task['index_parameters']['index_mississing']    
+            data['index_mississing']=task['index_parameters']['index_mississing']
         if 'off_diagonal' in task['index_parameters']:
             # offset off of the diagonal entries which is treated as missing (and ignored)
-            data['off_diagonal']=task['index_parameters']['off_diagonal']               
+            data['off_diagonal']=task['index_parameters']['off_diagonal']
         if 'pairwise_combinations' in task['index_parameters']:
             # optionally specify specific pairwise combination to use
-            data['pairwise_combinations']=task['index_parameters']['pairwise_combinations']                       
+            data['pairwise_combinations']=task['index_parameters']['pairwise_combinations']
     #%
-    
+
     if 'options' in task:
         options=task['options']
     else:
         options = {
-                "method": "BFGS", 
-                "display": True, 
+                "method": "BFGS",
+                "display": True,
                 "maxitr": 100000
                 }
-    
+
     start=time.time()
-                
-    result=opt.opt_E(data,parameters,options)     
+
+    result=opt.opt_E(data,parameters,options)
     print "Running ..."
     print "\tTaskname: "+task['taskname']
     if 'uuid' in task:
         print "\tUUID: "+task['uuid']
     if 'title' in task:
-        print "\ttitle: "+task['title']        
+        print "\ttitle: "+task['title']
     if 'description' in task:
-        print "\tdescription: "+task['description']             
+        print "\tdescription: "+task['description']
     result.run()
-    end=time.time()   
-    comptime=  end-start  
+    end=time.time()
+    comptime=  end-start
     print "Time ellapse: "+str((comptime)/(60))+" minutes"
     if check_jacobian:
         # Check analytical jacobian is correct ########################################
         jac_error=result.check_jacobian() # this should be a small number
-        # Check the correctness of a gradient function by comparing it against a 
+        # Check the correctness of a gradient function by comparing it against a
         # (forward) finite-difference approximation of the gradient.
         print 'Error between analytical and numerical gradient at initialized curve: '+str(jac_error)
         # norm of the difference between analytical jacobian and the finite difference approximation of jacobian at initialized curve.
     if result.XK is None:
         result.XK=[result.estimated_curve]
-    
+
     summary=summarize_results(result,task)
-    
+
     print "saving results to file:"+outputfilepath
     return save_data(outputfilepath,summary)
 def get_outputfilepath(task):
@@ -417,11 +440,11 @@ def get_outputfilepath(task):
     else:
         outputdir='.'
     if 'output_filename' in task['file_names']:
-        outputfilepath=outputdir+task['file_names']['output_filename']
+        outputfilepath=os.path.join(outputdir,task['file_names']['output_filename'])
     else:
         tag=get_tag_name(task)
         output_string   =  task['taskname'].replace(' ','_')+"_"+task['uuid']+'.npz'
-        outputfilepath  = os.path.join(outputdir,output_string )   
+        outputfilepath  = os.path.join(outputdir,output_string )
     return outputfilepath
 def summarize_results(result,task):
     """
@@ -434,7 +457,7 @@ def summarize_results(result,task):
             'n':result.n,
             'd':result.d,
             'a':result.a,
-            'b':result.b,   
+            'b':result.b,
             'E_evol':result.e,
             'X_evol':result.XK,
             'computation_time':result.computation_time,
@@ -444,12 +467,12 @@ def summarize_results(result,task):
     if task['store_task']:
         summary['json_task']=task
     if 'uuid'in task:
-        summary['uuid']=task['uuid']         
+        summary['uuid']=task['uuid']
     for term in  result.term_weights.keys():
         summary['weight_'+term.replace(' ','_')]= result.term_weights[term]
         print term+' = '+str(summary['weight_'+term.replace(' ','_')])
     return summary
-    
+
 def mp_worker(task):
     if 'taskname' in task:
         taskname=task['taskname']
@@ -460,17 +483,18 @@ def mp_worker(task):
     # place task here and pass in parameters
     t= time.time()
     run_tasks(task)
-    elapsed=time.time()-t    
+    elapsed=time.time()-t
     print '\nProcess %s \tDone \t %s seconds elapsed' % (taskname, elapsed)
-    
+
 def load_data(task):
     '''
-    
+
     potential problem here, this only loads numpy arrays npy files
     '''
+
     if 'inputdir' not in task['file_names']:
         task['file_names']['inputdir']='./'
-    inputdir=task['file_names']['inputdir'] 
+    inputdir=task['file_names']['inputdir']
     datatypes=list(set(task['file_names'].keys())- set(['inputdir','outputdir','output_filename']))
     if 'data' in task:
         data=task['data'];
@@ -478,9 +502,23 @@ def load_data(task):
         data={};
     for datatype in datatypes:
         if datatype not in data: # don't load it if the user specified the data at startup
-             #print "\nLoading "+ datatype+'\n'
-             data[datatype]=np.load(inputdir+task['file_names'][datatype])
-    return data 
+             if (datatype.split('_')[0] == "sparse"):
+                 data[datatype]=load_sparse_matrix(os.path.join(inputdir,task['file_names'][datatype]))
+             else:
+                 #print "\nLoading "+ datatype+'\n'
+                 ext=task['file_names'][datatype].split('.')[-1]
+                 if (ext=='npy')| (ext=='npz'):
+                     data[datatype]=np.load(os.path.join(inputdir,task['file_names'][datatype]))
+                 elif (ext=='mat'):
+                     data[datatype]=loadmat(os.path.join(inputdir,task['file_names'][datatype]))
+                 elif (ext=='json'):
+                     with open(os.path.join(inputdir,task['file_names'][datatype]), 'r') as jsonfile:
+                         data[datatype]=json.load(jsonfile)
+                     #keyboard()
+                     # special treatement here
+    return data
+
+
 
 def mp_handler(tasks,cores):
     """

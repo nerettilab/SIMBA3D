@@ -1,6 +1,6 @@
-Metadata-Version: 1.0
+Metadata-Version: 2.1
 Name: SIMBA3D
-Version: 1.1.2
+Version: 1.3.0
 Summary: Structure Inference from Multiscale BAyes in 3 Dimensions (SIMBA3D)
 Home-page: UNKNOWN
 Author: Michael M. Rosenthal
@@ -113,6 +113,11 @@ Description: # About
             * 'display' (optional) display function values at each iteration? [True]
             * 'store'   (optional) store the iterative curves? [False]
             * 'method'  (optional) optimizer option 'BFGS'[default],'AGM','Nelder-Mead','CG','Newton-CG'
+        * 'index_parameters'
+            * 'missing_rowsum_threshold'   (optional) specifies a threshold matrix row sum to treat an entry as missing data (missing nodes are ignored in the optimization)
+            * 'index_missing'              (optional) specifies which entries are treated as missing (missing nodes are ignored in the optimization)
+            * 'off_diagonal'               (optional) offset off of the diagonal entries which is treated as missing (and ignored)
+            * 'pairwise_combinations'      (optional) optionally specify specific pairwise combination to use
         
         You can either write a script to create a list of tasks with the desired 
         settings and then pass them into the optimzer, or you can create a JSON file
@@ -180,3 +185,4 @@ Description: # About
         
 Keywords: chromatin
 Platform: UNKNOWN
+Provides-Extra: ploting_tools

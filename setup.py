@@ -9,7 +9,7 @@ from distutils.core import setup
 
 setup (
        name='SIMBA3D',
-       version='1.1.2',
+       version='1.3.0',
        author='Michael M. Rosenthal',
        author_email='Michael.M.Rosenthal@gmail.com',
        url='',
@@ -20,6 +20,7 @@ setup (
        packages=setuptools.find_packages(exclude=["*.tests","*.tests.*","tests.*","tests"]),
        entry_points={'console_scripts' : [
                'simba3d=simba3d.simba3d_taskrun:main',
+               'simba3d-solo=simba3d.simba3d_taskrun_SOLO:main',
                'simba3d-disp=simba3d.display_results:main',
                'simba3d-convertion=simba3d.convertion_tool:main',
                'simba3d-print=simba3d.print_result_summary:main'

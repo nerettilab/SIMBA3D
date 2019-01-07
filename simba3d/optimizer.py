@@ -206,6 +206,24 @@ def h2penalty(curve):
         gradh2=gradh2.T
     #print h2
     return h2,gradh2
+
+def h4penalty(curve,radius=1.0):
+    '''
+    Compute the h4 lamina penalty and its gradient.   
+    
+    '''
+    # makes sure the curve is oriented correctly
+    n,p=np.shape(curve)
+    transpose=False
+    if p>n:
+        curve=curve.T
+        n,p=np.shape(curve)
+        transpose=True    
+    normed=np.sqrt(np.sum(pow(curve,2.0),1))
+    beyondind=normed>radius
+    h4=0.0
+    gradh4=np.zeros([n,p])  
+    return h4,gradh4
     
 def parametrization_error(curve,true_square_root_speed=None,t=None):
     """
@@ -477,6 +495,11 @@ class opt_E():
             parameters['b']=DTYPE(1);  # set default (b is not identifiable with scale of points)
             print "Default b ="+str(parameters['b'])
         self.b=DTYPE(parameters['b'])
+        # lamina_radius parameter default check
+        if 'lamina_radius' not in parameters: # check for b
+            parameters['lamina_radius']=DTYPE(1);  # set default (b is not identifiable with scale of points)
+            print "Default lamina_radius ="+str(parameters['lamina_radius'])
+        self.lamina_radius=DTYPE(parameters['lamina_radius'])
         # term_weights parameter default check
         if 'term_weights' not in parameters: # check for term weights
             parameters['term_weights']= {
@@ -501,6 +524,13 @@ class opt_E():
                 print self.term_weights['h2']       
             else:
                 self.term_weights['h2']=DTYPE(self.term_weights['smoothing'])             
+        if "h4" not in self.term_weights: # scale and intensity invariant "second order"-like penalty
+            if "lamina" not in self.term_weights:
+                self.term_weights['h4']=DTYPE(0.0)    # weight for the h2 penalty      
+                print "Default lamina h4 weight  ="
+                print self.term_weights['h4']       
+            else:
+                self.term_weights['h4']=DTYPE(self.term_weights['lamina'])              
         if "population prior" not in self.term_weights:
             self.term_weights['population prior']=DTYPE(0.0)    # weight for the population matrix prior         
             print "Default population prior weight  ="
@@ -533,21 +563,34 @@ class opt_E():
 
         # set data and defaults ###############################################
         # pairwise contact matrix
+        if 'sparse_pairwise_contact_matrix' in data:
+          print data['sparse_pairwise_contact_matrix']
+          if 'pairwise_contact_matrix' not in data:
+              # this is done the dumb way for now
+              data['pairwise_contact_matrix'] =data['sparse_pairwise_contact_matrix'].toarray()
+              data['pairwise_contact_matrix'] = data['pairwise_contact_matrix']+data['pairwise_contact_matrix'].transpose()
+              
         if 'pairwise_contact_matrix' not in data: # if no pairwise contact matrix is given
             data['pairwise_contact_matrix'] =0 # set to zero
             if self.term_weights['data']!=0: 
                 self.term_weights['data']=0
-                print "\nNo pairwise interaction matrix proivded for data term!\n"
+                print("\nNo pairwise interaction matrix proivded for data term!\n")
         else:
             self.pairwise_contact_matrix=self.term_weights['data']*data['pairwise_contact_matrix']
             (m,n)=np.shape(self.pairwise_contact_matrix)
             self.n=min([m,n])
         # population contact matrix
+        if 'sparse_population_contact_matrix' in data:
+          print data['sparse_population_contact_matrix']
+          if 'population_contact_matrix' not in data:
+              # this is done the dumb way for now
+              data['population_contact_matrix'] =data['sparse_population_contact_matrix'].toarray()
+              data['population_contact_matrix'] = data['population_contact_matrix']+data['population_contact_matrix'].transpose()    
         if 'population_contact_matrix' not in data: # if no population contact matrix is given
             self.population_contact_matrix=0
             if self.term_weights['population prior']!=0:
                 self.term_weights['population prior']=0
-                print "No population matrix provided for data prior!\n"
+                print("No population matrix provided for data prior!\n")
         else:    
             self.population_contact_matrix=data['population_contact_matrix'] 
             (m,n)=np.shape(self.pairwise_contact_matrix)
@@ -562,9 +605,9 @@ class opt_E():
             self.prior_shape_model=data['prior_shape_model']
         if 'initialized_curve' not in data:
             data['initialized_curve']=np.random.rand(self.n*self.d).reshape([self.d,self.n])
-            print "No initialized_curve provided, using randomized curve!\n"
-            print 'Number of points: '+str(self.n)
-            print 'Curve dimension: '+str(self.d)
+            print("No initialized_curve provided, using randomized curve!\n")
+            print('Number of points: '+str(self.n))
+            print('Curve dimension: '+str(self.d))
         self.initialized_curve=data['initialized_curve']
         
         # check that initialized curve has correct dimension
@@ -572,7 +615,7 @@ class opt_E():
         if (nn!=n): # if dimension does not match then interpolate
             print("\nInitialized curve has "+str(nn)+" nodes, "+
                 "but data has "+str(n)+" nodes!")
-            print "Interpolating initialized curve to match data dimension!\n"
+            print("Interpolating initialized curve to match data dimension!\n")
             t0=np.linspace(0,1,nn)
             t=np.linspace(0,1,n)
             self.initialized_curve=srvf.interp(t0,self.initialized_curve,t)
@@ -728,7 +771,12 @@ class opt_E():
         if (self.term_weights["h2"]!=0):
             [e_h2,gradient_h2]=h2penalty(curve.reshape(shp))
             gradient_h2=gradient_h2.flatten() 
-            
+        # compute the lamina penalty
+        e_h4=0   # initialize the energy
+        gradient_h4=0 # initialize the gradient
+        if (self.term_weights["h4"]!=0):
+            [e_h4,gradient_h4]=h4penalty(curve.reshape(shp),self.lamina_radius)
+            gradient_h4=gradient_h4.flatten()             
         # compute unsuported roughness terms (these have been replaced with better ones)
         gradient_roughness=0 # initialize the gradient
         e_r1=0 # initialize the energy
@@ -755,6 +803,7 @@ class opt_E():
         e+=self.term_weights["h1"]*e_h1# scaled first order roughness terms
         e+=self.term_weights["h2"]*e_h2# scaled second order roughness terms   
         e+=self.term_weights["shape prior"]*e_shape# first order roughness terms
+        e+=self.term_weights["h4"]*e_h4# lamina penalty
         # add unsupported penalties
         e+=self.term_weights["firstroughness"]*e_r1# first order roughness terms
         e+=self.term_weights["secondroughness"]*e_r2# second order roughness terms
@@ -767,7 +816,8 @@ class opt_E():
         gradient=DTYPE(0.0);
         gradient-=gradient_data/self.Ndata# data term
         gradient+=self.term_weights["h1"]*gradient_h1 # the h1 term
-        gradient+=self.term_weights["h2"]*gradient_h2 # the h1 term
+        gradient+=self.term_weights["h2"]*gradient_h2 # the h2 term
+        gradient+=self.term_weights["h4"]*gradient_h4 # the h4 term
         gradient+=self.term_weights["shape prior"]*gradient_shape # shape prior (needs scaled)
         # add unsupported penalties
         gradient+=gradient_roughness # roughness terms
