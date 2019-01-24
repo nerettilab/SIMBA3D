@@ -19,9 +19,9 @@ def printhelp():
     """
     print the help text for the convertion tool
     """
-    print 'Convert simba3d report output from npz to .mat, .json, or .txt'
+    print 'Convert simba3d report output from npz to .mat, or .json'
     print 'simba3d-convertion --ext_out [.mat, .json, or .txt] <list of files>'
-    
+
 def main(args=None):
     """
     main function executing the convertion tool
@@ -31,7 +31,7 @@ def main(args=None):
     if ('--help' in args) | ('-h'in args): # check if the help option was called
         printhelp()
         return 0; # do not continue if the help was called
-    ext_out='.npz' # set default output extention
+    ext_out='.json' # set default output extention
     if '--ext_out' in args: # check for the output extention
         ext_out=args[args.index('--ext_out')+1]
         del args[args.index('--ext_out')+1]
@@ -40,6 +40,6 @@ def main(args=None):
     for filename in args: # loop through all the arguments and convert them
         print "Converting "+filename+" to "+ext_out
         convert(filename,ext_out)
-        
+
 if __name__ == "__main__":
    main()

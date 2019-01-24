@@ -1,5 +1,6 @@
 """
-An assortment of low level functions that I use. Some of them resemble functions similiar to a popular matrix laboratory.
+An assortment of low level functions that I use. Some of them resemble 
+functions similiar to a popular matrix laboratory.
 """
 import code
 import sys

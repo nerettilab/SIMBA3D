@@ -70,9 +70,64 @@ def load_sparse_matrix(inputfile):
     iii=[]
     jjj=[]
     vvv=[]
-    row_dim=0
-    col_dim=0
-    if ext=='mat':
+    row_dim=None
+    col_dim=None
+    if ext=='csv':
+        with open(inputfile, 'r') as csvfile:
+            print("reading: "+inputfile)
+            line=csvfile.readline()
+            while len(line.split('#'))>1:
+                line=csvfile.readline()
+            linesplit=line.split(',')
+            try:
+                row_dim=int(linesplit[0])
+                col_dim=int(linesplit[1])
+            except:
+                print("Unable to read the dimension from line :\n"+line)
+                print("First should be row dimension (as a integer)")
+                print("Second should be column dimension (as a integer)\n")
+            number_of_entries=None
+            try:
+                number_of_entries=int(linesplit[2])
+                #do_nothing=true
+            except:
+                print("Unable to read the number of entries from line :\n"+line)
+                print("The third value should be the number of entries (integer)")
+                print("This input is optional, so SIMBA3d should still read the data")
+                print("You can actually leave it blank without issue")
+
+
+            if number_of_entries is None:
+                lines=csvfile.readlines();
+                for line in lines:
+                    linesplit=line.split(',')
+                    try:
+                        iii.append(int(linesplit[0]))
+                        jjj.append(int(linesplit[1]))
+                        vvv.append(float(linesplit[2]))
+                    except:
+                        print("Unable to read line :\n"+line)
+                        print("The first two values should be the row and column index (integer).")
+                        print("The third should be a float\n")
+            else:
+                for ii in range(number_of_entries):
+                    line=csvfile.readline();
+                    if line=="":
+                        print('Within the sparse input CSV file, this line is empty.')
+                        print('This sometimes happens when the number of entries is larger than the number of lines.')
+                        print('SIMBA3D will just repeat this message until it reaches the number of entries specified by the user.')
+                        print("If you don't know how may entries you have, then just leave it blank at the top of your csv file.\n")
+                    linesplit=line.split(',')
+                    try:
+                        iii.append(int(linesplit[0]))
+                        jjj.append(int(linesplit[1]))
+                        vvv.append(float(linesplit[2]))
+                    except:
+                        print("Unable to read line :\n"+line)
+                        print("The first two values should be the row and column index (integer).")
+                        print("The third should be a float\n")
+
+    elif ext=='mat':
         sparce_rep=loadmat(inputfile)
         iii=sparce_rep['row_index'][0].tolist()
         jjj=sparce_rep['column_index'][0].tolist()
@@ -87,8 +142,38 @@ def load_sparse_matrix(inputfile):
         vvv=sparce_rep['count']
         row_dim=sparce_rep['row_dimension']
         col_dim=sparce_rep['column_dimension']
-        n=max([row_dim,col_dim])
-    interactions=sp.coo_matrix((vvv,(iii,jjj)),shape=(n,n))
+    if (row_dim is None) or (col_dim is None):
+        print("There really is no way to know what the row and column dimension in general without user specification")
+        print("Please specify it. SIMBA3D will try in infer the dimenion from the indexes, but this will probably cause you problems.")
+        row_dim=max(iii)+1
+        col_dim=max(jjj)+1
+    n=max([row_dim,col_dim])
+    interactions=None;
+    try:
+        interactions=sp.coo_matrix((vvv,(iii,jjj)),shape=(n,n))
+    except:
+        print("\nFailed to load sparse matrix")
+        print("\tOvercoding to solve for common problems ...")
+        try:
+            '''
+            someone using matlab will be use to indexing from 1 to n instead
+            of between 0 to n-1. Try and see if they did that and give them
+            a friendly reminder.
+            '''
+            interactions=sp.coo_matrix((vvv,([ii-1 for ii in iii],[jj-1 for jj in jjj])),shape=(n,n))
+            print("\t... subtracting the indexes by one seems to fix the problem.")
+            print("\t\tNote that python indexes from 0 to n-1, not 1 to n!")
+            print("\t\tGoing forward with this fix")
+            print("\t\tPlease fix the input data to remove this warning.\n")
+        except:
+            '''
+            I don't know what went wrong. It is probably a user input error.
+            '''
+            print("\t... unable to identify a common input error. Please check your inputs\n\n")
+    if interactions is not None:
+        print("Pairwise interaction matrix apears to be loaded from file: "+inputfile)
+    else:
+        print("Pairwise interaction matrix failed to be loaded from file: "+inputfile)
     ''' to convert into a dense matrix'''
     #data=interactions.toarray()
     #data=data+data.transpose()
@@ -171,22 +256,22 @@ def save_data(outputfilepath,summary):
     """
     ext=os.path.splitext(outputfilepath)[-1].lower()
     if ext=='.mat':
-        savemat(outputfilepath,summary)
+        savemat(outputfilepath,summary,long_field_names=True)
         return outputfilepath
-    elif ext=='.json':
+    elif ext=='.npz':
+        np.savez(outputfilepath,summary=summary)
+    else:
+        if ext!='.json':
+            outputfilepath+='.json'
         with open(outputfilepath, 'w') as result:
             # serialize
+            summary['json_task']='not stored'
             serialized_summary=jsonify(summary)
             json.dump(serialized_summary, result,indent=4,sort_keys=True)
-    elif ext=='.txt':
-        with open(outputfilepath, 'w') as result:
-            pprint(summary, result)
-    else:
-        if ext != '.npz':
-            outputfilepath+='.npz'
-        np.savez(outputfilepath,summary=summary)
+
+
     return outputfilepath
-def convert(filename,ext_out=".npz"):
+def convert(filename,ext_out=".json"):
     """
     convert .npz simba3d result into some other supported format
     """
@@ -195,14 +280,11 @@ def convert(filename,ext_out=".npz"):
         ext_in = os.path.splitext(filename)[1]
         if (ext_in == ext_out):
             print "\tError input extention matches output extention"
-        elif  (ext_in!='.npz'):
-            print "\t Only convertion from .npz file is supported"
         else:
             summary=load_result(filename)
     except:
             print "\tError loading "+filename
     if summary:
-        save_data(os.path.splitext(filename)[0]+ext_out,summary)
         try:
             print "\t saving :"+os.path.splitext(filename)[0]+ext_out
             save_data(os.path.splitext(filename)[0]+ext_out,summary)
@@ -236,7 +318,7 @@ def run_tasks(tasks,resume=True):
     Ther resume option tells simba3d to skip over tasks with uuid's that have
     already been ran.
     '''
-
+    #keyboard()
     if type(tasks) is dict: # if a dicitonary is passed in, but it in a list so we know the layer
         tasks=[tasks]
     if resume:
@@ -443,7 +525,7 @@ def get_outputfilepath(task):
         outputfilepath=os.path.join(outputdir,task['file_names']['output_filename'])
     else:
         tag=get_tag_name(task)
-        output_string   =  task['taskname'].replace(' ','_')+"_"+task['uuid']+'.npz'
+        output_string   =  task['taskname'].replace(' ','_')+"_"+task['uuid']+'.json'
         outputfilepath  = os.path.join(outputdir,output_string )
     return outputfilepath
 def summarize_results(result,task):
@@ -482,6 +564,7 @@ def mp_worker(task):
     print '\nProcess %s \tStarted\t %s\n' % (taskname,time.strftime('%d%b%Y %H:%M:%S',time.gmtime()))
     # place task here and pass in parameters
     t= time.time()
+    #keyboard()
     run_tasks(task)
     elapsed=time.time()-t
     print '\nProcess %s \tDone \t %s seconds elapsed' % (taskname, elapsed)
@@ -509,11 +592,21 @@ def load_data(task):
                  ext=task['file_names'][datatype].split('.')[-1]
                  if (ext=='npy')| (ext=='npz'):
                      data[datatype]=np.load(os.path.join(inputdir,task['file_names'][datatype]))
+                 elif (ext=='csv'):
+                     data[datatype]=np.loadtxt(os.path.join(inputdir,task['file_names'][datatype]),delimiter=',',dtype=np.float)
+                     #keyboard()
                  elif (ext=='mat'):
                      data[datatype]=loadmat(os.path.join(inputdir,task['file_names'][datatype]))
+
                  elif (ext=='json'):
+
                      with open(os.path.join(inputdir,task['file_names'][datatype]), 'r') as jsonfile:
                          data[datatype]=json.load(jsonfile)
+             if type(data[datatype])==type(dict()):
+                    data[datatype]=data[datatype][datatype]
+             if type(data[datatype])==type(list()):
+                    data[datatype]=np.array(data[datatype],dtype=np.float)
+
                      #keyboard()
                      # special treatement here
     return data

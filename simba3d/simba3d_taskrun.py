@@ -241,7 +241,7 @@ def main(args=None):
            outputfilepath=mp.get_outputfilepath(task)
            ext=os.path.splitext(outputfilepath)[-1].lower()
            if (ext != '.npz')|(ext=='.mat')|(ext=='.json'):
-               outputfilepath+='.npz'
+               outputfilepath+='.json'
            if not mp.load_result(outputfilepath):
                mp.run_task(task)
            else:
@@ -251,7 +251,8 @@ def main(args=None):
        for inputfile in inputfiles:
         with open(inputfile,'r') as tasklist:
          tasks=json.load(tasklist)
-         taskss.append(tasks)
+         for task in tasks:
+             taskss.append(task)
        t= time.time()
        mp.mp_handler(taskss,cores)
        elapsed=time.time()-t

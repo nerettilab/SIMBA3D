@@ -1,0 +1,26 @@
+[
+    {
+    "file_names": {
+       "inputdir":"data_inputs",
+       "sparse_pairwise_contact_matrix":"sparse_json_format.json"
+      },
+      "options": {
+            "display": true,
+            "gradient tolerance": 1e-05,
+            "maxitr": 100,
+            "method": "default",
+            "store": false
+        },
+     "parameters": {
+            "a": -3.0,
+            "b": 1.0,
+            "term_weights": {
+                "data": 1.0,
+                "population prior": 0.0,
+                "shape prior": 0.0,
+                "smoothing": 1.0,
+                "uniform spacing": 1.0
+            }
+        }
+    }
+]

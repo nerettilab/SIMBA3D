@@ -11,7 +11,7 @@ from simba3d.matrixlabish import significant_figures,keyboard
 import numpy as np
 import os
 import scipy.io
-
+from scipy.io import loadmat
 # import simplejson or json
 #
 # This is useful because the syntax is pythonic, it's human readable, and it
@@ -23,6 +23,7 @@ import scipy.io
 # A good practice is to use one or the other as a fallback.
 try: import simplejson as json # try to import simplejson
 except ImportError: import json #otherwise import json
+
 
 def load_result(outputfile):
     """

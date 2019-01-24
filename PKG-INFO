@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: SIMBA3D
-Version: 1.3.0
+Version: 2.1.0
 Summary: Structure Inference from Multiscale BAyes in 3 Dimensions (SIMBA3D)
 Home-page: UNKNOWN
 Author: Michael M. Rosenthal
@@ -38,6 +38,14 @@ Description: # About
         Pip results in a cleaner install, and it is easier to remove if desired
         
         > pip uninstall simba3d
+        
+        If you do not have root access you can do an install using the user scheme
+        
+        pip install . --user
+        
+        This is probably safer to use in general. Installing using root privelges could
+        potentially create os issues in some cases. It is unlikely that the os uses
+        numpy or scipy or any other packages simba3d may want updated.
         
         simba3d can either be used as a python module or as a command line interface.
         Using it as a python module has the advantage that a long and tedious sequence 
@@ -94,8 +102,10 @@ Description: # About
         * 'input_file_names' manage file names
             * 'inputdir' parent directory for the input files ['.']
             * "pairwise_contact_matrix"  the pairwise interacation matrix file (path relative to inputdir )
+            * "sparse_pairwise_contact_matrix"  the pairwise interacation matrix file in a sparse format (path relative to inputdir )
             * "initialized_curve" (optional) file to import initialized curve (path relative to inputdir )
             * "population_contact_matrix" (optional) the pairwise interacation matrix file from poptulation data (path relative to inputdir )
+            * "sparse_population_contact_matrix" (optional) the pairwise interacation matrix file from population data in a sparse format (path relative to inputdir )
             * "prior_shape_model" (optional) shape prior curve file (path relative to inputdir )
             * 'outputdir' parent directory for the output files ['.']
             * 'output_filename' (optional) the file name to output the result it (.mat or .npz) [uuid.npz]
@@ -152,36 +162,18 @@ Description: # About
         
         # Output File Formats
         
-        Currently, can create reports in the following output formats:
-        * '.npz'  zipped NumPy array file
-        * '.mat'  MatLab Mat-File file
-        * '.txt' text file
-        * '.json' text file
+        The default format is no longer '.npz'. The python2 and python3 binaries are not compatable.
+        The default output is now '.json'.
         
-        The default format is '.npz' and it is recommended to use this output because
-        it is easier to load into python and convert to some other format if desired.
+        # Sparse Input File Formats
         
-        A convertion tool has been packaged with simba3d to assist in converting
-        from .npz to some other desirable format. This convertion tool can be called
-        from the <'simba3d-convertion'> command.
+        Currently there is a json input format where you specify the row index, column index, and count values 
+        as arrays. This is a very new feature. The previous output formats still work, and are left untouched.
+        See the sparse example for details.
         
-        For more information on using the convertion tool type
-        > simba3d-convertion -h
+        (coming soon) I am working on a comma delimited input format as well. 
         
-        This can also be called on a local install using the command
-        > python run_simba3d_convertion.py -h
-        
-        # Veiwing Results
-        
-        simba3d has several tools to aid in summarizing the results collected.
-        
-        The <'please-print'> command can be used to get print out specific key data
-        values stored in the results file. 
-        
-        If the matplotlib module is installed, then simba3d also has a graphical
-        summary command which can be called by <'simba3d-disp'>
-        
-        This command will display the final curve and the energy of selected results
+        I am still working on the documentation for this (much harder than just coding it).
         
 Keywords: chromatin
 Platform: UNKNOWN
