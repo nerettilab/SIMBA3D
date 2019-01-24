@@ -54,17 +54,17 @@ but these files can be loaded into python fairly easily using the numpy module.
 
 ## Converting to Other formats
 
-It is recommended the results be saved in the.npz since it is more likely to 
+It is recommended the results be saved in the .json since it is more likely to 
 load correctly in python. Other output formates can then be converted later 
 using the <'simba3d-convertion'> tool.
 
-To convert all the .npz files into .mat (MatLab Mat-File format) in the results
+To convert all the .json files into .mat (MatLab Mat-File format) in the results
 directory, type the following command:
-> simba3d-convertion results/*.npz --ext_out .mat
+> simba3d-convertion results/*.json --ext_out .mat
 
-This command might actually work for generally convering .npz to .mat, but this
+This command might actually work for generally convering .json to .mat, but this
 feature will not be supported to that level of generality. Currently only 
-convertion from .npz to .mat, .json, and .txt is supported specifically for 
+convertion from .json to .mat, .json, and .npz is supported specifically for 
 simba3d outputs.
 
 ## Printing information from results

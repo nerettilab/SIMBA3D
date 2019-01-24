@@ -9,7 +9,7 @@ from distutils.core import setup
 
 setup (
        name='SIMBA3D',
-       version='2.0.0',
+       version='2.1.0',
        author='Michael M. Rosenthal',
        author_email='Michael.M.Rosenthal@gmail.com',
        url='',
@@ -26,8 +26,8 @@ setup (
                'simba3d-print=simba3d.print_result_summary:main'
                ]},
        install_requires=[   'numpy',
-                            'scipy'                          
+                            'scipy'
                             ],
-       extras_require={     'ploting_tools':'matplotlib'                            
-                            }                           
+       extras_require={     'ploting_tools':'matplotlib'
+                            }
        )
