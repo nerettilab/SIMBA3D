@@ -21,7 +21,7 @@ import scipy.io
 from simba3d.optimizer import compute_pairwise_distance,listIndices
 import simba3d.srvf_open_curve_Rn as srvf
 import simba3d.plotting_tools as pt
-
+#from simba3d.matrixlabish import keyboard
 #%% load the ground truth curve
 ground_truth_curve=np.load("data/ground_truth_curves/double_spiral_curve.npy")
 t=np.linspace(0,1,len(ground_truth_curve)) # parametrized the original curve
@@ -42,12 +42,14 @@ np.save("data/ground_truth_curves/double_spiral_"+str(n)+".npy",resampled_ground
 D=compute_pairwise_distance(resampled_ground_truth_curve) 
 ind=listIndices(n,1) # get the upper triangular index of the matrix
 # compute expect number of interactions
-MU=b*pow(D,a)
+
+d=D[np.triu_indices(n,1)]
+mu=b*pow(d,a)
 # simulate from independent poisson distribution
-c=np.random.poisson(MU[ind[:,0],ind[:,1]])
+c=np.random.poisson(mu)
 # construct the pairwise interaction matrix
 C=np.zeros([n,n])
-C[ind[:,0],ind[:,1]]=c # only the upper triangular part
+C[np.triu_indices(n,1)]=c # only the upper triangular part
 C=C+C.T # make the matrix symetric
 # save the simulated matrix
 np.save("data/simulate_data_"+str(n)+".npy",C)
@@ -55,7 +57,8 @@ np.save("data/simulate_data_"+str(n)+".npy",C)
 
         
 fig1,ax1=pt.plot_curve(resampled_ground_truth_curve,tn)
-pt.plot_pts(resampled_ground_truth_curve,t,ax=ax1,fig=fig1)   
+
+pt.plot_pts(resampled_ground_truth_curve,tn,ax=ax1,fig=fig1)   
 fig1.suptitle('Ground Truth Curve',fontsize=18)
 fig1.savefig('images/ground_truth_curve.png');
 
