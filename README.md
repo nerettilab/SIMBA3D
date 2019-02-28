@@ -84,23 +84,23 @@ There are a lot of options available which can make the process of specifying
 the task look complicated at first. There are defaults set for many of the
 keys (which are shown in square brackets below).
 
-The individual tasks have the following keys:
+The individual tasks are dictionaries with the following keys:
 * 'taskname' (optional) name of the task [uuid]
 * 'uuid' (recommended) unique identifier specific to the task [randomly generated]
 * 'store_task' (optional) store the task in the output [True] 
 * 'randomize_initialization' (optional) should we randomize the initialized curve? [False]
 * 'seed' (optional) integer between 0 and 4294967295 to fixed seed for randomizing inititialization
-* 'check_jacobian' (optional) to check the alytical gradient with numerical gradient for debug purposes [False]
+* 'check_jacobian' (optional) to check the alytical gradient with numerical gradient [False]
 * 'input_file_names' manage file names
     * 'inputdir' parent directory for the input files ['.']
     * "pairwise_contact_matrix"  the pairwise interacation matrix file (path relative to inputdir )
     * "sparse_pairwise_contact_matrix"  the pairwise interacation matrix file in a sparse format (path relative to inputdir )
     * "initialized_curve" (optional) file to import initialized curve (path relative to inputdir )
-    * "population_contact_matrix" (optional) the pairwise interacation matrix file from poptulation data (path relative to 
-    inputdir )
+    * "population_contact_matrix" (optional) the pairwise interacation matrix file from poptulation data (path relative to inputdir )
     * "sparse_population_contact_matrix" (optional) the pairwise interacation matrix file from population data in a sparse format (path relative to inputdir )
+    * "prior_shape_model" (optional) shape prior curve file (path relative to inputdir )
     * 'outputdir' parent directory for the output files ['.']
-    * 'output_filename' (optional) the file name to output the result it (.json) [uuid.json]
+    * 'output_filename' (optional) the file name to output the result it (.mat or .npz) [uuid.npz]
 * 'parameters'
     * 'a' (optional) the a parameter [-3.0]
     * 'b' (optional) not identifiable with unconstrained scale [1.0]
@@ -124,13 +124,13 @@ The individual tasks have the following keys:
 You can either write a script to create a list of tasks with the desired 
 settings and then pass them into the optimzer, or you can create a JSON file
 with a list of tasks that can be read in. JSON is used because it can be 
-read and edited manually by a human being and it is flexible enough to specify many 
+read and edited manually by a human being and it is flexible to specify many 
 settings for a run.
 
 There is also a "data" key which can be used to pass the data matrix and 
 initilaized curve as an array (without loading it from a file). This is useful
-for running simba3d module within a python script. This may be useful for more advanced
-users who wish to edit the data matrix without
+for running simba3d within a python script. This may be useful for more advanced
+users who wish to edit the data matrix (or generate simulated data) without
 reading and writing the data to file.
 
 To read a json file with these parameters set, use the following command
@@ -140,9 +140,11 @@ To read a json file with these parameters set, use the following command
 
 Warmstarts is a technique where the final result from the previous setting is
 used to initialized the next run with different settings. This is useful for
-parameter tuning because it can lower the total computation time. 
+parameter tuning because it can lower the total computation time. It can also
+limit space of curves you can converge to, which may not always be ideal since
+the previous setting may trap the curve in a local solution.
 
-The usewarmstarts key must be set to true within a sequentially
+In any case, the usewarmstarts key must be set to true within a sequentially
 ordered task. To create a sequence of task which are to be done in a specific 
 order, simply nest them inside an array. In each task inside the array, set
 the usewarmstarts to true so that simba3d will know that it should initialize 
@@ -158,11 +160,9 @@ The default output is now '.json'.
 # Sparse Input File Formats
 
 Currently there is a json input format where you specify the row index, column index, and count values 
-as arrays. This is a very new feature. The previous input formats still work, and are left untouched.
+as arrays. This is a very new feature. The previous output formats still work, and are left untouched.
 See the sparse example for details.
 
-The input data can also be passed in as a csv data.
+(coming soon) I am working on a comma delimited input format as well. 
 
-I am still working on the documentation for this (much harder than just coding it). 
-
-The data_format_examples has updated versions of the input formats.
+I am still working on the documentation for this (much harder than just coding it).
