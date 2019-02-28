@@ -114,7 +114,7 @@ The individual tasks are dictionaries with the following keys:
     * 'maxitr'  (optional) set maximum number of iterations [100000]
     * 'display' (optional) display function values at each iteration? [True]
     * 'store'   (optional) store the iterative curves? [False]
-    * 'method'  (optional) optimizer option 'BFGS'[default],'AGM','Nelder-Mead','CG','Newton-CG'
+    * 'method'  (optional) optimizer option 'L-BFGS_B'[default],'BFGS','AGM','Nelder-Mead','CG','Newton-CG'
 * 'index_parameters'
     * 'missing_rowsum_threshold'   (optional) specifies a threshold matrix row sum to treat an entry as missing data (missing nodes are ignored in the optimization)
     * 'index_missing'              (optional) specifies which entries are treated as missing (missing nodes are ignored in the optimization)

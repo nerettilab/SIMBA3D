@@ -36,7 +36,7 @@ def printhelp():
     print(document options for the simba3d taskrun command
     '''
     print('To apply multiprocessing to a list of tasks specify # of cores and a json tasklist')
-    print('\t-r <json_tasklist_file>')
+    print('\t-i <json_tasklist_file>')
     print('')
     print('Alternatively, to specify a single run, specify file and parameter options:')
     filename_option_descriptions={
@@ -164,7 +164,7 @@ def main(args=None):
        elif args[ii]== '-c':
            ii+=1
            #cores=int(args[ii] )
-       elif args[ii]== '-r':
+       elif (args[ii]== '-r')|(args[ii]== '-i'):
            ii+=1
            inputfiles=[args[ii] for ii in range(ii,len(args))]
        #FILE SETTINGS

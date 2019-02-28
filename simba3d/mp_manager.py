@@ -18,6 +18,7 @@ import os
 import multiprocessing
 import time
 import uuid
+
 import numpy as np
 import scipy
 from scipy.io import loadmat, savemat
@@ -28,7 +29,8 @@ except ImportError: import json #otherwise import json
 import simba3d.optimizer as opt
 #import simba3d.plotting_tools as pt
 import simba3d.srvf_open_curve_Rn as srvf
-from simba3d.uuid_check import check_tasks_index, load_result
+from simba3d.uuid_check import check_tasks_index, load_result,get_outputfilepath
+
 
 def create_downsampled_matrices(data):
     """
@@ -222,7 +224,7 @@ def jsonify(data):
     """
     if isinstance(data,dict):
         serialized_summary= dict()
-        for key,value in data.iteritems():
+        for key,value in data.items():
           if isinstance(value, list):
             value = [jsonify(item) for item in value]
           elif isinstance(value, list):
@@ -231,7 +233,7 @@ def jsonify(data):
             value=value.tolist()
           else:
               if isinstance(value, dict):
-                  for key2,value2 in value.iteritems():
+                  for key2,value2 in value.items():
                       value[key2]=jsonify(value2)
               if isinstance(value,scipy.sparse.coo.coo_matrix):
                   value="not serializable"
@@ -279,35 +281,20 @@ def convert(filename,ext_out=".json"):
     try:
         ext_in = os.path.splitext(filename)[1]
         if (ext_in == ext_out):
-            print "\tError input extention matches output extention"
+            print("\tError input extention matches output extention")
         else:
             summary=load_result(filename)
     except:
-            print "\tError loading "+filename
+            print("\tError loading "+filename)
     if summary:
         try:
-            print "\t saving :"+os.path.splitext(filename)[0]+ext_out
+            print("\t saving :"+os.path.splitext(filename)[0]+ext_out)
             save_data(os.path.splitext(filename)[0]+ext_out,summary)
         except:
-            print "\tError converting "+filename+" to "+ext_out
+            print("\tError converting "+filename+" to "+ext_out)
     else:
-        print "\tCould not load "+filename
-def get_tag_name(task):
-    '''
-    Gets a tag name (this may go away in future versions)
-    '''
-    tag=''
-    for penalty in task['parameters']['term_weights'].keys():
+        print("\tCould not load "+filename)
 
-        f=task['parameters']['term_weights'][penalty]
-        if f !=0.0:
-            if penalty!='data':
-                tag+='_'+penalty+''+significant_figures(f)
-            elif f!=1.0:
-                tag+='_'+penalty+''+significant_figures(f)
-    if 'seed' in task:
-        tag+='_seed'+str(task['seed'])
-    return tag
 def run_tasks(tasks,resume=True):
     '''
     plural task runner.
@@ -321,17 +308,25 @@ def run_tasks(tasks,resume=True):
     #keyboard()
     if type(tasks) is dict: # if a dicitonary is passed in, but it in a list so we know the layer
         tasks=[tasks]
-    if resume:
-        index_remaining=check_tasks_index(tasks) # find which tasks still need to run
-        print index_remaining
-    else:
-        index_remaining=range(len(tasks))
-    usewarmstarts=False # default setting for warmstarts
-
     if 'uuid' in tasks[0]:
       UUID=tasks[0]["uuid"] # if the task has a uuid use that
     else:
       UUID=str(uuid.uuid4()) # generate a uuid
+    # make sure each subtask has a unique uuid and a taskname
+    for ii in range(len(tasks)): # loop through remaining tasks
+        if 'uuid' not in tasks[ii]: # make sure the task has a uuid
+            tasks[ii]["uuid"]=UUID+'_'+str(ii)
+        if 'taskname' not in tasks[ii]:
+            tasks[ii]['taskname']= "unnamed task" # give the task a more intuitive name
+    if resume:
+        index_remaining=check_tasks_index(tasks) # find which tasks still need to run
+        print(index_remaining)
+    else:
+        index_remaining=range(len(tasks))
+
+    usewarmstarts=False # default setting for warmstarts
+
+
     for ii in index_remaining: # loop through remaining tasks
         if 'uuid' not in tasks[ii]: # make sure the task has a uuid
           tasks[ii]["uuid"]=UUID+'_'+str(ii)
@@ -342,11 +337,11 @@ def run_tasks(tasks,resume=True):
 
                 usewarmstarts=tasks[ii]['usewarmstarts'] # if usewarmstarts parameter is set then use that value
             if usewarmstarts:
-                print "Using warmstarts sequentially from previous task"
+                print("Using warmstarts sequentially from previous task")
                 if 'uuid' not in tasks[ii]:
                     tasks[ii]["uuid"]=UUID+'_'+str(ii) # make sure the task has a uuid
                 outputfilepath=get_outputfilepath(tasks[ii-1]) # get the outputfile path from the previous run
-                print outputfilepath
+                print(outputfilepath)
                 '''
                 ext=os.path.splitext(outputfilepath)[-1].lower()
                 if ext=='.mat':
@@ -383,6 +378,8 @@ def run_tasks(tasks,resume=True):
                 else:
                     tasks[ii]['data']={'initialized_curve' : initialized_curve}
             outputfilepath=run_task(tasks[ii])
+ 
+    
 def run_task(task):
     """
     run a singular task
@@ -424,7 +421,7 @@ def run_task(task):
                     #'parameterization' :0, # not implemented
                     }
     if 'store_task' not in task: # set default for store_task
-        task['store_task']=True # store the task in the output file
+        task['store_task']=True # store the task in the output file  
 
     parameters=task['parameters']
     term_types=parameters['term_weights'].keys()
@@ -442,7 +439,7 @@ def run_task(task):
     try:
         os.stat(directory)
     except:
-        print "Please make sure the output directory exists"
+        print("Please make sure the output directory exists")
         return 0
     outputfilepath=get_outputfilepath(task)
 
@@ -450,6 +447,12 @@ def run_task(task):
     # load data ###############################################################
     data=load_data(task);
     if 'initialized_curve' in data:
+        #check the dimension
+        (m,n)=np.shape(data['initialized_curve'])
+        if m>n:
+            if n==3:
+                data['initialized_curve']=data['initialized_curve'].T
+                (m,n)=np.shape(data['initialized_curve'])
         if task['randomize_initialization']:
             # randomize initialized curve with gaussian noise
             if 'seed' in task:
@@ -457,8 +460,31 @@ def run_task(task):
                 data['initialized_curve']=rng.normal(data['initialized_curve'],sig)
             else:
                 data['initialized_curve']=np.random.normal(data['initialized_curve'],sig)
+    else:
+        '''
+        define the default initialization here
+        '''
     # check that the initialized curve matches dimension of data
-
+    if 'nonspecified_zeros_as_missing' in task:
+        if task['nonspecified_zeros_as_missing']:
+            row =None
+            if 'sparse_population_contact_matrix' in data:
+                row=data['sparse_population_contact_matrix'].row
+                col=data['sparse_population_contact_matrix'].col
+            elif 'sparse_pairwise_contact_matrix' in data:
+                row=data['sparse_pairwise_contact_matrix'].row
+                col=data['sparse_pairwise_contact_matrix'].col      
+            if row is not None:
+                numberofpairs=min(len(row),len(col))
+                idx=[]
+                for ii in range(numberofpairs):
+                    if row[ii]!=col[ii]:
+                        idx.append([row[ii],col[ii]])                    
+                data['pairwise_combinations']=np.array(idx)
+            else:
+                print('There are no non-specified zeros')
+           #data['pairwise_combinations']=
+    
     if 'index_parameters' in task:
         if 'missing_rowsum_threshold' in task['index_parameters']:
             # specifies a threshold matrix row sum to treat an entry as missing data (missing nodes are ignored in the optimization)
@@ -472,62 +498,51 @@ def run_task(task):
         if 'pairwise_combinations' in task['index_parameters']:
             # optionally specify specific pairwise combination to use
             data['pairwise_combinations']=task['index_parameters']['pairwise_combinations']
-    #%
 
     if 'options' in task:
         options=task['options']
     else:
         options = {
-                "method": "BFGS",
+                #"method": "BFGS",
+                "method": "L-BFGS-B",
                 "display": True,
                 "maxitr": 100000
                 }
-
+    if 'seed' in task:
+        options['seed']=task['seed']
+        
     start=time.time()
 
     result=opt.opt_E(data,parameters,options)
-    print "Running ..."
-    print "\tTaskname: "+task['taskname']
+    print("Running ...")
+    print("\tTaskname: "+task['taskname'])
     if 'uuid' in task:
-        print "\tUUID: "+task['uuid']
+        print("\tUUID: "+task['uuid'])
     if 'title' in task:
-        print "\ttitle: "+task['title']
+        print("\ttitle: "+task['title'])
     if 'description' in task:
-        print "\tdescription: "+task['description']
+        print("\tdescription: "+task['description'])
     result.run()
     end=time.time()
     comptime=  end-start
-    print "Time ellapse: "+str((comptime)/(60))+" minutes"
+    print("Time ellapse: "+str((comptime)/(60))+" minutes")
     if check_jacobian:
         # Check analytical jacobian is correct ########################################
         jac_error=result.check_jacobian() # this should be a small number
         # Check the correctness of a gradient function by comparing it against a
         # (forward) finite-difference approximation of the gradient.
-        print 'Error between analytical and numerical gradient at initialized curve: '+str(jac_error)
+        print('Error between analytical and numerical gradient at initialized curve: '+str(jac_error))
         # norm of the difference between analytical jacobian and the finite difference approximation of jacobian at initialized curve.
     if result.XK is None:
         result.XK=[result.estimated_curve]
 
     summary=summarize_results(result,task)
 
-    print "saving results to file:"+outputfilepath
+    print("saving results to file:"+outputfilepath)
     return save_data(outputfilepath,summary)
-def get_outputfilepath(task):
-    """
-    returns the output file path of a task
-    """
-    outputfilepath=None
-    if 'outputdir' in task['file_names']:
-        outputdir= task['file_names']['outputdir']
-    else:
-        outputdir='.'
-    if 'output_filename' in task['file_names']:
-        outputfilepath=os.path.join(outputdir,task['file_names']['output_filename'])
-    else:
-        tag=get_tag_name(task)
-        output_string   =  task['taskname'].replace(' ','_')+"_"+task['uuid']+'.json'
-        outputfilepath  = os.path.join(outputdir,output_string )
-    return outputfilepath
+
+
+
 def summarize_results(result,task):
     """
     creates a summary of the result as dict
@@ -548,11 +563,13 @@ def summarize_results(result,task):
             }
     if task['store_task']:
         summary['json_task']=task
+    if 'nonspecified_zeros_as_missing' in task:
+        summary['nonspecified_zeros_as_missing']=task['nonspecified_zeros_as_missing']
     if 'uuid'in task:
         summary['uuid']=task['uuid']
     for term in  result.term_weights.keys():
         summary['weight_'+term.replace(' ','_')]= result.term_weights[term]
-        print term+' = '+str(summary['weight_'+term.replace(' ','_')])
+        print(term+' = '+str(summary['weight_'+term.replace(' ','_')]))
     return summary
 
 def mp_worker(task):
@@ -561,20 +578,20 @@ def mp_worker(task):
     else:
         taskname='task'
     #output_string=taskname+get_tag_name(task)
-    print '\nProcess %s \tStarted\t %s\n' % (taskname,time.strftime('%d%b%Y %H:%M:%S',time.gmtime()))
+    print('\nProcess %s \tStarted\t %s\n' % (taskname,time.strftime('%d%b%Y %H:%M:%S',time.gmtime())))
     # place task here and pass in parameters
     t= time.time()
     #keyboard()
     run_tasks(task)
     elapsed=time.time()-t
-    print '\nProcess %s \tDone \t %s seconds elapsed' % (taskname, elapsed)
+    print('\nProcess %s \tDone \t %s seconds elapsed' % (taskname, elapsed))
 
 def load_data(task):
     '''
 
     potential problem here, this only loads numpy arrays npy files
     '''
-
+    
     if 'inputdir' not in task['file_names']:
         task['file_names']['inputdir']='./'
     inputdir=task['file_names']['inputdir']
@@ -588,18 +605,15 @@ def load_data(task):
              if (datatype.split('_')[0] == "sparse"):
                  data[datatype]=load_sparse_matrix(os.path.join(inputdir,task['file_names'][datatype]))
              else:
-                 #print "\nLoading "+ datatype+'\n'
+                 #print("\nLoading "+ datatype+'\n'
                  ext=task['file_names'][datatype].split('.')[-1]
                  if (ext=='npy')| (ext=='npz'):
                      data[datatype]=np.load(os.path.join(inputdir,task['file_names'][datatype]))
                  elif (ext=='csv'):
                      data[datatype]=np.loadtxt(os.path.join(inputdir,task['file_names'][datatype]),delimiter=',',dtype=np.float)
-                     #keyboard()
                  elif (ext=='mat'):
                      data[datatype]=loadmat(os.path.join(inputdir,task['file_names'][datatype]))
-
                  elif (ext=='json'):
-
                      with open(os.path.join(inputdir,task['file_names'][datatype]), 'r') as jsonfile:
                          data[datatype]=json.load(jsonfile)
              if type(data[datatype])==type(dict()):

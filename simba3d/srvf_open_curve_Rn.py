@@ -254,10 +254,10 @@ def find_best_rotation(curve1,curve2):
         t=np.linspace(0,1,n)
         recurve1=interp(t1,curve1,t)   
         recurve2=interp(t2,curve2,t)
-        print np.shape(recurve1)
-        print np.shape(recurve2)
+        #print(np.shape(recurve1))
+        #print(np.shape(recurve2))
         A=np.matrix(recurve1)*np.matrix(recurve2.T)
-        print np.shape(A)
+        #print np.shape(A)
     else:        
         A=np.matrix(curve1)*np.matrix(curve2.T)
     U,S,V=npla.svd(A)
