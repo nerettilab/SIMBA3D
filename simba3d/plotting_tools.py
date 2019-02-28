@@ -70,10 +70,10 @@ def plot_curve(curve,t=None,ax=None,fig=None):
     else:  # if temperal parametrization is given
         cn=Normalize(min(t),max(t))
         if d==2:# if the curve is 2 dimensional
-            for i in xrange(n-1):
+            for i in range(n-1):
                 line,=ax.plot(curve[0,i:i+2],curve[1,i:i+2],color =plt.cm.jet(cn(t[i])));
         if d==3:# if the curve is 3 dimensional
-            for i in xrange(n-1):
+            for i in range(n-1):
                 line,=ax.plot(curve[0,i:i+2],curve[1,i:i+2],curve[2,i:i+2],color =plt.cm.jet(cn(t[i])));                
             set_axis_equal(ax)
     

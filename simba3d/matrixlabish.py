@@ -40,7 +40,7 @@ def keyboard(banner=None):
         raise None
     except:
         frame = sys.exc_info()[2].tb_frame.f_back
-    print "# Use quit() to exit :) Happy debugging!"
+    print( "# Use quit() to exit :) Happy debugging!")
     # evaluate commands in current namespace
     namespace = frame.f_globals.copy()
     namespace.update(frame.f_locals)
@@ -91,7 +91,7 @@ class getlines:
         self.cid1 = self.line.figure.canvas.mpl_connect('button_press_event', self.on_click)        
         self.cid2 = self.line.figure.canvas.mpl_connect('key_press_event', self.on_key)
         self.go=True
-        print ('Press Enter when you have finished getting points.')
+        print('Press Enter when you have finished getting points.')
     def on_click(self,event):
         self.x.append(event.xdata)
         self.y.append(event.ydata)
@@ -102,7 +102,7 @@ class getlines:
             plt.draw()
     def on_key(self,event):
         if event.key=='enter':
-            print ('Exited getpts')
+            print('Exited getpts')
             self.fig.canvas.mpl_disconnect(self.cid1)
             self.fig.canvas.mpl_disconnect(self.cid2)
             self.go=False
@@ -120,7 +120,7 @@ class getpts:
         self.cid1 = self.line.figure.canvas.mpl_connect('button_press_event', self.on_click)        
         self.cid2 = self.line.figure.canvas.mpl_connect('key_press_event', self.on_key)
         self.go=True
-        print ('Press Enter when you have finished getting points.')
+        print('Press Enter when you have finished getting points.')
     def on_click(self,event):
         self.x.append(event.xdata)
         self.y.append(event.ydata)
@@ -128,7 +128,7 @@ class getpts:
             plt.scatter(self.x,self.y ,s=100,c='black',edgecolor='white',linewidth=2)
     def on_key(self,event):
         if event.key=='enter':
-            print ('Exited getpts')
+            print('Exited getpts')
             self.fig.canvas.mpl_disconnect(self.cid1)
             self.fig.canvas.mpl_disconnect(self.cid2)
             self.go=False
@@ -147,7 +147,7 @@ class getptstk:
         self.cid1 = self.line.figure.canvas.mpl_connect('button_press_event', self.on_click)        
         self.cid2 = self.line.figure.canvas.mpl_connect('key_press_event', self.on_key)
         self.go=True
-        print ('Press Enter when you have finished getting points.')
+        print('Press Enter when you have finished getting points.')
     def on_click(self,event):
         self.x.append(event.xdata)
         self.tk.longitude=self.x
@@ -157,7 +157,7 @@ class getptstk:
             plt.scatter(self.x,self.y ,s=100,c='black',edgecolor='white',linewidth=2)
     def on_key(self,event):
         if event.key=='enter':
-            print ('Exited getpts')
+            print('Exited getpts')
             self.fig.canvas.mpl_disconnect(self.cid1)
             self.fig.canvas.mpl_disconnect(self.cid2)
             self.go=False

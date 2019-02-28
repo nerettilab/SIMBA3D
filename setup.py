@@ -9,7 +9,7 @@ from distutils.core import setup
 
 setup (
        name='SIMBA3D',
-       version='2.1.0',
+       version='2.2.1',
        author='Michael M. Rosenthal',
        author_email='Michael.M.Rosenthal@gmail.com',
        url='',
@@ -21,9 +21,11 @@ setup (
        entry_points={'console_scripts' : [
                'simba3d=simba3d.simba3d_taskrun:main',
                'simba3d-solo=simba3d.simba3d_taskrun_SOLO:main',
-               'simba3d-disp=simba3d.display_results:main',
+               'simba3d-result-disp=simba3d.display_results:main',
+               'simba3d-task-disp=simba3d.display_task:main',
                'simba3d-convertion=simba3d.convertion_tool:main',
-               'simba3d-print=simba3d.print_result_summary:main'
+               'simba3d-print=simba3d.print_result_summary:main',
+               'simba3d-initialize=simba3d.initialize_curve:main'
                ]},
        install_requires=[   'numpy',
                             'scipy'

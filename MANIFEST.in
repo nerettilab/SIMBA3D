@@ -5,5 +5,5 @@ include run_simba3d.py
 include run_simba3d_disp.py
 include run_simba3d_print.py
 include run_simba3d_convertion.py
-include run_simba3d_womp.py
+include run_simba3d_solo.py
 include README.md

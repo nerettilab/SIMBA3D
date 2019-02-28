@@ -22,7 +22,7 @@ from scipy.misc import comb
 from simba3d.matrixlabish import keyboard
 
 #import plotting_tools as pt
-import srvf_open_curve_Rn as srvf # most of this is not used right now
+import simba3d.srvf_open_curve_Rn as srvf # most of this is not used right now
 
 # set the data precision used within the algorithm
 # !incomplete task! (only done for h1 and data term)
@@ -317,14 +317,18 @@ def analytical_data_gradient(curve,pairwise_contact_matrix,a,b,offdiag=1,idxmiss
     '''
     compute log-likelihood gradient analytically
     '''
+    if idxlist is not None:
+        idxmiss = None
     if idxmiss is None:
         idxmiss=np.array([],dtype='int')
     X=np.delete(curve,idxmiss,1)
     C=np.delete(pairwise_contact_matrix,idxmiss,0)
     C=np.delete(C,idxmiss,1)
     [p,n]=np.shape(X)
+    
     if idxlist is None:
         idxlist=listIndices(n,offdiag)
+    
     differences=np.array(X[:,idxlist[:,0]]-X[:,idxlist[:,1]],dtype=DTYPE)
     #np.nansum(differences)
     squared_distances=DTYPE(0.0);
@@ -350,7 +354,6 @@ def analytical_data_gradient(curve,pairwise_contact_matrix,a,b,offdiag=1,idxmiss
         list0=np.delete(list0,idxmiss)
         temp[:,list0]=gradE_data
         gradE_data=temp
-
     E_data=np.sum(a*C[idxlist[:,0],idxlist[:,1]]*np.log(distances)-bda,dtype=DTYPE)
 
     return E_data,gradE_data
@@ -484,21 +487,21 @@ class opt_E():
         # parameters
         if parameters is None: # if parameters were not passed, then use default
             parameters={}
-            print "Default parameter settings will be used:"
+            print("Default parameter settings will be used:")
         # a parameter default check
         if 'a' not in parameters: # check for a
             parameters['a']=DTYPE(-3); # set default
-            print "Default a ="+str(parameters['a'])
+            print("Default a ="+str(parameters['a']))
         self.a=DTYPE(parameters['a'])
         # b parameter default check
         if 'b' not in parameters: # check for b
             parameters['b']=DTYPE(1);  # set default (b is not identifiable with scale of points)
-            print "Default b ="+str(parameters['b'])
+            print( "Default b ="+str(parameters['b']))
         self.b=DTYPE(parameters['b'])
         # lamina_radius parameter default check
         if 'lamina_radius' not in parameters: # check for b
             parameters['lamina_radius']=DTYPE(1);  # set default (b is not identifiable with scale of points)
-            print "Default lamina_radius ="+str(parameters['lamina_radius'])
+            print( "Default lamina_radius ="+str(parameters['lamina_radius']))
         self.lamina_radius=DTYPE(parameters['lamina_radius'])
         # term_weights parameter default check
         if 'term_weights' not in parameters: # check for term weights
@@ -513,32 +516,32 @@ class opt_E():
         if "h1" not in self.term_weights: # scale and intensity invariant "first order"-like penalty
             if "uniform spacing" not in self.term_weights:
                 self.term_weights['h1']=DTYPE(0.0 )   # weight for the h1 penalty
-                print "Default population h1 weight  ="
-                print self.term_weights['h1']
+                print("Default population h1 weight  =")
+                print(self.term_weights['h1'])
             else:
                 self.term_weights['h1']=DTYPE(self.term_weights['uniform spacing'])
         if "h2" not in self.term_weights: # scale and intensity invariant "second order"-like penalty
             if "smoothing" not in self.term_weights:
                 self.term_weights['h2']=DTYPE(0.0)    # weight for the h2 penalty
-                print "Default population h2 weight  ="
-                print self.term_weights['h2']
+                print("Default population h2 weight  =")
+                print(self.term_weights['h2'])
             else:
                 self.term_weights['h2']=DTYPE(self.term_weights['smoothing'])
         if "h4" not in self.term_weights: # scale and intensity invariant "second order"-like penalty
             if "lamina" not in self.term_weights:
                 self.term_weights['h4']=DTYPE(0.0)    # weight for the h2 penalty
-                print "Default lamina h4 weight  ="
-                print self.term_weights['h4']
+                print( "Default lamina h4 weight  =")
+                print( self.term_weights['h4'])
             else:
                 self.term_weights['h4']=DTYPE(self.term_weights['lamina'])
         if "population prior" not in self.term_weights:
             self.term_weights['population prior']=DTYPE(0.0)    # weight for the population matrix prior
-            print "Default population prior weight  ="
-            print self.term_weights['population prior']
+            print( "Default population prior weight  =")
+            print( self.term_weights['population prior'])
         if "shape prior" not in self.term_weights:
             self.term_weights['shape prior']=DTYPE(0.0)    # weight for the shape prior
-            print "Default shape prior weight  ="
-            print self.term_weights['shape prior']
+            print( "Default shape prior weight  =")
+            print( self.term_weights['shape prior'])
 
         # set defaults for unsuported penalties
         # scale and intensity dependent penalties are no longer supported
@@ -564,7 +567,7 @@ class opt_E():
         # set data and defaults ###############################################
         # pairwise contact matrix
         if 'sparse_pairwise_contact_matrix' in data:
-          print data['sparse_pairwise_contact_matrix']
+          print( data['sparse_pairwise_contact_matrix'])
           if 'pairwise_contact_matrix' not in data:
               # this is done the dumb way for now
               data['pairwise_contact_matrix'] = data['sparse_pairwise_contact_matrix'].toarray()
@@ -581,7 +584,7 @@ class opt_E():
             self.n=min([m,n])
         # population contact matrix
         if 'sparse_population_contact_matrix' in data:
-          print data['sparse_population_contact_matrix']
+          print( data['sparse_population_contact_matrix'])
           if 'population_contact_matrix' not in data:
               # this is done the dumb way for now
               data['population_contact_matrix'] =data['sparse_population_contact_matrix'].toarray()
@@ -600,11 +603,15 @@ class opt_E():
             self.prior_shape_model=None
             if self.term_weights['shape prior']!=0:
                 self.term_weights['shape prior']=0
-                print "No prior shape model provided for shape prior!\n"
+                print( "No prior shape model provided for shape prior!\n")
         else:
             self.prior_shape_model=data['prior_shape_model']
         if 'initialized_curve' not in data:
-            data['initialized_curve']=np.random.rand(self.n*self.d).reshape([self.d,self.n])
+            if 'seed' in options:
+                rng=np.random.RandomState(options['seed'])
+                data['initialized_curve']=rng.normal(0,1,self.n*self.d).reshape([self.d,self.n])
+            else:
+                data['initialized_curve']=np.random.rand(self.n*self.d).reshape([self.d,self.n])
             print("No initialized_curve provided, using randomized curve!\n")
             print('Number of points: '+str(self.n))
             print('Curve dimension: '+str(self.d))
@@ -681,33 +688,33 @@ class opt_E():
         # set options #########################################################
         if 'maxitr' not in options:
             options['maxitr']=100000
-            print 'Maximum number of iterations: '+str(options['maxitr'])
+            print( 'Maximum number of iterations: '+str(options['maxitr']))
         self.maxitr=options['maxitr']
         if 'display' not in options:
             options['display']=False
-            print 'display output: '+str(options['display'])
+            print( 'display output: '+str(options['display']))
         self.display=options['display']
         if 'store' not in options:
             options['store']=False
-            print 'store iterative values: '+str(options['store'])
+            print( 'store iterative values: '+str(options['store']))
         self.store=options['store']
         if 'method' not in options:
             #options['method']='Nelder-Mead'
             options['method']='BFGS'
             #options['method']='CG'
             #options['method']='Newton-CG'
-            print 'Optimization Method: '+options['method']
+            print( 'Optimization Method: '+options['method'])
         self.method= options['method']
         if 'gradient tolerance' not in options:
             options['gradient tolerance']=1e-5   # default for MatLab and Scipy Optimize
-            print 'store iterative values: '+str(options['store'])
+            print( 'store iterative values: '+str(options['store']))
         self.gtol=options['gradient tolerance']
         if 'minimum energy' not in options:
             options['minimum energy']=-np.inf  # stop if minimum energy is obtained
         self.minimum_energy= options['minimum energy']
         # store useful variables ##############################################
         self.shp=np.shape(self.initialized_curve)
-        print self.shp
+        print( self.shp)
         self.XK=None;
         if self.store:
             self.XK=np.zeros([self.maxitr,np.prod(self.shp)])
@@ -911,7 +918,7 @@ class opt_E():
         '''
         display iteration during callback and store iterative result
         '''
-        print "Iteration "+str(self.itr)+" e="+str(self.e_current)
+        print( "Iteration "+str(self.itr)+" e="+str(self.e_current))
 
         if xk is not None:
             self.estimated_curve=xk.reshape(self.shp) ;
@@ -925,7 +932,7 @@ class opt_E():
         '''
         display iteration during callback
         '''
-        print "Iteration "+str(self.itr)+" e="+str(self.e_current)
+        print( "Iteration "+str(self.itr)+" e="+str(self.e_current))
         self.e[self.itr]=self.e_current
         if xk is not None:
             self.estimated_curve=xk.reshape(self.shp) ;

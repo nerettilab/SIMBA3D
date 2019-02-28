@@ -30,13 +30,12 @@ t=np.linspace(0,1,len(ground_truth_curve)) # parametrized the original curve
 a=-3 # the power parameter relating the # of pairwise interactions and distance
 b=.01 # scaling parameter relating the # of pairwise interactions and distance
 #n=1280  # number of resampled points
-n=400  # number of resampled points
+n=4000  # number of resampled points
 tn=np.linspace(0,1,n) # curve parametrization
 # resample the gorund ture curve with repsect the the tn parametrization
 resampled_ground_truth_curve=srvf.interp(t,ground_truth_curve,tn).T
 # save the resampled ground truth curve
-np.save("data/ground_truth_curves/double_spiral_"+str(n)+".npy",resampled_ground_truth_curve)
-
+np.savetxt("data/ground_truth_curves/double_spiral_"+str(n)+".csv",resampled_ground_truth_curve.T,delimiter=',')
 #%% simulate a data matrix according to the Varoquaux model
 # compute pairwise distance
 D=compute_pairwise_distance(resampled_ground_truth_curve) 
@@ -50,8 +49,7 @@ C=np.zeros([n,n])
 C[ind[:,0],ind[:,1]]=c # only the upper triangular part
 C=C+C.T # make the matrix symetric
 # save the simulated matrix
-np.save("data/simulate_data_"+str(n)+".npy",C)
-
+np.savetxt("data/simulate_data_"+str(n)+".csv",C,delimiter=',')
 
         
 fig1,ax1=pt.plot_curve(resampled_ground_truth_curve,tn)
