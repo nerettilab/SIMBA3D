@@ -104,10 +104,10 @@ for jj in range(1):
                   'term_weights'   :  
                       {
                       'data'             : 1.0,      # weight for the data term
-                      'uniform spacing'  : 0.1, # scaled first order penalty
+                      'uniform_spacing'  : 0.1, # scaled first order penalty
                       'smoothing'        : 0.1, # scaled second order penalty
-                       #  'population prior' : 0.0,    # weight for the population matrix prior
-                      'shape prior'      : 0.0,    # weight for the shape prior
+                       #  'population_prior' : 0.0,    # weight for the population matrix prior
+                      'shape_prior'      : 0.0,    # weight for the shape_prior
                       
                       # below are unsupported penalties
                       #'firstroughness'   :0.0e3,   # weight for the fist order roughness

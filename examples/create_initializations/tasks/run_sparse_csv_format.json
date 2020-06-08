@@ -1,27 +1,19 @@
 [
     {
-    "file_names": {
-       "inputdir":"inputs",
-       "initialized_curve":"initialized_curves/initialization00.csv",
-       "sparse_pairwise_contact_matrix":"data/sparse_csv_format.csv"
-      },
-      "options": {
-            "display": true,
-            "gradient tolerance": 1e-05,
-            "maxitr": 100,
-            "method": "default",
-            "store": false
-        },
-     "parameters": {
-            "a": -3.0,
-            "b": 1.0,
-            "term_weights": {
-                "data": 1.0,
-                "population prior": 0.0,
-                "shape prior": 0.0,
-                "smoothing": 1.0,
-                "uniform spacing": 1.0
-            }
-        }
+    "file_names_inputdir":"inputs",
+    "file_names_initialized_curve":"initialized_curves/initialization00.csv",
+    "file_names_sparse_pairwise_contact_matrix":"data/sparse_csv_format.csv",
+    "options_display": true,
+    "options_gradient tolerance": 1e-05,
+    "options_maxitr": 100,
+    "options_method": "default",
+    "options_store": false,
+    "parameters_a": -3.0,
+    "parameters_b": 1.0,
+    "parameters_term_weights_data": 1.0,
+    "parameters_term_weights_population_prior": 0.0,
+    "parameters_term_weights_shape_prior": 0.0,
+    "parameters_term_weights_smoothing": 1.0,
+    "parameters_term_weights_uniform_spacing": 1.0
     }
 ]

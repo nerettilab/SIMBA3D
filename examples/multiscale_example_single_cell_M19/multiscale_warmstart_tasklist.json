@@ -25,10 +25,10 @@
                 "b": 1.0,
                 "term_weights": {
                     "data": 1.0,
-                    "population prior": 0.1,
-                    "shape prior": 0.0,
+                    "population_prior": 0.1,
+                    "shape_prior": 0.0,
                     "smoothing": 1.0,
-                    "uniform spacing": 0.5
+                    "uniform_spacing": 0.5
                 }
             },
             "plotfigs": false,
@@ -62,10 +62,10 @@
                 "b": 1.0,
                 "term_weights": {
                     "data": 1.0,
-                    "population prior": 0.1,
-                    "shape prior": 0.0,
+                    "population_prior": 0.1,
+                    "shape_prior": 0.0,
                     "smoothing": 1.0,
-                    "uniform spacing": 0.5
+                    "uniform_spacing": 0.5
                 }
             },
             "plotfigs": false,
@@ -99,10 +99,10 @@
                 "b": 1.0,
                 "term_weights": {
                     "data": 1.0,
-                    "population prior": 0.1,
-                    "shape prior": 0.0,
+                    "population_prior": 0.1,
+                    "shape_prior": 0.0,
                     "smoothing": 1.0,
-                    "uniform spacing": 0.5
+                    "uniform_spacing": 0.5
                 }
             },
             "plotfigs": false,
@@ -136,10 +136,10 @@
                 "b": 1.0,
                 "term_weights": {
                     "data": 1.0,
-                    "population prior": 0.1,
-                    "shape prior": 0.0,
+                    "population_prior": 0.1,
+                    "shape_prior": 0.0,
                     "smoothing": 1.0,
-                    "uniform spacing": 0.5
+                    "uniform_spacing": 0.5
                 }
             },
             "plotfigs": false,

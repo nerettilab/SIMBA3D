@@ -46,7 +46,7 @@ fig1.suptitle('Estimated Curve with Ground Truth',fontsize=18)
 fig1.savefig('images/estimated_and_groundtruth_curve.png');
 
 # print the weight settings
-print("uniform spacing penalty:"+str(summary['weight_uniform_spacing']))
+print("uniform_spacing penalty:"+str(summary['weight_uniform_spacing']))
 print("smoothing penalty:"+str(summary['weight_smoothing']))
-print("population prior penalty:"+str(summary['weight_population_prior']))
+print("population_prior penalty:"+str(summary['weight_population_prior']))
 

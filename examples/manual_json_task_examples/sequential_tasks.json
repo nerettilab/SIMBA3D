@@ -23,10 +23,10 @@
               "b": 1.0,
               "term_weights": {
                   "data": 1.0,
-                  "population prior": 0.0,
-                  "shape prior": 0.0,
+                  "population_prior": 0.0,
+                  "shape_prior": 0.0,
                   "smoothing": 1.0,
-                  "uniform spacing": 1.0
+                  "uniform_spacing": 1.0
               }
           }
       },
@@ -52,10 +52,10 @@
               "b": 1.0,
               "term_weights": {
                   "data": 1.0,
-                  "population prior": 0.0,
-                  "shape prior": 0.0,
+                  "population_prior": 0.0,
+                  "shape_prior": 0.0,
                   "smoothing": 1.0,
-                  "uniform spacing": 0.0
+                  "uniform_spacing": 0.0
               }
           }
       }

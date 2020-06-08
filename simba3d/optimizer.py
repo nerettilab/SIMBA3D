@@ -257,7 +257,7 @@ def penalized_log_likelihood(curve,t,pairwise_contact_matrix,a,b,term_weights,sq
     R1=0    # initialize first order term
     R2=0    # initialize second order term
     Q=0     # initialize parametrization penalty term
-    S=0     # initialize shape prior term
+    S=0     # initialize shape_prior term
     if term_weights[0]!=0:
         L=term_weights[0]*loglikelihood_Varoquaux(pairwise_distance_matrix,a,b,pairwise_contact_matrix)
     if (term_weights[1]!=0)&(term_weights[2]==0):
@@ -398,7 +398,7 @@ def energy_roughness(curve):
 
 def energy_shape_prior(curve,shape_model):
     '''
-    compute energy and gradient of the shape prior
+    compute energy and gradient of the shape_prior
     '''
     curve,m=srvf.center_curve(curve)
     shape_model,m=srvf.center_curve(shape_model)
@@ -515,12 +515,12 @@ class opt_E():
             #print "Default data weight  ="
             #print self.term_weights['data']
         if "h1" not in self.term_weights: # scale and intensity invariant "first order"-like penalty
-            if "uniform spacing" not in self.term_weights:
+            if "uniform_spacing" not in self.term_weights:
                 self.term_weights['h1']=DTYPE(0.0 )   # weight for the h1 penalty
                 print("Default population h1 weight  =")
                 print(self.term_weights['h1'])
             else:
-                self.term_weights['h1']=DTYPE(self.term_weights['uniform spacing'])
+                self.term_weights['h1']=DTYPE(self.term_weights['uniform_spacing'])
         if "h2" not in self.term_weights: # scale and intensity invariant "second order"-like penalty
             if "smoothing" not in self.term_weights:
                 self.term_weights['h2']=DTYPE(0.0)    # weight for the h2 penalty
@@ -535,14 +535,14 @@ class opt_E():
                 print( self.term_weights['h4'])
             else:
                 self.term_weights['h4']=DTYPE(self.term_weights['lamina'])
-        if "population prior" not in self.term_weights:
-            self.term_weights['population prior']=DTYPE(0.0)    # weight for the population matrix prior
-            print( "Default population prior weight  =")
-            print( self.term_weights['population prior'])
-        if "shape prior" not in self.term_weights:
-            self.term_weights['shape prior']=DTYPE(0.0)    # weight for the shape prior
-            print( "Default shape prior weight  =")
-            print( self.term_weights['shape prior'])
+        if "population_prior" not in self.term_weights:
+            self.term_weights['population_prior']=DTYPE(0.0)    # weight for the population matrix prior
+            print( "Default population_prior weight  =")
+            print( self.term_weights['population_prior'])
+        if "shape_prior" not in self.term_weights:
+            self.term_weights['shape_prior']=DTYPE(0.0)    # weight for the shape_prior
+            print( "Default shape_prior weight  =")
+            print( self.term_weights['shape_prior'])
 
         # set defaults for unsuported penalties
         # scale and intensity dependent penalties are no longer supported
@@ -592,19 +592,19 @@ class opt_E():
               data['population_contact_matrix'] = data['population_contact_matrix']+data['population_contact_matrix'].transpose()
         if 'population_contact_matrix' not in data: # if no population contact matrix is given
             self.population_contact_matrix=0
-            if self.term_weights['population prior']!=0:
-                self.term_weights['population prior']=0
+            if self.term_weights['population_prior']!=0:
+                self.term_weights['population_prior']=0
                 print("No population matrix provided for data prior!\n")
         else:
             self.population_contact_matrix=data['population_contact_matrix']
             (m,n)=np.shape(self.pairwise_contact_matrix)
             self.n=min([m,n])
-        # shape prior model data
+        # shape_prior model data
         if 'prior_shape_model' not in data:
             self.prior_shape_model=None
-            if self.term_weights['shape prior']!=0:
-                self.term_weights['shape prior']=0
-                print( "No prior shape model provided for shape prior!\n")
+            if self.term_weights['shape_prior']!=0:
+                self.term_weights['shape_prior']=0
+                print( "No prior shape model provided for shape_prior!\n")
         else:
             self.prior_shape_model=data['prior_shape_model']
         if 'initialized_curve' not in data:
@@ -647,15 +647,15 @@ class opt_E():
         # population matrix prior  adjustment #################################
         Ndata=sum(data['pairwise_contact_matrix'][self.index] )+10e-16
         Nprior=1
-        if self.term_weights['population prior']:
+        if self.term_weights['population_prior']:
             Nprior=sum(self.population_contact_matrix[self.index] )+10e-16
-            self.pairwise_contact_matrix+=self.term_weights['population prior']*(Ndata/Nprior)*self.population_contact_matrix
+            self.pairwise_contact_matrix+=self.term_weights['population_prior']*(Ndata/Nprior)*self.population_contact_matrix
 
         if 1:
-            self.b=(self.term_weights['data']+self.term_weights['population prior']*Ndata/Nprior)*self.b
+            self.b=(self.term_weights['data']+self.term_weights['population_prior']*Ndata/Nprior)*self.b
             self.Ndata=Ndata
         else:
-            self.b=(self.term_weights['population prior']*Ndata/Nprior)*self.b
+            self.b=(self.term_weights['population_prior']*Ndata/Nprior)*self.b
             # adjust weights
             self.term_weights['scaledfirstroughness']*=Ndata
             self.term_weights['scaledsecondroughness']*=Ndata
@@ -693,7 +693,7 @@ class opt_E():
         self.maxitr=options['maxitr']
         if 'display' not in options:
             options['display']=False
-            print( 'display output: '+str(options['display']))
+            print( 'display_output: '+str(options['display']))
         self.display=options['display']
         if 'store' not in options:
             options['store']=False
@@ -706,13 +706,13 @@ class opt_E():
             #options['method']='Newton-CG'
             print( 'Optimization Method: '+options['method'])
         self.method= options['method']
-        if 'gradient tolerance' not in options:
-            options['gradient tolerance']=1e-5   # default for MatLab and Scipy Optimize
+        if 'gradient_tolerance' not in options:
+            options['gradient_tolerance']=1e-5   # default for MatLab and Scipy Optimize
             print( 'store iterative values: '+str(options['store']))
-        self.gtol=options['gradient tolerance']
-        if 'minimum energy' not in options:
-            options['minimum energy']=-np.inf  # stop if minimum energy is obtained
-        self.minimum_energy= options['minimum energy']
+        self.gtol=options['gradient_tolerance']
+        if 'minimum_energy' not in options:
+            options['minimum_energy']=-np.inf  # stop if minimum_energy is obtained
+        self.minimum_energy= options['minimum_energy']
         # store useful variables ##############################################
         self.shp=np.shape(self.initialized_curve)
         print( self.shp)
@@ -757,14 +757,14 @@ class opt_E():
         # compute data term
         e_data=0
         gradient_data=0
-        if (self.term_weights['data']!=0)|(self.term_weights['population prior']!=0):
+        if (self.term_weights['data']!=0)|(self.term_weights['population_prior']!=0):
             e_data,gradient_data=analytical_data_gradient(curve.reshape(shp),self.pairwise_contact_matrix,self.a,self.b,offdiag=self.off_diagonal,idxmiss=self.index_mississing,idxlist=self.pairwise_combinations)
             gradient_data=gradient_data.flatten()
 
         # compute shape terms
         e_shape=0 # initialize the energy
         gradient_shape=0 # initialize the gradient
-        if (self.term_weights["shape prior"]!=0):
+        if (self.term_weights["shape_prior"]!=0):
             e_shape,gradient_shape=energy_shape_prior(curve.reshape(shp),self.prior_shape_model)
             gradient_shape=gradient_shape.flatten()
 
@@ -810,7 +810,7 @@ class opt_E():
         e-=e_data/self.Ndata # data term
         e+=self.term_weights["h1"]*e_h1# scaled first order roughness terms
         e+=self.term_weights["h2"]*e_h2# scaled second order roughness terms
-        e+=self.term_weights["shape prior"]*e_shape# first order roughness terms
+        e+=self.term_weights["shape_prior"]*e_shape# first order roughness terms
         e+=self.term_weights["h4"]*e_h4# lamina penalty
         # add unsupported penalties
         e+=self.term_weights["firstroughness"]*e_r1# first order roughness terms
@@ -826,7 +826,7 @@ class opt_E():
         gradient+=self.term_weights["h1"]*gradient_h1 # the h1 term
         gradient+=self.term_weights["h2"]*gradient_h2 # the h2 term
         gradient+=self.term_weights["h4"]*gradient_h4 # the h4 term
-        gradient+=self.term_weights["shape prior"]*gradient_shape # shape prior (needs scaled)
+        gradient+=self.term_weights["shape_prior"]*gradient_shape # shape_prior (needs scaled)
         # add unsupported penalties
         gradient+=gradient_roughness # roughness terms
         gradient+=self.term_weights["scaledfirstroughness"]*gradient_scaled_first_roughness # scaled second order roughness term
