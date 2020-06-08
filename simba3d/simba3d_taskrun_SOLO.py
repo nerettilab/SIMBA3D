@@ -64,11 +64,11 @@ def printhelp():
                 'set value weight for the population prior penalty'
                 }
     print('File and Directory options:')
-    for option in filename_option_descriptions.keys():
+    for option in list(filename_option_descriptions):
         print('\t'+option)
         print('\t\t'+filename_option_descriptions[option])
     print('Parameter options:')
-    for option in parameter_option_descriptions.keys():
+    for option in list(parameter_option_descriptions):
         print('\t'+option)
         print('\t\t'+parameter_option_descriptions[option]   )
 #%%

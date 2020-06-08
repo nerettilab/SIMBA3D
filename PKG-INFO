@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: SIMBA3D
-Version: 2.2.1
+Version: 2.1.1
 Summary: Structure Inference from Multiscale BAyes in 3 Dimensions (SIMBA3D)
 Home-page: UNKNOWN
 Author: Michael M. Rosenthal
@@ -122,7 +122,7 @@ Description: # About
             * 'maxitr'  (optional) set maximum number of iterations [100000]
             * 'display' (optional) display function values at each iteration? [True]
             * 'store'   (optional) store the iterative curves? [False]
-            * 'method'  (optional) optimizer option 'L-BFGS_B'[default],'BFGS','AGM','Nelder-Mead','CG','Newton-CG'
+            * 'method'  (optional) optimizer option 'BFGS'[default],'AGM','Nelder-Mead','CG','Newton-CG'
         * 'index_parameters'
             * 'missing_rowsum_threshold'   (optional) specifies a threshold matrix row sum to treat an entry as missing data (missing nodes are ignored in the optimization)
             * 'index_missing'              (optional) specifies which entries are treated as missing (missing nodes are ignored in the optimization)

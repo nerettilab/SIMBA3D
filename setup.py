@@ -19,8 +19,8 @@ setup (
        long_description=open('README.md').read(),
        packages=setuptools.find_packages(exclude=["*.tests","*.tests.*","tests.*","tests"]),
        entry_points={'console_scripts' : [
-               'simba3d=simba3d.simba3d_taskrun:main',
-               'simba3d-solo=simba3d.simba3d_taskrun_SOLO:main',
+               #'simba3d=simba3d.simba3d_taskrun:main',
+               'simba3d=simba3d.simba3d_taskrun_SOLO:main',
                'simba3d-result-disp=simba3d.display_results:main',
                'simba3d-task-disp=simba3d.display_task:main',
                'simba3d-convertion=simba3d.convertion_tool:main',

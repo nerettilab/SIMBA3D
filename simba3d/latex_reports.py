@@ -21,7 +21,7 @@ def make_latex_report_header(image_path):
     latex+=r'\begin{document}'+u'\n'
     latex+=r'\small'+u'\n'
     return latex
-def make_latex_table(params): 
+def make_latex_table(params):
     latex_table=u'\n'
     latex_table+=r'\begin{lstlisting}' +u'\n'
     if 'inputfile' in params:
@@ -31,9 +31,9 @@ def make_latex_table(params):
         ncols=params['table width']
     else:
         ncols=1.0;
-    
+
     if 'images' in params:
-        latex_table+=r'\begin{tabular}{'    
+        latex_table+=r'\begin{tabular}{'
         for ii in range(ncols):
             latex_table+='c'
         latex_table+='}'+u'\n'
@@ -56,10 +56,10 @@ def make_latex_table(params):
                 latex_table+=u'\n'
                 itr+=1;
         latex_table+=r'\end{tabular}'+u'\n'
-    
+
     if 'statistics' in params:
         latex_table+=r'\begin{tabular}{cc}'+u'\n'
-        for key in params['statistics'].keys():
+        for key in list(params['statistics']):
             latex_table+=key
             latex_table+=r'&'
             latex_table+=str(params['statistics'][key])

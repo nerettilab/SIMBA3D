@@ -17,7 +17,8 @@ import scipy.spatial.distance as ssd
 from scipy.spatial.distance import pdist
 from scipy.sparse import csr_matrix
 from scipy.optimize import minimize,check_grad
-from scipy.misc import comb
+#from scipy.misc import comb # has been deprecated since version 1.0.0
+from scipy.special import comb
 
 from simba3d.matrixlabish import keyboard
 
@@ -325,10 +326,10 @@ def analytical_data_gradient(curve,pairwise_contact_matrix,a,b,offdiag=1,idxmiss
     C=np.delete(pairwise_contact_matrix,idxmiss,0)
     C=np.delete(C,idxmiss,1)
     [p,n]=np.shape(X)
-    
+
     if idxlist is None:
         idxlist=listIndices(n,offdiag)
-    
+
     differences=np.array(X[:,idxlist[:,0]]-X[:,idxlist[:,1]],dtype=DTYPE)
     #np.nansum(differences)
     squared_distances=DTYPE(0.0);

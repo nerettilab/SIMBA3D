@@ -68,13 +68,13 @@ def main(args=None):
            sys.exit()
         if (args[ii]== '-p')|(args[ii]== '--print-each'):
             ii+=1
-            summary_name = str(args[ii])    
+            summary_name = str(args[ii])
             print('\t'+args[ii])
             print_each=True
             latex_print=True
         if (args[ii]== '-o')|(args[ii]== '--output-directory'):
             ii+=1
-            report_directory = str(args[ii])       
+            report_directory = str(args[ii])
             print('\t'+args[ii])
             print_each=True
             latex_print=True
@@ -124,7 +124,7 @@ def main(args=None):
         latex+=r'\pagebreak' +u'\n'
         latex+=lr.make_latex_section('Task Summary',inputfile)
 
-        with open(inputfile,'r') as tasklist:           
+        with open(inputfile,'r') as tasklist:
             tasks=json.load(tasklist)
             number_of_tasks=str(len(tasks))
             number_of_tasks_remaining=str(len(check_tasks_index(tasks))) # find which tasks still need to run
@@ -136,7 +136,7 @@ def main(args=None):
                     UUID=None
                     if 'uuid' in subtask:
                         UUID=subtask['uuid']
-                    
+
                     latex+=lr.make_latex_subsection('Subtask Summary',UUID)
                     if UUID is None:
                         UUID=str(uuid.uuid4())
@@ -152,14 +152,14 @@ def main(args=None):
                         if 'inputdir' in subtask['file_names']:
                             inputdir=subtask['file_names']['inputdir']
                         input_parameters= '';
-                        for key in subtask.keys():
+                        for key in list(subtask):
                             skip='data' in key
                             skip+='file_names' in key
                             if skip ==0:
                                 if type(subtask[key])==type(dict()):
-                                    for subkey in subtask[key].keys():
+                                    for subkey in list(subtask[key]):
                                         if type(subtask[key][subkey])==type(dict()):
-                                            for subsubkey in subtask[key][subkey].keys():
+                                            for subsubkey in list(subtask[key][subkey]):
                                                 name=key+' '+subkey+' '+subsubkey
                                                 input_parameters+=  name+':'+str(subtask[key][subkey][subsubkey])+u'\n'
                                         else:
@@ -168,17 +168,17 @@ def main(args=None):
                                 else:
                                    name=key
                                    input_parameters+= name+':'+str(subtask[key])+u'\n'
-                        
+
                         latex+=lr.make_latex_table({'inputfile':input_parameters})
-                        for key in subtask['file_names'].keys():
+                        for key in list(subtask['file_names']):
                             if 'output' not in key:
                                 params=dict()
                                 params['inputfile']=key+':'+subtask['file_names'][key]
-                                params['table width']=2      
+                                params['table width']=2
                                 if key in data:
                                     filename=UUID+key
                                     if 'initialized_curve' in key:
-                                        
+
                                         curve,mu=srvf.center_curve(data[key])
                                         scurve,scale=srvf.scale_curve(curve)
                                         if scenter_curve is None:
@@ -200,14 +200,14 @@ def main(args=None):
                                         else:
                                             imagename=os.path.join(image_directory,filename+'.'+image_ext)
                                             fig3.savefig(imagename)
-    
+
                                             params['images']=[
                                                     filename+'.'+image_ext
                                                   ]
                                             params['statistics']={
                                                     'm' : str(m),
                                                     'n' : str(n),
-                                                    }                    
+                                                    }
                                     if '_matrix' in key:
                                         # you have a matrix
                                         if 'sparse_' in key:
@@ -216,7 +216,7 @@ def main(args=None):
                                         else:
                                             # it is not sparse
                                             matrix=data[key]
-                                        q=np.percentile(matrix,p) 
+                                        q=np.percentile(matrix,p)
                                         plt.close('all')
                                         fig1=plt.figure()
                                         plt.figure(fig1.number)
@@ -228,10 +228,10 @@ def main(args=None):
                                         else:
                                             imagename=os.path.join(image_directory,filename+'.'+image_ext)
                                             fig1.savefig(imagename)
-                                            
-    
+
+
                                             (m,n)=np.shape(matrix)
-    
+
                                             params['images']=[
                                                     filename+'.'+image_ext
                                                   ]
@@ -255,7 +255,6 @@ def main(args=None):
                           print(summary['uuid'])
                         if 'E_evol'in summary:
                             energy.append(summary['E_evol'])
-                            #print summary.keys()
                         if 'X_evol'in summary:
                             X0=np.array(summary['X_evol'][-1]) # get the last curve
                             # get dimension
@@ -270,7 +269,7 @@ def main(args=None):
                             X0=X0.reshape((d,n)) # correct dimensions
                             curves.append(X0)
                             length.append(n)
-            
+
                             curve,mu=srvf.center_curve(X0)
                             scurve,scale=srvf.scale_curve(curve)
                             scurves.append(scurve)
@@ -302,7 +301,7 @@ def main(args=None):
                             X0=X0.reshape((d,n)) # correct dimensions
                             curves.append(X0)
                             length.append(n)
-            
+
                             curve,mu=srvf.center_curve(X0)
                             scurve,scale=srvf.scale_curve(curve)
                             scurves_init.append(scurve)
@@ -313,7 +312,7 @@ def main(args=None):
                             plt.figure(fig1.number)
                             plt.plot(energy[-1])
                             plt.title("Energy Evolution")
-            
+
                             fig3=plt.figure()
                             plt.subplots_adjust(left=0.0,right=1.0,bottom=0.0,top=1.0,wspace=0.0,hspace=0.0)
                             #fig2.tight_layout()
@@ -325,7 +324,7 @@ def main(args=None):
                             pt.plot_pts(scurves_init[-1],t,ax=ax3,fig=fig3)
                             plt.title("Initialized Curve")
                             plt.figure(fig3.number)
-            
+
                             fig2=plt.figure()
                             plt.subplots_adjust(left=0.0,right=1.0,bottom=0.0,top=1.0,wspace=0.0,hspace=0.0)
                             #fig2.tight_layout()
@@ -359,7 +358,7 @@ def main(args=None):
                                         }
                                 latex_table=lr.make_latex_table(params)
                                 latex+=latex_table
-                            
+
     if latex_print:
         latex+=r'\end{document}'+u'\n'
         print(latex)
