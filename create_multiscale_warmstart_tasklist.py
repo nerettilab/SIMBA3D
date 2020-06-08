@@ -230,10 +230,10 @@ for l1 in l1_penalties:
                   'parameters_a'              : -3.0,
                   'parameters_b'              : 1.0, # not identifiable with unconstrained scale
                   'parameters_term_weights_data'             : 1.0,      # weight for the data term
-                  'parameters_term_weights_uniform spacing'  : l1, # scaled first order penalty
+                  'parameters_term_weights_uniform_spacing'  : l1, # scaled first order penalty
                   'parameters_term_weights_smoothing'        : l2, # scaled second order penalty
-                  'parameters_term_weights_population prior' : l3,    # weight for the population matrix prior
-                  'parameters_term_weights_shape prior'      : 0.0,    # weight for the shape prior
+                  'parameters_term_weights_population_prior' : l3,    # weight for the population matrix prior
+                  'parameters_term_weights_shape_prior'      : 0.0,    # weight for the shape_prior
                   # options
                   #'options_gradient tolerance':1e-3,
                   'options_maxitr'    : 1000000, # set maximum number of iterations

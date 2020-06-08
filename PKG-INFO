@@ -106,7 +106,7 @@ Description: # About
             * "initialized_curve" (optional) file to import initialized curve (path relative to inputdir )
             * "population_contact_matrix" (optional) the pairwise interacation matrix file from poptulation data (path relative to inputdir )
             * "sparse_population_contact_matrix" (optional) the pairwise interacation matrix file from population data in a sparse format (path relative to inputdir )
-            * "prior_shape_model" (optional) shape prior curve file (path relative to inputdir )
+            * "prior_shape_model" (optional) shape_prior curve file (path relative to inputdir )
             * 'outputdir' parent directory for the output files ['.']
             * 'output_filename' (optional) the file name to output the result it (.mat or .npz) [uuid.npz]
         * 'parameters'
@@ -114,9 +114,9 @@ Description: # About
             * 'b' (optional) not identifiable with unconstrained scale [1.0]
             * 'term_weights' dictionary storing the weights for the penalty terms
                 * 'data' (optional) weight for the data term [1.0]
-                * 'uniform spacing' (optional)  lambda_1 penalty weight [0.0]
+                * 'uniform_spacing' (optional)  lambda_1 penalty weight [0.0]
                 * 'smoothing' (optional) lambda_2 penalty weight [0.0]
-                * 'population prior' (optional) weight for the population matrix prior [0.0]            
+                * 'population_prior' (optional) weight for the population matrix prior [0.0]            
         * 'options'
             * 'gtol'    (optional) tollerance for the norm of the gradient (stopping criteria) [e-5]
             * 'maxitr'  (optional) set maximum number of iterations [100000]

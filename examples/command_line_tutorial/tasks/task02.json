@@ -1,20 +1,14 @@
 [
     {
-    "file_names": {
-       "inputdir":"data/",
-       "pairwise_contact_matrix":"simulated_contact_matrix.npy",
-       "outputdir":"results/"
-      },
-     "parameters": {
-            "a": -3.0,
-            "b": 1.0,
-            "term_weights": {
-                "data": 1.0,
-                "population prior": 0.0,
-                "shape prior": 0.0,
-                "smoothing": 1.0,
-                "uniform spacing": 1.0
-            }
-        }
+    "file_names_inputdir":"data/",
+    "file_names_pairwise_contact_matrix":"simulated_contact_matrix.npy",
+    "file_names_outputdir":"results/",
+    "parameters_a": -3.0,
+    "parameters_b": 1.0,
+    "parameters_term_weights_data": 1.0,
+    "parameters_term_weights_population_prior": 0.0,
+    "parameters_term_weights_shape_prior": 0.0,
+    "parameters_term_weights_smoothing": 1.0,
+    "parameters_term_weights_uniform_spacing": 1.0
     }
 ]

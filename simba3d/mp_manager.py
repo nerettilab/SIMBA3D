@@ -30,7 +30,7 @@ import simba3d.optimizer as opt
 #import simba3d.plotting_tools as pt
 import simba3d.srvf_open_curve_Rn as srvf
 from simba3d.uuid_check import check_tasks_index, load_result,get_outputfilepath
-from simba3d.pdb_support import make_pdb_file
+
 
 def create_downsampled_matrices(data):
     """
@@ -262,8 +262,6 @@ def save_data(outputfilepath,summary):
         return outputfilepath
     elif ext=='.npz':
         np.savez(outputfilepath,summary=summary)
-    elif ext=='.pdb':
-        make_pdb_file(outputfilepath,np.array(summary['X_evol'][-1]))
     else:
         if ext!='.json':
             outputfilepath+='.json'
@@ -297,57 +295,6 @@ def convert(filename,ext_out=".json"):
     else:
         print("\tCould not load "+filename)
 
-def convert_modern_task(task):
-    # define the defaults here
-    if 'parameters' not in task:
-        task['parameters']= {
-                                'a':-3.0,
-                                'b':1.0
-                            }
-    if 'term_weights' not in task['parameters']:
-        task['parameters']['term_weights']= {
-                    'data'             : 1.0e0,      # weight for the data term
-                    'uniform spacing'  : 0.0, # scaled first order penalty
-                    'smoothing'        : 0.0, # scaled second order penalty
-                    'continuous pairwise repulsion' : 0.0, # scaled second order penalty
-                    'pairwise repulsion' : 0.0, # scaled second order penalty
-                    'population prior' : 0.0,    # weight for the population matrix prior
-                    'shape prior'      : 0.0,    # weight for the shape prior
-                    # below are unsupported penalties
-                    #'firstroughness'   :0.0e3,   # weight for the fist order roughness
-                    #'secondroughness'  :0.0e-16,   # weight for the second order roughness
-                    #'scaledfirstroughness'  :0.0,   # weight for the scaled second order roughness
-                    #'scaledsecondroughness' :0.0,   # weight for the scaled second order roughness
-                    #'parameterization' :0, # not implemented
-                    }
-
-    if 'file_names' not in task:
-        task['file_names']={'inputdir':'.'}
-    if 'options' not in task:
-        task['options']={
-                #"method": "BFGS",
-                "method": "L-BFGS-B",
-                "display": True,
-                "maxitr": 100000
-                }
-    # loop through the keys
-    for key in list(task):
-        parts=key.split('_')
-        if parts[0]=='parameters':
-            if '_term_weights_' in key:
-                newkey=' '.join(parts[3:])
-                task['parameters']['term_weights'][newkey]=task[key]
-            else:
-                newkey=' '.join(parts[1:])
-                task['parameters'][newkey]=task[key]
-        if 'file_names_'in key:
-            newkey='_'.join(parts[2:])
-            task['file_names'][newkey]=task[key]
-        if 'options_'in key:
-            newkey='_'.join(parts[2:])
-            task['options'][newkey]=task[key]
-    return task
-
 def run_tasks(tasks,resume=True):
     '''
     plural task runner.
@@ -361,8 +308,6 @@ def run_tasks(tasks,resume=True):
     #keyboard()
     if type(tasks) is dict: # if a dicitonary is passed in, but it in a list so we know the layer
         tasks=[tasks]
-    for task in tasks:
-        task=convert_modern_task(task)
     if 'uuid' in tasks[0]:
       UUID=tasks[0]["uuid"] # if the task has a uuid use that
     else:
@@ -375,18 +320,20 @@ def run_tasks(tasks,resume=True):
             tasks[ii]['taskname']= "unnamed task" # give the task a more intuitive name
         # convert simplified user input into the older format
 
-        if 'file_names' not in tasks[ii].keys():
+        if 'file_names' not in list(tasks[ii]):
             tasks[ii]['file_names']=dict()
             for key in list(tasks[ii]):
                 if 'file_names_' in key:
                     subkey=key.split('file_names_')[1]
+                    subkey="_".join(subkey.split(" "))
                     tasks[ii]['file_names'][subkey]=tasks[ii][key]
                     tasks[ii].pop(key,None)
-        if 'options' not in tasks[ii].keys():
+        if 'options' not in list(tasks[ii]):
             tasks[ii]['options']=dict()
             for key in list(tasks[ii]):
                 if 'options_' in key:
                     subkey=key.split('options_')[1]
+                    subkey="_".join(subkey.split(" "))
                     tasks[ii]['options'][subkey]=tasks[ii][key]
                     tasks[ii].pop(key,None)
         if 'index_parameters' not in tasks[ii].keys():
@@ -394,6 +341,7 @@ def run_tasks(tasks,resume=True):
             for key in list(tasks[ii]):
                 if 'index_parameters_' in key:
                     subkey=key.split('index_parameters_')[1]
+                    subkey="_".join(subkey.split(" "))
                     tasks[ii]['index_parameters'][subkey]=tasks[ii][key]
                     tasks[ii].pop(key,None)
         if 'parameters' not in tasks[ii].keys():
@@ -401,14 +349,16 @@ def run_tasks(tasks,resume=True):
             for key in list(tasks[ii]):
                 if 'parameters_' in key:
                     subkey=key.split('parameters_')[1]
+                    subkey="_".join(subkey.split(" "))
                     if 'term_weights_' not in key:
                         tasks[ii]['parameters'][subkey]=tasks[ii][key]
                         tasks[ii].pop(key,None)
-        if 'term_weights' not in tasks[ii]['parameters'].keys():
+        if 'term_weights' not in list(tasks[ii]['parameters']):
             tasks[ii]['parameters']['term_weights']=dict()
             for key in list(tasks[ii]):
                 if 'parameters_term_weights_' in key:
                     subkey=key.split('parameters_term_weights_')[1]
+                    subkey="_".join(subkey.split(" "))
                     tasks[ii]['parameters']['term_weights'][subkey]=tasks[ii][key]
                     tasks[ii].pop(key,None)
     if resume:
@@ -416,19 +366,19 @@ def run_tasks(tasks,resume=True):
         print(index_remaining)
     else:
         index_remaining=range(len(tasks))
-
     usewarmstarts=False # default setting for warmstarts
-
-
     for ii in index_remaining: # loop through remaining tasks
+        print("--------------------------------------------")
+        print("RUN:"+str(ii))
+        print("Remaining:",index_remaining)
         if 'uuid' not in tasks[ii]: # make sure the task has a uuid
           tasks[ii]["uuid"]=UUID+'_'+str(ii)
         if ii==0:
           outputfilepath=run_task(tasks[0])   # run the first task
         else:
             if 'usewarmstarts' in tasks[ii]:
-
                 usewarmstarts=tasks[ii]['usewarmstarts'] # if usewarmstarts parameter is set then use that value
+            print("warmstarts",usewarmstarts)
             if usewarmstarts:
                 print("Using warmstarts sequentially from previous task")
                 if 'uuid' not in tasks[ii]:
@@ -504,8 +454,8 @@ def run_task(task):
                     'data'             : 1.0e0,      # weight for the data term
                     'uniform spacing'  : 0.0, # scaled first order penalty
                     'smoothing'        : 0.0, # scaled second order penalty
-                    'population prior' : 0.0,    # weight for the population matrix prior
-                    'shape prior'      : 0.0,    # weight for the shape prior
+                    'population_prior' : 0.0,    # weight for the population matrix prior
+                    'shape_prior'      : 0.0,    # weight for the shape_prior
                     # below are unsupported penalties
                     #'firstroughness'   :0.0e3,   # weight for the fist order roughness
                     #'secondroughness'  :0.0e-16,   # weight for the second order roughness
@@ -628,17 +578,13 @@ def run_task(task):
         # norm of the difference between analytical jacobian and the finite difference approximation of jacobian at initialized curve.
     if result.XK is None:
         result.XK=[result.estimated_curve]
+
     summary=summarize_results(result,task)
-    make_pdb_file_too=False
-    if 'make_pdb_file' in task:
-        make_pdb_file_too= task['make_pdb_file']
-    print(make_pdb_file_too)
-    if make_pdb_file_too:
-        pdbfilepath=os.path.splitext(outputfilepath)[0]+".pdb"
-        print("saving results to file:"+pdbfilepath)
-        save_data(pdbfilepath,summary)
+
     print("saving results to file:"+outputfilepath)
     return save_data(outputfilepath,summary)
+
+
 
 def summarize_results(result,task):
     """

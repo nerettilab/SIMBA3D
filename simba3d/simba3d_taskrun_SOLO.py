@@ -57,11 +57,11 @@ def printhelp():
             }
     parameter_option_descriptions={
             '--lambda_1_value or --term_weight_uniform_spacing <value>':
-                'set value weight for the uniform spacing penalty',
+                'set value weight for the uniform_spacing penalty',
             '--lambda_2_value or --term_weight_smoothing <value>':
                 'set value weight for the uniform smoothing penalty',
             '--lambda_3_value or --term_weight_population_prior <value>':
-                'set value weight for the population prior penalty'
+                'set value weight for the population_prior penalty'
                 }
     print('File and Directory options:')
     for option in list(filename_option_descriptions):
@@ -129,10 +129,10 @@ def main(args=None):
                 'term_weights'   :
                     {
                     'data'             : 1.0e0,      # weight for the data term
-                    'uniform spacing'  : 0.0, # scaled first order penalty
+                    'uniform_spacing'  : 0.0, # scaled first order penalty
                     'smoothing'        : 0.0, # scaled second order penalty
-                    'population prior' : 0.0,    # weight for the population matrix prior
-                    'shape prior'      : 0.0,    # weight for the shape prior
+                    'population_prior' : 0.0,    # weight for the population matrix prior
+                    'shape_prior'      : 0.0,    # weight for the shape_prior
 
                     # below are unsupported penalties
                     #'firstroughness'   :0.0e3,   # weight for the fist order roughness
@@ -209,10 +209,10 @@ def main(args=None):
            task['parameters']['term_weights']['data']=np.float(args[ii] )
        elif args[ii]== '--lambda_1_value':
            ii+=1
-           task['parameters']['term_weights']['uniform spacing']=np.float(args[ii] )
+           task['parameters']['term_weights']['uniform_spacing']=np.float(args[ii] )
        elif args[ii]== '--term_weight_uniform_spacing':
            ii+=1
-           task['parameters']['term_weights']['uniform spacing']=np.float(args[ii])
+           task['parameters']['term_weights']['uniform_spacing']=np.float(args[ii])
        elif args[ii]== '--lambda_2_value':
            ii+=1
            task['parameters']['term_weights']['smoothing']=np.float(args[ii] )
@@ -221,10 +221,10 @@ def main(args=None):
            task['parameters']['term_weights']['smoothing']=np.float(args[ii] )
        elif args[ii]== '--lambda_3_value':
            ii+=1
-           task['parameters']['term_weights']['population prior']=np.float(args[ii])
+           task['parameters']['term_weights']['population_prior']=np.float(args[ii])
        elif args[ii]== '--term_weight_population_prior':
            ii+=1
-           task['parameters']['term_weights']['population prior']=np.float(args[ii]   )
+           task['parameters']['term_weights']['population_prior']=np.float(args[ii]   )
        ii+=1
    print('Input file is ', inputfiles)
    print('number of cores', str(cores))

@@ -24,9 +24,9 @@
                 "b": 1.0,
                 "term_weights": {
                     "data": 1.0,
-                    "shape prior": 0.0,
+                    "shape_prior": 0.0,
                     "smoothing": 0.1,
-                    "uniform spacing": 0.1
+                    "uniform_spacing": 0.1
                 }
             },
             "plotfigs": false,
@@ -59,9 +59,9 @@
                 "b": 1.0,
                 "term_weights": {
                     "data": 1.0,
-                    "shape prior": 0.0,
+                    "shape_prior": 0.0,
                     "smoothing": 0.1,
-                    "uniform spacing": 0.1
+                    "uniform_spacing": 0.1
                 }
             },
             "plotfigs": false,
@@ -94,9 +94,9 @@
                 "b": 1.0,
                 "term_weights": {
                     "data": 1.0,
-                    "shape prior": 0.0,
+                    "shape_prior": 0.0,
                     "smoothing": 0.1,
-                    "uniform spacing": 0.1
+                    "uniform_spacing": 0.1
                 }
             },
             "plotfigs": false,
@@ -129,9 +129,9 @@
                 "b": 1.0,
                 "term_weights": {
                     "data": 1.0,
-                    "shape prior": 0.0,
+                    "shape_prior": 0.0,
                     "smoothing": 0.1,
-                    "uniform spacing": 0.1
+                    "uniform_spacing": 0.1
                 }
             },
             "plotfigs": false,

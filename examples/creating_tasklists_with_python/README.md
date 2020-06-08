@@ -21,34 +21,40 @@ updated than the standard json package.
 
 A python script called create_simple_but_long_tasklist.py has been created
 which illustrates how to create an arbitrarily long tasklist using python. In
-this example, a search over various settings of uniform spacing penalty is
+this example, a search over various settings of uniform_spacing penalty is
 specified. More specifically, lambda_2 = lambda_3 = 0.5 but lambda_1 varied
 from 0 ,0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0.
 
 To create this tasklist run to following command:
-> python create_simple_but_long_tasklist.py
+> python3.6 create_simple_but_long_tasklist.py
 
 After running the script, a file called simple_but_long_tasklist.txt will be
 made. Once this tasklist is created, one can run it using the following command:
-> simba3d -r simple_but_long_tasklist.txt
+> simba3d -i simple_but_long_tasklist.json
+
+You can create a latex report with the following command
+> simba3d-result-disp -p simple -i results/* 
 
 # warmstarts tasklist example
 
 A python script called create_warmstarts_tasklist.py has been created
 which illustrates how to create a warmstarts tasklist.This is accomplished
 by setting the 'usewarmstarts' parameter to True and nesting the tasklist inside
-another list. As before a search over various settings of uniform spacing 
+another list. As before a search over various settings of uniform_spacing 
 penalty is specified. More specifically, lambda_2 = lambda_3 = 0.5 but lambda_1 
 varied from 0 ,0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0. simba3d will 
 run the list of task sequentially, and if 'usewarmstarts' is set to true it 
 will use the solution from the previous run to initialize the next.
 
 To create this tasklist run to following command:
-> python create_warmstarts_tasklist.py
+> python3.6 create_warmstarts_tasklist.py
 
 After running the script, a file called warmstart_tasklist.txt will be
 made. Once this tasklist is created, one can run it using the following command:
-> simba3d -r warmstart_tasklist.txt
+> simba3d -r warmstart_tasklist.json
+
+You can create a latex report with the following command
+> simba3d-result-disp -p warmstarts -i results/* 
 
 # run simba3d within python script example
 
@@ -56,7 +62,7 @@ simba3d can also be called within the script itself by loading the mp_handler.
 
 An example of this can be seen in the run_simba3d_within_python_script.py 
 script. Run the script with the following command:
-> python run_simba3d_within_python_script.py
+> python3.6 run_simba3d_within_python_script.py
 
 This time, the simba3d command does not need to be called because the script
 will run the tasklist.

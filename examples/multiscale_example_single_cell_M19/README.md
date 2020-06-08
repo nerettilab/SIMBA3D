@@ -81,7 +81,7 @@ and 35) to the name of your matrix files stored in the input directory
   - In this example there are two matrices (a single cell and a population 
   matrix). If you have only one matrix, then comment out the population matrix 
   lines (comment out lines 32, 74, and 109 if you only have one data matrix 
-  or if you are not using the population prior term).
+  or if you are not using the population_prior term).
   
 - optionally, you may wish the change the 'output_filename' (line 76) to 
 provide a more intutitive output file name.
