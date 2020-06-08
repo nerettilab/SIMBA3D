@@ -70,7 +70,7 @@ def main(args=None):
             report_directory = str(args[ii])
             image_directory = os.path.join(report_directory,'figures')
             ii+=1
-            summary_name = str(args[ii])            
+            summary_name = str(args[ii])
             ii+=1
             image_ext = str(args[ii])
             print_each=True
@@ -113,8 +113,8 @@ def main(args=None):
             matrix=data.todense()
         else:
              #print "\nLoading "+ datatype+'\n'
-             
-             
+
+
 
              if (ext=='.npy')| (ext=='.npz'):
                  matrix=np.load(inputfile)
@@ -123,16 +123,16 @@ def main(args=None):
                  #keyboard()
              elif (ext=='.mat'):
                  data=loadmat(inputfile)
-                 for key in data.keys():
+                 for key in list(data):
                      if '__' not in key:
                          matrix=data[key]
              elif (ext=='.json'):
                  with open(inputfile, 'r') as jsonfile:
                      data=json.load(jsonfile)
-                 for key in data.keys():
+                 for key in list(data):
                      if '__' not in key:
                          matrix=data[key]
-             q=np.percentile(matrix,p)    
+             q=np.percentile(matrix,p)
         plt.close('all')
         fig1=plt.figure()
         plt.figure(fig1.number)
@@ -141,9 +141,9 @@ def main(args=None):
         plt.colorbar()
         if not print_each:
             plt.show()
-            
+
         else:
-         if image_ext not in ["png",'pdf','svg','ps','eps']: 
+         if image_ext not in ["png",'pdf','svg','ps','eps']:
              print('invalid image format:'+image_ext)
          else:
             imagename=os.path.join(image_directory,filename+'.'+image_ext)

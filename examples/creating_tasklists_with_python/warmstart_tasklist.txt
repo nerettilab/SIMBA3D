@@ -5,7 +5,7 @@
         "file_names": {
             "initialized_curve": "initialized_curve.npy",
             "inputdir": "data/",
-            "output_filename": "4d5fc668-ed76-4238-93af-fe2f00dcdffd1.npy",
+            "output_filename": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696021.npy",
             "outputdir": "results/",
             "pairwise_contact_matrix": "simulated_contact_matrix.npy"
         },
@@ -28,9 +28,9 @@
             }
         },
         "randomize_initialization": false,
-        "taskname": "4d5fc668-ed76-4238-93af-fe2f00dcdffd1",
+        "taskname": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696021",
         "usewarmstarts": true,
-        "uuid": "4d5fc668-ed76-4238-93af-fe2f00dcdffd1"
+        "uuid": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696021"
     },
     {
         "check_jacobian": false,
@@ -38,7 +38,7 @@
         "file_names": {
             "initialized_curve": "initialized_curve.npy",
             "inputdir": "data/",
-            "output_filename": "4d5fc668-ed76-4238-93af-fe2f00dcdffd2.npy",
+            "output_filename": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696022.npy",
             "outputdir": "results/",
             "pairwise_contact_matrix": "simulated_contact_matrix.npy"
         },
@@ -57,13 +57,13 @@
                 "population prior": 0.5,
                 "shape prior": 0.0,
                 "smoothing": 0.5,
-                "uniform spacing": 0.10000000000000001
+                "uniform spacing": 0.1
             }
         },
         "randomize_initialization": false,
-        "taskname": "4d5fc668-ed76-4238-93af-fe2f00dcdffd2",
+        "taskname": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696022",
         "usewarmstarts": true,
-        "uuid": "4d5fc668-ed76-4238-93af-fe2f00dcdffd2"
+        "uuid": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696022"
     },
     {
         "check_jacobian": false,
@@ -71,7 +71,7 @@
         "file_names": {
             "initialized_curve": "initialized_curve.npy",
             "inputdir": "data/",
-            "output_filename": "4d5fc668-ed76-4238-93af-fe2f00dcdffd3.npy",
+            "output_filename": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696023.npy",
             "outputdir": "results/",
             "pairwise_contact_matrix": "simulated_contact_matrix.npy"
         },
@@ -90,13 +90,13 @@
                 "population prior": 0.5,
                 "shape prior": 0.0,
                 "smoothing": 0.5,
-                "uniform spacing": 0.20000000000000001
+                "uniform spacing": 0.2
             }
         },
         "randomize_initialization": false,
-        "taskname": "4d5fc668-ed76-4238-93af-fe2f00dcdffd3",
+        "taskname": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696023",
         "usewarmstarts": true,
-        "uuid": "4d5fc668-ed76-4238-93af-fe2f00dcdffd3"
+        "uuid": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696023"
     },
     {
         "check_jacobian": false,
@@ -104,7 +104,7 @@
         "file_names": {
             "initialized_curve": "initialized_curve.npy",
             "inputdir": "data/",
-            "output_filename": "4d5fc668-ed76-4238-93af-fe2f00dcdffd4.npy",
+            "output_filename": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696024.npy",
             "outputdir": "results/",
             "pairwise_contact_matrix": "simulated_contact_matrix.npy"
         },
@@ -127,9 +127,9 @@
             }
         },
         "randomize_initialization": false,
-        "taskname": "4d5fc668-ed76-4238-93af-fe2f00dcdffd4",
+        "taskname": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696024",
         "usewarmstarts": true,
-        "uuid": "4d5fc668-ed76-4238-93af-fe2f00dcdffd4"
+        "uuid": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696024"
     },
     {
         "check_jacobian": false,
@@ -137,7 +137,7 @@
         "file_names": {
             "initialized_curve": "initialized_curve.npy",
             "inputdir": "data/",
-            "output_filename": "4d5fc668-ed76-4238-93af-fe2f00dcdffd5.npy",
+            "output_filename": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696025.npy",
             "outputdir": "results/",
             "pairwise_contact_matrix": "simulated_contact_matrix.npy"
         },
@@ -156,13 +156,13 @@
                 "population prior": 0.5,
                 "shape prior": 0.0,
                 "smoothing": 0.5,
-                "uniform spacing": 0.40000000000000002
+                "uniform spacing": 0.4
             }
         },
         "randomize_initialization": false,
-        "taskname": "4d5fc668-ed76-4238-93af-fe2f00dcdffd5",
+        "taskname": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696025",
         "usewarmstarts": true,
-        "uuid": "4d5fc668-ed76-4238-93af-fe2f00dcdffd5"
+        "uuid": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696025"
     },
     {
         "check_jacobian": false,
@@ -170,7 +170,7 @@
         "file_names": {
             "initialized_curve": "initialized_curve.npy",
             "inputdir": "data/",
-            "output_filename": "4d5fc668-ed76-4238-93af-fe2f00dcdffd6.npy",
+            "output_filename": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696026.npy",
             "outputdir": "results/",
             "pairwise_contact_matrix": "simulated_contact_matrix.npy"
         },
@@ -193,9 +193,9 @@
             }
         },
         "randomize_initialization": false,
-        "taskname": "4d5fc668-ed76-4238-93af-fe2f00dcdffd6",
+        "taskname": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696026",
         "usewarmstarts": true,
-        "uuid": "4d5fc668-ed76-4238-93af-fe2f00dcdffd6"
+        "uuid": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696026"
     },
     {
         "check_jacobian": false,
@@ -203,7 +203,7 @@
         "file_names": {
             "initialized_curve": "initialized_curve.npy",
             "inputdir": "data/",
-            "output_filename": "4d5fc668-ed76-4238-93af-fe2f00dcdffd7.npy",
+            "output_filename": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696027.npy",
             "outputdir": "results/",
             "pairwise_contact_matrix": "simulated_contact_matrix.npy"
         },
@@ -222,13 +222,13 @@
                 "population prior": 0.5,
                 "shape prior": 0.0,
                 "smoothing": 0.5,
-                "uniform spacing": 0.60000000000000009
+                "uniform spacing": 0.6000000000000001
             }
         },
         "randomize_initialization": false,
-        "taskname": "4d5fc668-ed76-4238-93af-fe2f00dcdffd7",
+        "taskname": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696027",
         "usewarmstarts": true,
-        "uuid": "4d5fc668-ed76-4238-93af-fe2f00dcdffd7"
+        "uuid": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696027"
     },
     {
         "check_jacobian": false,
@@ -236,7 +236,7 @@
         "file_names": {
             "initialized_curve": "initialized_curve.npy",
             "inputdir": "data/",
-            "output_filename": "4d5fc668-ed76-4238-93af-fe2f00dcdffd8.npy",
+            "output_filename": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696028.npy",
             "outputdir": "results/",
             "pairwise_contact_matrix": "simulated_contact_matrix.npy"
         },
@@ -255,13 +255,13 @@
                 "population prior": 0.5,
                 "shape prior": 0.0,
                 "smoothing": 0.5,
-                "uniform spacing": 0.70000000000000007
+                "uniform spacing": 0.7000000000000001
             }
         },
         "randomize_initialization": false,
-        "taskname": "4d5fc668-ed76-4238-93af-fe2f00dcdffd8",
+        "taskname": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696028",
         "usewarmstarts": true,
-        "uuid": "4d5fc668-ed76-4238-93af-fe2f00dcdffd8"
+        "uuid": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696028"
     },
     {
         "check_jacobian": false,
@@ -269,7 +269,7 @@
         "file_names": {
             "initialized_curve": "initialized_curve.npy",
             "inputdir": "data/",
-            "output_filename": "4d5fc668-ed76-4238-93af-fe2f00dcdffd9.npy",
+            "output_filename": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696029.npy",
             "outputdir": "results/",
             "pairwise_contact_matrix": "simulated_contact_matrix.npy"
         },
@@ -288,13 +288,13 @@
                 "population prior": 0.5,
                 "shape prior": 0.0,
                 "smoothing": 0.5,
-                "uniform spacing": 0.80000000000000004
+                "uniform spacing": 0.8
             }
         },
         "randomize_initialization": false,
-        "taskname": "4d5fc668-ed76-4238-93af-fe2f00dcdffd9",
+        "taskname": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696029",
         "usewarmstarts": true,
-        "uuid": "4d5fc668-ed76-4238-93af-fe2f00dcdffd9"
+        "uuid": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe696029"
     },
     {
         "check_jacobian": false,
@@ -302,7 +302,7 @@
         "file_names": {
             "initialized_curve": "initialized_curve.npy",
             "inputdir": "data/",
-            "output_filename": "4d5fc668-ed76-4238-93af-fe2f00dcdffd10.npy",
+            "output_filename": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe6960210.npy",
             "outputdir": "results/",
             "pairwise_contact_matrix": "simulated_contact_matrix.npy"
         },
@@ -321,13 +321,13 @@
                 "population prior": 0.5,
                 "shape prior": 0.0,
                 "smoothing": 0.5,
-                "uniform spacing": 0.90000000000000002
+                "uniform spacing": 0.9
             }
         },
         "randomize_initialization": false,
-        "taskname": "4d5fc668-ed76-4238-93af-fe2f00dcdffd10",
+        "taskname": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe6960210",
         "usewarmstarts": true,
-        "uuid": "4d5fc668-ed76-4238-93af-fe2f00dcdffd10"
+        "uuid": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe6960210"
     },
     {
         "check_jacobian": false,
@@ -335,7 +335,7 @@
         "file_names": {
             "initialized_curve": "initialized_curve.npy",
             "inputdir": "data/",
-            "output_filename": "4d5fc668-ed76-4238-93af-fe2f00dcdffd11.npy",
+            "output_filename": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe6960211.npy",
             "outputdir": "results/",
             "pairwise_contact_matrix": "simulated_contact_matrix.npy"
         },
@@ -358,8 +358,8 @@
             }
         },
         "randomize_initialization": false,
-        "taskname": "4d5fc668-ed76-4238-93af-fe2f00dcdffd11",
+        "taskname": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe6960211",
         "usewarmstarts": true,
-        "uuid": "4d5fc668-ed76-4238-93af-fe2f00dcdffd11"
+        "uuid": "6b7710d3-6eb6-4f13-ba1a-d0a2cfe6960211"
     }
 ]

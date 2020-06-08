@@ -1,0 +1,18 @@
+[
+    {
+		"file_names_inputdir":"data/",
+		"file_names_pairwise_contact_matrix":"cell1_mESC_M19_a_138x138.npy",
+		"file_names_population_contact_matrix":"population_mESC_M19_a_138x138.npy",
+		"file_names_outputdir":"results/",
+		"randomize_initialization":false,
+		"options_gtol":1e-5,
+		"options_maxitr":100000,
+		"options_method":"L-BFGS-B",
+		"parameters_a":-3.0,
+		"parameters_b":1.0,
+		"parameters_term_weights_data":1.0,
+		"parameters_term_weights_pairwise_repulsion":0.0,
+		"parameters_term_weights_population_prior":1.0,
+		"make_pdb_file":true
+    }
+]

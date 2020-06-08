@@ -35,7 +35,7 @@ def printhelp():
     print('-o of --output-directory <output/directory> specify where to create the summary report ( ./ is the default)' )
     print('-f or --format <format as png,eps, or jpg> format for outputed images (png is the default)')
     print('-p or --print-each <report name> print each result individually')
-    
+
     #print '-f or --filter <string parameter name> <minimum value> <maximum value>'
 def result_passes_filter(summary,param_name,param_min,param_max):
     """
@@ -72,13 +72,13 @@ def main(args=None):
            sys.exit()
         if (args[ii]== '-p')|(args[ii]== '--print-each'):
             ii+=1
-            summary_name = str(args[ii])    
+            summary_name = str(args[ii])
             print('\t'+args[ii])
             print_each=True
             latex_print=True
         if (args[ii]== '-o')|(args[ii]== '--output-directory'):
             ii+=1
-            report_directory = str(args[ii])       
+            report_directory = str(args[ii])
             print('\t'+args[ii])
             print_each=True
             latex_print=True
@@ -134,24 +134,22 @@ def main(args=None):
             d,n0=np.shape(X0)
         if 'n' in summary:
             n=summary['n']
-    
+
         else:
             d,n=np.shape(X0)
         X0=X0.reshape((d,n)) # correct dimensions
         center_curve,mu=srvf.center_curve(X0)
         scenter_curve,scale=srvf.scale_curve(center_curve)
-    
+
     latex=make_latex_report_header('figures')
 
     for inputfile in inputfiles:
         summary=mp.load_result(inputfile)
         if result_passes_filter(summary,param_name,param_min,param_max):
-            #print summary.keys()
             if 'uuid' in summary:
               print(summary['uuid'])
             if 'E_evol'in summary:
                 energy.append(summary['E_evol'])
-                #print summary.keys()
             if 'X_evol'in summary:
                 X0=np.array(summary['X_evol'][-1]) # get the last curve
                 # get dimension
@@ -239,7 +237,7 @@ def main(args=None):
             if not print_each:
                 plt.show()
             if print_each:
-                if image_ext not in ["png",'pdf','svg','ps','eps']: 
+                if image_ext not in ["png",'pdf','svg','ps','eps']:
                     print('invalid image format:'+image_ext)
                 else:
                         base=os.path.basename(inputfile);
@@ -268,7 +266,7 @@ def main(args=None):
                                         'Population Penalty':weight_population_prior,
                                         'Nonspecified Zeros As Missing':nonspecified_zeros_as_missing
                                         }
-                                
+
                                 latex_table=make_latex_table(params)
                                 latex+=latex_table
                         except:
