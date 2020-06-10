@@ -1,4 +1,5 @@
 [
+	[
     {
     "file_names_inputdir":"data/",
     "file_names_pairwise_contact_matrix":"simulated_contact_matrix.npy",
@@ -11,4 +12,5 @@
     "parameters_term_weights_smoothing": 1.0,
     "parameters_term_weights_uniform_spacing": 1.0
     }
+    ]
 ]

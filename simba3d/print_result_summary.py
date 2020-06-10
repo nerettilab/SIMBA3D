@@ -18,9 +18,9 @@ def printhelp():
     """
     print the document options for the simba3d print utility
     """
-    print 'Print specific keys from .mat or .npz simba3d report file'
-    print 'simba3d-print -i path/to/file [keys]'
-    
+    print('Print specific keys from .mat or .npz simba3d report file')
+    print('simba3d-print -i path/to/file [keys]')
+
 def main(args=None):
     """
     main function call for the simba3d print utility
@@ -43,12 +43,12 @@ def main(args=None):
         try:
             summary=load_result(filename)
         except:
-            print "\tError loading "+filename
+            print("\tError loading "+filename)
         if args:
             for key in args:
                 if key in summary:
-                    print key+"="+str(summary[key])
+                    print(key+"="+str(summary[key]))
         else:
-            print 'keys='+str(summary.keys())
+            print('keys='+str(summary.keys()))
 if __name__ == "__main__":
    main()

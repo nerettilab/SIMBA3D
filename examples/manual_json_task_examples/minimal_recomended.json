@@ -1,31 +1,22 @@
-[
+[[
     {
     "taskname":"short descriptive name",
     "description":"A longer description of the task for posterity",
     "uuid":"unique-number-or-randomly-generated-string-specific-to-this-task",
-    "file_names": {
-        "inputdir": "./",
-        "outputdir": "./",
-        "pairwise_contact_matrix":"simulated_contact_matrix.npy",
-        "initialized_curve" : "initialized_curve.npy"
-        },
-     "options": {
-            "display": true,
-            "gradient tolerance": 1e-05,
-            "maxitr": 100000,
-            "method": "default",
-            "store": false
-        },
-     "parameters": {
-            "a": -3.0,
-            "b": 1.0,
-            "term_weights": {
-                "data": 1.0,
-                "population_prior": 0.0,
-                "shape_prior": 0.0,
-                "smoothing": 0.0,
-                "uniform_spacing": 0.0
-            }
-        }
-    }
-]
+    "file_names_inputdir": "./",
+    "file_names_outputdir": "./",
+    "file_names_pairwise_contact_matrix":"simulated_contact_matrix.npy",
+    "file_names_initialized_curve" : "initialized_curve.npy",
+    "options_display": false,
+	"options_gtol":1e-5,
+	"options_maxitr":100000,
+	"options_method":"L-BFGS-B",
+	"parameters_a":-3.0,
+	"parameters_b":1.0,
+	"parameters_term_weights_data":1.0,
+	"parameters_term_weights_pairwise_repulsion":0.0,
+	"parameters_term_weights_population_prior":0.0,
+	"usewarmstarts":false,
+	"make_pdb_file":false
+	}
+]]

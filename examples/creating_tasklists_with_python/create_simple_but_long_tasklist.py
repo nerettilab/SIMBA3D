@@ -14,7 +14,7 @@ from simba3d.mp_manager import significant_figures
 
 taskfilepath="simple_but_long_tasklist.json"
 
-tasks=[]
+tasks=[[]]
 
 lambda_2=0.5;
 lambda_3=0.5;
@@ -22,7 +22,7 @@ UUID0=str(uuid.uuid4()) # generate a unique id
 iii=0
 for lambda_1 in np.linspace(0,1,11):
 	UUID=UUID0+"_"+str(iii).zfill(5) # unique id for each subtask
-	tasks.append(
+	tasks[0].append(
 		{
 		    # task parameters        
 		    "usewarmstarts":False,
@@ -50,7 +50,7 @@ for lambda_1 in np.linspace(0,1,11):
 		    "parameters_term_weights_shape_prior"      : 0.0,    # weight for the shape_prior
 		    # options
 		    "options_maxitr"    : 100000, # set maximum number of iterations
-		    "options_display"   : True, # display function values at each iteration
+		    "options_display"   : False, # display function values at each iteration
 		    "options_store"     : False, # store iterative curves
 		    "options_method"    : "BFGS",# Broyden, Fletcher, Goldfarb, and Shanno (quasi-Newton, only first derivatives are used)
 		    #"options_method"    :"Nelder-Mead",# robust but slow numerical approach

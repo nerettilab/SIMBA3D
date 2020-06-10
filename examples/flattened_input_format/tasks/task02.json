@@ -1,4 +1,4 @@
-[
+[[
     {
 		"file_names_inputdir":"data/",
 		"file_names_sparse_pairwise_contact_matrix":"sparse_csv_format.csv",
@@ -14,4 +14,4 @@
 		"parameters_term_weights_population_prior":0.0,
 		"make_pdb_file":true
     }
-]
+]]

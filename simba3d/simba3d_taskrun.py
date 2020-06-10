@@ -35,11 +35,11 @@ def printhelp():
     '''
     print document options for the simba3d taskrun command
     '''
-    print 'To apply multiprocessing to a list of tasks specify # of cores and a json tasklist'
-    print '\t-c <number_of_cores> '
-    print '\t-i <json_tasklist_file>'
-    print ''
-    print 'Alternatively, to specify a single run, specify file and parameter options:'
+    print('To apply multiprocessing to a list of tasks specify # of cores and a json tasklist')
+    print('\t-c <number_of_cores> ')
+    print('\t-i <json_tasklist_file>')
+    print('')
+    print('Alternatively, to specify a single run, specify file and parameter options:')
     filename_option_descriptions={
             '--inputdir':
                 'local dircetory for data input files (for simplier relative paths)',
@@ -64,14 +64,14 @@ def printhelp():
             '--lambda_3_value or --term_weight_population_prior <value>':
                 'set value weight for the population_prior penalty'
                 }
-    print 'File and Directory options:'
+    print('File and Directory options:')
     for option in list(filename_option_descriptions):
-        print '\t'+option
-        print '\t\t'+filename_option_descriptions[option]
-    print 'Parameter options:'
+        print('\t'+option)
+        print('\t\t'+filename_option_descriptions[option])
+    print('Parameter options:')
     for option in list(parameter_option_descriptions):
-        print '\t'+option
-        print '\t\t'+parameter_option_descriptions[option]
+        print('\t'+option)
+        print('\t\t'+parameter_option_descriptions[option])
 #%%
 def main(args=None):
    """
@@ -245,7 +245,7 @@ def main(args=None):
            if not mp.load_result(outputfilepath):
                mp.run_task(task)
            else:
-               print "Skipping task with same output file"
+               print("Skipping task with same output file")
    else:
        taskss=[]
        for inputfile in inputfiles:
@@ -256,7 +256,7 @@ def main(args=None):
        t= time.time()
        mp.mp_handler(taskss,cores)
        elapsed=time.time()-t
-       print 'Total %s seconds elapsed' % (elapsed)
+       print('Total %s seconds elapsed' % (elapsed))
 
 if __name__ == "__main__":
    main()

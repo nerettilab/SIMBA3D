@@ -3,7 +3,7 @@ order to specify the pairwise interaction matrix.
 
 # Introduction
 
-There are main two input format types for data matricies to input into SIMBA3D.
+There are two main input format types for data matricies to input into SIMBA3D.
 
 There is a dense matrix representation which is inputed as an array of row 
 arrays. This is not ideal since the data is often sparse and it is symmetric
@@ -25,16 +25,15 @@ that can be read using just about any code language. A csv (comma separate
 value) consists of data values separated by one or more delimiters (usually
 a comma and an end line character).
 
-We suggest json as a default format to passing in data into SIMBA3D, so that 
+We suggest json or csv as a default format to passing in data into SIMBA3D, so that 
 users are not restricted to use python or matlab for data manipulations. If you 
 choose to use mat or npy files as inputs, then anyone who wants to use
 your data will be required to use python or matlab if they want to reprocess it.
-If you use json, then most people will be able to read it without much
+If you use json or csv, then most people will be able to read it without much
 assistance.
 
-A comma delimited format will be made for SIMBA3D in versions 2.1 and greater.
-The csv format is probably more familiar to biologist and statisticians and so
-it will be included for ease of use. It is less flexible than json though.
+The csv format is probably more familiar to biologist and statisticians. It is 
+less flexible than json though.
 
 The sections below go into further details.
 
@@ -104,6 +103,11 @@ You should call this command from the directory which contains this readme file
 since the tasks use relative paths.
 
 This will begin to reconstruct things using various input examples.
+
+You should get 6 identical results with different computation times. Use the 
+following command to generate a report to compare the results. 
+> simba3d-result-disp -p formats -i ./*.json
+
 
 # Conclusion
 

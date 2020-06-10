@@ -9,7 +9,7 @@ from distutils.core import setup
 
 setup (
        name='SIMBA3D',
-       version='2.2.1',
+       version='3.0.0',
        author='Michael M. Rosenthal',
        author_email='Michael.M.Rosenthal@gmail.com',
        url='',

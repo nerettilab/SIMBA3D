@@ -1,64 +1,40 @@
 [
-    [
-      {
-      "usewarmstarts":true,
-      "taskname":"first sequential warmstart task",
-      "description":"first subtask of the sequence",
-      "uuid":"aegysrheyuw35asytsj5-0",
-      "file_names": {
-          "inputdir": "./",
-          "outputdir": "./",
-          "pairwise_contact_matrix":"simulated_contact_matrix.npy",
-          "initialized_curve" : "initialized_curve.npy"
-          },
-       "options": {
-              "display": true,
-              "gradient tolerance": 1e-05,
-              "maxitr": 100000,
-              "method": "default",
-              "store": false
-          },
-       "parameters": {
-              "a": -3.0,
-              "b": 1.0,
-              "term_weights": {
-                  "data": 1.0,
-                  "population_prior": 0.0,
-                  "shape_prior": 0.0,
-                  "smoothing": 1.0,
-                  "uniform_spacing": 1.0
-              }
-          }
-      },
-      {
-      "usewarmstarts":true,
-      "taskname":"second sequential warmstart task",
-      "description":"second subtask of the sequence to be finished after the first is done",
-      "uuid":"aegysrheyuw35asytsj5-1",
-      "file_names": {
-          "inputdir": "./",
-          "outputdir": "./",
-          "pairwise_contact_matrix":"simulated_contact_matrix.npy",
-          "initialized_curve" : "initialized_curve.npy"
-          },
-       "options": {
-              "display": true,
-              "gradient tolerance": 1e-05,
-              "maxitr": 100000,
-              "method": "default",
-              "store": false
-          },
-       "parameters": {
-              "a": -3.0,
-              "b": 1.0,
-              "term_weights": {
-                  "data": 1.0,
-                  "population_prior": 0.0,
-                  "shape_prior": 0.0,
-                  "smoothing": 1.0,
-                  "uniform_spacing": 0.0
-              }
-          }
-      }
-    ]
+	[{
+		"taskname":"first independent task",
+		"description":"first task in an example list of tasks",
+		"uuid":"43j9gag90j",
+		"file_names_inputdir":"data/",
+		"file_names_sparse_pairwise_contact_matrix":"sparse_csv_format.csv",
+		"file_names_outputdir":"results/",
+		"randomize_initialization":false,
+		"options_gtol":1e-5,
+		"options_maxitr":100000,
+		"options_method":"L-BFGS-B",
+		"parameters_a":-3.0,
+		"parameters_b":1.0,
+		"parameters_term_weights_data":1.0,
+		"parameters_term_weights_pairwise_repulsion":0.0,
+		"parameters_term_weights_population_prior":0.0,
+		"usewarmstarts":true,
+		"make_pdb_file":false
+    },
+    {
+	    "taskname":"second independent task",
+		"description":"first task in an example list of tasks",
+		"uuid":"52yh8q930gawehd8-9",
+		"file_names_inputdir":"data/",
+		"file_names_sparse_pairwise_contact_matrix":"sparse_csv_format.csv",
+		"file_names_outputdir":"results/",
+		"randomize_initialization":false,
+		"options_gtol":1e-5,
+		"options_maxitr":100000,
+		"options_method":"L-BFGS-B",
+		"parameters_a":-3.0,
+		"parameters_b":1.0,
+		"parameters_term_weights_data":1.0,
+		"parameters_term_weights_pairwise_repulsion":0.0,
+		"parameters_term_weights_population_prior":0.0,
+		"usewarmstarts":true,
+		"make_pdb_file":false
+    }]
 ]

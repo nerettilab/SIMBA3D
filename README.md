@@ -114,15 +114,15 @@ The individual tasks are dictionaries with the following keys:
 * 'randomize_initialization' (optional) should we randomize the initialized curve? [False]
 * 'seed' (optional) integer between 0 and 4294967295 to fixed seed for randomizing inititialization
 * 'check_jacobian' (optional) to check the alytical gradient with numerical gradient [False]
-* 'input_file_names_'inputdir' parent directory for the input files ['.']
-* 'input_file_names_pairwise_contact_matrix"  the pairwise interacation matrix file (path relative to inputdir )
-* 'input_file_names_sparse_pairwise_contact_matrix"  the pairwise interacation matrix file in a sparse format (path relative to inputdir )
-* 'input_file_names_initialized_curve" (optional) file to import initialized curve (path relative to inputdir )
-* 'input_file_names_population_contact_matrix" (optional) the pairwise interacation matrix file from poptulation data (path relative to inputdir )
-* 'input_file_names_sparse_population_contact_matrix" (optional) the pairwise interacation matrix file from population data in a sparse format (path relative to inputdir )
-* 'input_file_names_prior_shape_model" (optional) shape_prior curve file (path relative to inputdir )
-* 'input_file_names_outputdir' parent directory for the output files ['.']
-* 'input_file_names_output_filename' (optional) the file name to output the result it (.mat or .npz) [uuid.npz]
+* 'file_names_inputdir' parent directory for the input files ['.']
+* 'file_names_pairwise_contact_matrix"  the pairwise interacation matrix file (path relative to inputdir )
+* 'file_names_sparse_pairwise_contact_matrix"  the pairwise interacation matrix file in a sparse format (path relative to inputdir )
+* 'file_names_initialized_curve" (optional) file to import initialized curve (path relative to inputdir )
+* 'file_names_population_contact_matrix" (optional) the pairwise interacation matrix file from poptulation data (path relative to inputdir )
+* 'file_names_sparse_population_contact_matrix" (optional) the pairwise interacation matrix file from population data in a sparse format (path relative to inputdir )
+* 'file_names_prior_shape_model" (optional) shape_prior curve file (path relative to inputdir )
+* 'file_names_outputdir' parent directory for the output files ['.']
+* 'file_names_output_filename' (optional) the file name to output the result it (.json, .mat, or .npz) [taskname_uuid.json]
 * 'parameters_a' (optional) the a parameter [-3.0]
 * 'parameters_'b' (optional) not identifiable with unconstrained scale [1.0]
 * 'parameters_term_weights' dictionary storing the weights for the penalty terms
