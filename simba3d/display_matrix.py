@@ -38,9 +38,7 @@ def printhelp():
     print('-c or --colormap <colormap name> pink, jet, bone, winter, summer, ...')
     print('-d or --dense flag which indicates a dense matrix input is provided')
     print('-q or --quantile-color-scale <value> value is an integer between 0 and 100 specifying the upper threshold quantile for the color limit')
-    print('-p or --print-each <outputdir> <summaryname> <format as png,eps, or jpg> print each image individually')
-
-    #print '-f or --filter <string parameter name> <minimum value> <maximum value>'
+    print('-p or --print-each <outputdir> <summaryname> <format as png,eps, or jpg> print each image individually')'
 
 def main(args=None):
     """

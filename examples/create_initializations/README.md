@@ -22,7 +22,7 @@ Use the following command to see the help file:
 
 > simba3d-initialize -n 100 -o inputs/initialized_curves/initialization01.csv initialized_curves/initialization02.csv initialized_curves/initialization03.csv
 
-# Make hundreds of intializations using linux command
+# Make hundreds of intializations using the command
 
 > simba3d-initializeze -n 100 -o inputs/initialized_curves/initialization{0001...1000}.csv 
 
@@ -44,3 +44,8 @@ Go ahead and retype the same command.
 
 After the exiperiment finished running you will find two results with identical
 outputs (except for the uuid and file name).
+
+Create a report with the following command:
+> simba3d-result-disp -p same -i *.json
+
+You will see that everything except the name and computation time are the same.

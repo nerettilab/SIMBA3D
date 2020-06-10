@@ -32,9 +32,6 @@ After running the script, a file called simple_but_long_tasklist.txt will be
 made. Once this tasklist is created, one can run it using the following command:
 > simba3d -i simple_but_long_tasklist.json
 
-You can create a latex report with the following command
-> simba3d-result-disp -p simple -i results/* 
-
 # warmstarts tasklist example
 
 A python script called create_warmstarts_tasklist.py has been created
@@ -53,12 +50,18 @@ After running the script, a file called warmstart_tasklist.txt will be
 made. Once this tasklist is created, one can run it using the following command:
 > simba3d -r warmstart_tasklist.json
 
+# compare the two
+
 You can create a latex report with the following command
-> simba3d-result-disp -p warmstarts -i results/* 
+> simba3d-result-disp -p with_and_without_warmstarts -i results/* 
+
+This should create an ordered report with the two set of runs. One will have 
+the warmstarts run which uses the previous run to initialize the next, and 
+the other will have a random initialization for each run.
 
 # run simba3d within python script example
 
-simba3d can also be called within the script itself by loading the mp_handler.
+simba3d can also be called within the script itself by loading the mp_worker.
 
 An example of this can be seen in the run_simba3d_within_python_script.py 
 script. Run the script with the following command:

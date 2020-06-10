@@ -30,6 +30,7 @@ import simba3d.optimizer as opt
 #import simba3d.plotting_tools as pt
 import simba3d.srvf_open_curve_Rn as srvf
 from simba3d.uuid_check import check_tasks_index, load_result,get_outputfilepath
+from simba3d.pdb_support import make_pdb_file
 
 
 def create_downsampled_matrices(data):
@@ -184,38 +185,39 @@ def load_sparse_matrix(inputfile):
 
 
 def save_matrices(inputdir,data_matrix_file,outputdir=None):
-    """
-    This saves a downsampled versions of a matrix npy file.
-
-    You tell it the directory and the name of the file, and this will create the
-    down sampled matrix files for the multiresolution warm-starts.
-    """
     if (outputdir==None):
-      """
-      if the user does not specify the outputdir, assume the ouput and input
-      directory are the same.
-      """
-      outputdir=inputdir
-    # load the data matrix to down sample
-    data=np.load(os.path.join(inputdir,data_matrix_file))
-    # create the down sampled matrices
-    Crev=create_downsampled_matrices(data)
-    multires_filenames=[]
-    res=[]
-    reversed_index=list(reversed(range(len(Crev))))
-    C=[]
-    # loop through the downsampled matrices in reverse order
-    for ii in range(len(Crev)):
-        C.append(Crev[reversed_index[ii]])
-        # store the resolutions for automating the tasklist generation
-        res.append(len(C[ii]))
+        """
+        if the user does not specify the outputdir, assume the ouput and input
+        directory are the same.
+        """
+        outputdir=inputdir
         file_name,file_extension=os.path.splitext(data_matrix_file)
-        # store the file names for automating the tasklist generation
-        multires_filenames.append(file_name+'_'+str(res[ii])+'x'+str(res[ii])+file_extension)
-        # save the multiresolution matrices to the desired directory
-        print('Saving '+multires_filenames[ii])
-        np.save(os.path.join(outputdir,multires_filenames[ii]),C[ii])
-    return res,multires_filenames
+        # load the data matrix to down sample
+        if file_extension =='.npy':
+            data=np.load(os.path.join(inputdir,data_matrix_file))
+        elif file_extension =='.mat':
+            data=loadmat(os.path.join(inputdir,data_matrix_file))
+        # create the down sampled matrices
+        Crev=create_downsampled_matrices(data)
+        multires_filenames=[]
+        res=[]
+        reversed_index=list(reversed(range(len(Crev))))
+        C=[]
+        # loop through the downsampled matrices in reverse order
+        for ii in range(len(Crev)):
+            C.append(Crev[reversed_index[ii]])
+            # store the resolutions for automating the tasklist generation
+            res.append(len(C[ii]))
+
+            # store the file names for automating the tasklist generation
+            multires_filenames.append(file_name+'_'+str(res[ii])+'x'+str(res[ii])+file_extension)
+            # save the multiresolution matrices to the desired directory
+            print('Saving '+multires_filenames[ii])
+            if file_extension =='.npy':
+                np.save(os.path.join(outputdir,multires_filenames[ii]),C[ii])
+            elif file_extension =='.mat':
+                savemat(os.path.join(outputdir,multires_filenames[ii]),C[ii])
+        return res,multires_filenames
 
 
 def jsonify(data):
@@ -262,6 +264,8 @@ def save_data(outputfilepath,summary):
         return outputfilepath
     elif ext=='.npz':
         np.savez(outputfilepath,summary=summary)
+    elif ext=='.pdb':
+        make_pdb_file(outputfilepath,np.array(summary['X_evol'][-1]))
     else:
         if ext!='.json':
             outputfilepath+='.json'
@@ -270,6 +274,9 @@ def save_data(outputfilepath,summary):
             summary['json_task']='not stored'
             serialized_summary=jsonify(summary)
             json.dump(serialized_summary, result,indent=4,sort_keys=True)
+
+
+    return outputfilepath
 
 
     return outputfilepath
@@ -553,7 +560,10 @@ def run_task(task):
                 }
     if 'seed' in task:
         options['seed']=task['seed']
-
+    # option to make a pdf file to be viewed in Chrimera
+    make_pdb_file_too=False
+    if 'make_pdb_file' in task:
+        make_pdb_file_too=task['make_pdb_file']
     start=time.time()
 
     result=opt.opt_E(data,parameters,options)
@@ -581,6 +591,11 @@ def run_task(task):
 
     summary=summarize_results(result,task)
 
+
+    if (make_pdb_file_too == True):
+        pdbfilepath=os.path.splitext(outputfilepath)[0]+".pdb"
+        print("saving results to file:"+pdbfilepath)
+        save_data(pdbfilepath,summary)
     print("saving results to file:"+outputfilepath)
     return save_data(outputfilepath,summary)
 

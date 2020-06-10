@@ -14,7 +14,7 @@ from simba3d.mp_manager import significant_figures
 
 taskfilepath="warmstarts_tasklist.json"
 
-tasks=[]
+tasks=[[]]
 
 lambda_2=0.5;
 lambda_3=0.5;
@@ -22,7 +22,7 @@ UUID0=str(uuid.uuid4()) # generate a unique id
 iii=0
 for lambda_1 in np.linspace(0,1,11):
 	UUID=UUID0+"_"+str(iii).zfill(5) # unique id for each subtask
-	tasks.append(
+	tasks[0].append(
 		{
 		    # task parameters        
 		    "usewarmstarts":True,
