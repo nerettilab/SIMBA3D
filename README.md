@@ -9,21 +9,24 @@ estimate 3D architecture from pairwise interaction matrices.
 # What is New
 
 I am deprecating multi-processing part so that only the solo run
-will work. I have found the multi-processing messages too difficult to debug,
-and I just cannot support it. Sorry, if you use it. You can still use it in
-as a python script, but I will not be updating the 'simba3d_taskrun.py' file
+will work.
+I have found the multi-processing messages too difficult to debug,
+and I just cannot support it.
+Sorry, if you use it.
+You can still use it in as a python script, but I will not be updating the 'simba3d_taskrun.py' file
 with new features.
 
 I have improved the input json to something easier for a human being to input.
-See the section below on Simplified JSON format. I will push it to the main
-branch when I have the examples converted into the new format. I do not plan to
-removing the old format, but I will not be documenting it anymore after I get
-the examples converted. I think most people will agree that it is an improvement.
+See the section below on Simplified JSON format.
+I do not plan to purposely remove the old format, but I will not be documenting it anymore.
+I think most people will agree that it is an improvement.
 
 The results generated can now be converted to a pdb file which can be viewed in
 UCSF Chrimera.
 
 There are now tools for generating automated reports.
+
+The examples have been updated.
 
 # What is coming up
 
@@ -92,20 +95,12 @@ For help type:
 
 If you are using a local install you can also use <'python run_simba3d.py'> just
 like the <'simba3d'> command. For example, to get help you can type:
-> python run_simba3d.py -h
-
-The help documentation will tell the user that there are two ways to pass in
-file parameters. One way is to use the -r option to read in a json file
-containing a tasklist. If a single task is to be ran, then one can pass in input
-and output instructions and the parameter settings using the options specified.
-This feature does not currently have all the available parameters and will most
-likely be phased out of future versions. It is recommended either individual
-files with different tasklists are used or one big file with a large list of
-tasks is used.
+> python run_simba3d_solo.py -h
 
 ## Simplified JSON format
 
-All the Previous examples should still work, but the json format from here on out has been flattened. This should be easier for the user because the nesting brackets can be complicated to keep track of, especially when cutting and pasting examples.
+All the previous formats should still work, but the json format from here on out has been flattened.
+This should be easier for the user because the nesting brackets can be complicated to keep track of, especially when cutting and pasting examples.
 
 The individual tasks are dictionaries with the following keys:
 * 'taskname' (optional) name of the task [uuid]
@@ -144,67 +139,6 @@ The individual tasks are dictionaries with the following keys:
 
 Examples can be seen in examples/flattened_input_format
 
-
-## Old JSON Tasks for simba3d
-simba3d requires some information to know what to run. This information can be
-efficiently passed in as a list of tasks stored in a formated json file.
-
-There are a lot of options available which can make the process of specifying
-the task look complicated at first. There are defaults set for many of the
-keys (which are shown in square brackets below).
-
-The individual tasks are dictionaries with the following keys:
-* 'taskname' (optional) name of the task [uuid]
-* 'uuid' (recommended) unique identifier specific to the task [randomly generated]
-* 'store_task' (optional) store the task in the output [True]
-* 'randomize_initialization' (optional) should we randomize the initialized curve? [False]
-* 'seed' (optional) integer between 0 and 4294967295 to fixed seed for randomizing inititialization
-* 'check_jacobian' (optional) to check the alytical gradient with numerical gradient [False]
-* 'input_file_names' manage file names
-    * 'inputdir' parent directory for the input files ['.']
-    * "pairwise_contact_matrix"  the pairwise interacation matrix file (path relative to inputdir )
-    * "sparse_pairwise_contact_matrix"  the pairwise interacation matrix file in a sparse format (path relative to inputdir )
-    * "initialized_curve" (optional) file to import initialized curve (path relative to inputdir )
-    * "population_contact_matrix" (optional) the pairwise interacation matrix file from poptulation data (path relative to inputdir )
-    * "sparse_population_contact_matrix" (optional) the pairwise interacation matrix file from population data in a sparse format (path relative to inputdir )
-    * "prior_shape_model" (optional) shape_prior curve file (path relative to inputdir )
-    * 'outputdir' parent directory for the output files ['.']
-    * 'output_filename' (optional) the file name to output the result it (.mat or .npz) [uuid.npz]
-* 'parameters'
-    * 'a' (optional) the a parameter [-3.0]
-    * 'b' (optional) not identifiable with unconstrained scale [1.0]
-    * 'term_weights' dictionary storing the weights for the penalty terms
-        * 'data' (optional) weight for the data term [1.0]
-        * 'uniform_spacing' (optional)  lambda_1 penalty weight [0.0]
-        * 'smoothing' (optional) lambda_2 penalty weight [0.0]
-        * 'population_prior' (optional) weight for the population matrix prior [0.0]            
-* 'options'
-    * 'gtol'    (optional) tollerance for the norm of the gradient (stopping criteria) [e-5]
-    * 'maxitr'  (optional) set maximum number of iterations [100000]
-    * 'display' (optional) display function values at each iteration? [True]
-    * 'store'   (optional) store the iterative curves? [False]
-    * 'method'  (optional) optimizer option 'L-BFGS_B'[default],'BFGS','AGM','Nelder-Mead','CG','Newton-CG'
-* 'index_parameters'
-    * 'missing_rowsum_threshold'   (optional) specifies a threshold matrix row sum to treat an entry as missing data (missing nodes are ignored in the optimization)
-    * 'index_missing'              (optional) specifies which entries are treated as missing (missing nodes are ignored in the optimization)
-    * 'off_diagonal'               (optional) offset off of the diagonal entries which is treated as missing (and ignored)
-    * 'pairwise_combinations'      (optional) optionally specify specific pairwise combination to use
-
-You can either write a script to create a list of tasks with the desired
-settings and then pass them into the optimzer, or you can create a JSON file
-with a list of tasks that can be read in. JSON is used because it can be
-read and edited manually by a human being and it is flexible to specify many
-settings for a run.
-
-There is also a "data" key which can be used to pass the data matrix and
-initilaized curve as an array (without loading it from a file). This is useful
-for running simba3d within a python script. This may be useful for more advanced
-users who wish to edit the data matrix (or generate simulated data) without
-reading and writing the data to file.
-
-To read a json file with these parameters set, use the following command
-> simba3d -r path/to/simba3d_task.json
-
 # How to tell simba3d to run sequentially with warmstarts
 
 Warmstarts is a technique where the final result from the previous setting is
@@ -224,10 +158,4 @@ Several examples can be seen in the examples directory.
 # Output File Formats
 
 The default format is no longer '.npz'. The python2 and python3 binaries are not compatable.
-The default output is now '.json'.
-
-# Sparse Input File Formats
-
-Currently there is a json input format where you specify the row index, column index, and count values
-as arrays. This is a very new feature. The previous output formats still work, and are left untouched.
-See the sparse example for details.
+The default output is now '.json'. You can still output to a .npz or .mat file.
