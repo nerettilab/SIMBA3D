@@ -581,6 +581,8 @@ class opt_E():
                 print("\nNo pairwise interaction matrix proivded for data term!\n")
         else:
             self.pairwise_contact_matrix=self.term_weights['data']*data['pairwise_contact_matrix']
+            # treat negative values as observed zeros
+            self.pairwise_contact_matrix[self.pairwise_contact_matrix<0]=0
             (m,n)=np.shape(self.pairwise_contact_matrix)
             self.n=min([m,n])
         # population contact matrix
@@ -597,6 +599,8 @@ class opt_E():
                 print("No population matrix provided for data prior!\n")
         else:
             self.population_contact_matrix=data['population_contact_matrix']
+            # treat negative values as observed zeros
+            self.population_contact_matrix[self.population_contact_matrix<0]=0
             (m,n)=np.shape(self.pairwise_contact_matrix)
             self.n=min([m,n])
         # shape_prior model data
