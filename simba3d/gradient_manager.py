@@ -8,8 +8,8 @@
 
 # import the gradients
 '''
-Some gradients have cython code associated with them to speed up the 
-computation. Try and import the cython and import a python if that fails. 
+Some gradients have cython code associated with them to speed up the
+computation. Try and import the cython and import a python if that fails.
 '''
 
 import numpy as np
@@ -23,21 +23,21 @@ import scipy.sparse as sp
 
 from simba3d.pairwise_computations import run_pairwise_computations,run_adjacent_computations
 from simba3d.gradient_poisson import gradient_poisson
-from simba3d.h1_penalty import gradient_h1    
-from simba3d.h2a_penalty import gradient_h2a   
-from simba3d.h2b_penalty import run_h2b_computations,gradient_h2b   
-from simba3d.h2c_penalty import run_h2c_computations,gradient_h2c  
+from simba3d.h1_penalty import gradient_h1
+from simba3d.h2a_penalty import gradient_h2a
+from simba3d.h2b_penalty import run_h2b_computations,gradient_h2b
+from simba3d.h2c_penalty import run_h2c_computations,gradient_h2c
 
 class gradient_manager():
 	'''
-	Manages the gradients 
+	Manages the gradients
 
-	As simba3d has developed, we have gone through many penalty functions. To 
-	ease the burden of maintaining these functions, a  class object 
+	As simba3d has developed, we have gone through many penalty functions. To
+	ease the burden of maintaining these functions, a  class object
 	has been made to efficiciently manage gradient computations.
 
 	The reason this is needed is because the gradient computations need to be
-	very efficient. They are called thousands of times within an optimization. 
+	very efficient. They are called thousands of times within an optimization.
 	This requires efficient coding and resource utlization. Several functions
 	use the same types of computations. Rather than computing these values
 	multiple times, it is better to store them within the object class and then
@@ -50,7 +50,7 @@ class gradient_manager():
 	implementation which can be loaded natively with a minimal number of depencies.
 
 	'''
-	def __init__(self,term_parameters=None):
+	def __init__(self,term_parameters=None,threads=None):
 		# initialize the stored inputs, calculations, and parameters
 		# set default values for parameters here (set to None to error out when misspecified)
 		self.contact_row_index=None
@@ -84,11 +84,11 @@ class gradient_manager():
 		self.x_gradient=None
 		self.y_gradient=None
 		self.z_gradient=None
-		self.e=None		
+		self.e=None
 		# a list of functions is created upon initialization to eliminate
 		# the need for if statements or switches during the optimization
 		self.functions =[]
-		# For each iteration, there are calculations that are used in multiple gradients. 
+		# For each iteration, there are calculations that are used in multiple gradients.
 		# This list tells the gradient manager which computations it needs to update prior
 		# to computing the gradients.
 		self.shared_computations=[]
@@ -166,11 +166,11 @@ class gradient_manager():
 		self.pairwise_difference_y=[0]*self.number_of_pairs
 		self.pairwise_difference_z=[0]*self.number_of_pairs
 		self.pairwise_distance=[0]*self.number_of_pairs
-		series=[0]*2 
+		series=[0]*2
 		# There are several scalar values computed. Rather than outputing them in the return
 		# I opted to pass in mutable objects so that the memory is already allocated
 		# for them and I can assume the memory is allocated when I make the c code.
-		run_pairwise_computations(	
+		run_pairwise_computations(
 								self.number_of_pairs,
 								self.x,
 								self.y,
@@ -257,13 +257,13 @@ class gradient_manager():
 		self.poisson_loglikelihood  =penalty_weight*series[0]
 		return  self.poisson_loglikelihood
 
-	def gradient_h1(self,penalty_weight,x_gradient,y_gradient,z_gradient):	
+	def gradient_h1(self,penalty_weight,x_gradient,y_gradient,z_gradient):
 		'''
 		A uniform spacing penalty which will force the nodes to be spaces uniformly.
 
 		Depends on computations made during run_adjacent_computations and run_pairwise_computations
 		'''
-		gradient_h1(				
+		gradient_h1(
 				penalty_weight,
 				self.length,
 				self.sum_adjacent_distance,
@@ -278,7 +278,7 @@ class gradient_manager():
 					)
 		self.h1_uniform_spacing_value = penalty_weight*((self.length-1)*self.sum_of_squared_adjacent_distance/(self.sum_adjacent_distance*self.sum_adjacent_distance) -1)
 		return self.h1_uniform_spacing_value
-	def gradient_h2a(self,penalty_weight,x_gradient,y_gradient,z_gradient):	
+	def gradient_h2a(self,penalty_weight,x_gradient,y_gradient,z_gradient):
 		'''
 		'''
 		series=[0]*1
@@ -295,8 +295,8 @@ class gradient_manager():
 				series
 				)
 		self.h2a_value=penalty_weight*series[0];
-		return self.h2a_value		
-	def gradient_h2b(self,penalty_weight,x_gradient,y_gradient,z_gradient):	
+		return self.h2a_value
+	def gradient_h2b(self,penalty_weight,x_gradient,y_gradient,z_gradient):
 		'''
 		'''
 		gradient_h2b(
@@ -317,7 +317,7 @@ class gradient_manager():
 				z_gradient
 				)
 		return penalty_weight*self.h2b_unwieghted_value
-	def gradient_h2c(self,penalty_weight,x_gradient,y_gradient,z_gradient):	
+	def gradient_h2c(self,penalty_weight,x_gradient,y_gradient,z_gradient):
 		'''
 		'''
 		gradient_h2c(
