@@ -22,14 +22,14 @@ from scipy.special import comb
 
 try:
     from simba3d.cysimba3d import gradient_manager
-    use_cython=True
+    cython_loaded=True
 except:
     from simba3d.gradient_manager import gradient_manager
-    use_cython=False
+    cython_loaded=False
 from simba3d.h2b_penalty import run_h2b_computations,gradient_h2b
 from simba3d.h2c_penalty import run_h2c_computations,gradient_h2c
 from simba3d.pairwise_computations import triu_ij_to_ind,triu_ind_to_ij
-cython_loaded=True
+
 
 
 
