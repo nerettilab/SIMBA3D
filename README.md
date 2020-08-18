@@ -30,6 +30,8 @@ The examples have been updated.
 
 # What is coming up
 
+...
+
 I plan to implement a cythonized version of the code to increase the computation
 speed. I will be putting that in a separate branch and I plan to maintain a pure
 python version of everything going forward. What this means is that there will
