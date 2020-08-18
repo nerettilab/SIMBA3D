@@ -100,21 +100,24 @@ def convert_modern_task(task):
                 "display": True,
                 "maxitr": 100000
                 }
+
     # loop through the keys
     for key in task.keys():
         parts=key.split('_')
         if parts[0]=='parameters':
             if '_term_weights_' in key:
                 newkey=' '.join(parts[3:])
+                print(key,newkey)
                 task['parameters']['term_weights'][newkey]=task[key]
             else:
                 newkey=' '.join(parts[1:])
+                print(key,newkey)
                 task['parameters'][newkey]=task[key]
         if 'file_names_'in key:
             newkey='_'.join(parts[2:])
             task['file_names'][newkey]=task[key]
         if 'options_'in key:
-            newkey='_'.join(parts[2:])
+            newkey='_'.join(parts[1:])
             task['options'][newkey]=task[key]
     return task
 
@@ -559,6 +562,7 @@ def run_task(task,threads=None):
                 "display": True,
                 "maxitr": 100000
                 }
+
     if 'seed' in task:
         options['seed']=task['seed']
 
