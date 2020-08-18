@@ -46,7 +46,7 @@ pip3 install numpy
 ```
 - You may potentially need some additional c++ build tools. If you are using a managed python installation like anaconda, then it should contain the build tools required for the install.
 
-- use `pip install .` to install simba3d with the cython.
+- use `pip3 install .` to install simba3d with the cython.
 
 If it does not work, then you can revert to the pure python install.
 ```
