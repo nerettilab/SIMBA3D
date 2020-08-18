@@ -13,7 +13,7 @@ import numpy as np
 from scipy.io import loadmat, savemat
 from scipy.sparse import coo_matrix
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from difflib import SequenceMatcher
 import uuid
@@ -152,14 +152,14 @@ def main(args=None):
                         if 'inputdir' in subtask['file_names']:
                             inputdir=subtask['file_names']['inputdir']
                         input_parameters= '';
-                        for key in list(subtask):
+                        for key in subtask.keys():
                             skip='data' in key
                             skip+='file_names' in key
                             if skip ==0:
                                 if type(subtask[key])==type(dict()):
-                                    for subkey in list(subtask[key]):
+                                    for subkey in subtask[key].keys():
                                         if type(subtask[key][subkey])==type(dict()):
-                                            for subsubkey in list(subtask[key][subkey]):
+                                            for subsubkey in subtask[key][subkey].keys():
                                                 name=key+' '+subkey+' '+subsubkey
                                                 input_parameters+=  name+':'+str(subtask[key][subkey][subsubkey])+u'\n'
                                         else:
@@ -170,7 +170,7 @@ def main(args=None):
                                    input_parameters+= name+':'+str(subtask[key])+u'\n'
 
                         latex+=lr.make_latex_table({'inputfile':input_parameters})
-                        for key in list(subtask['file_names']):
+                        for key in subtask['file_names'].keys():
                             if 'output' not in key:
                                 params=dict()
                                 params['inputfile']=key+':'+subtask['file_names'][key]
@@ -255,6 +255,7 @@ def main(args=None):
                           print(summary['uuid'])
                         if 'E_evol'in summary:
                             energy.append(summary['E_evol'])
+                            #print summary.keys()
                         if 'X_evol'in summary:
                             X0=np.array(summary['X_evol'][-1]) # get the last curve
                             # get dimension

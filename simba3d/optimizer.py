@@ -20,10 +20,21 @@ from scipy.optimize import minimize,check_grad
 #from scipy.misc import comb # has been deprecated since version 1.0.0
 from scipy.special import comb
 
+
+from simba3d.cysimba3d import gradient_manager
+from simba3d.h2b_penalty import run_h2b_computations,gradient_h2b
+from simba3d.h2c_penalty import run_h2c_computations,gradient_h2c
+from simba3d.pairwise_computations import triu_ij_to_ind,triu_ind_to_ij
+cython_loaded=True
+
+
+
 from simba3d.matrixlabish import keyboard
 
 #import plotting_tools as pt
 import simba3d.srvf_open_curve_Rn as srvf # most of this is not used right now
+
+import scipy.sparse as sp
 
 # set the data precision used within the algorithm
 # !incomplete task! (only done for h1 and data term)
@@ -31,8 +42,10 @@ import simba3d.srvf_open_curve_Rn as srvf # most of this is not used right now
 # or undo it.
 DTYPE=np.float # there is no point in changing this now,
 
+
 class stop_optimizing_exception(Exception):
     pass
+
 
 def listIndices(n,offdiag):
     '''
@@ -59,7 +72,7 @@ def listIndices(n,offdiag):
     return idx
 
 
-def scale_initialized_curve(curve,pairwise_contact_matrix,a,b,index,idxmiss):
+def scale_initialized_curve0(curve,pairwise_contact_matrix,a,b,index,idxmiss):
     '''
     optimally scale the curve to the data for fewer iterations
     '''
@@ -79,7 +92,18 @@ def scale_initialized_curve(curve,pairwise_contact_matrix,a,b,index,idxmiss):
     scale= pow(sum(c)/(b*sum(pow(d,a))),1/a)
 
     return scale*curve
-
+def scale_initialized_curve(curve,C,a,b):
+    '''
+    optimally scale the curve to the data for fewer iterations
+    '''
+    X,mu=srvf.center_curve(curve)
+    n,m=C.shape
+    scale=1
+    a=np.double(a);
+    b=np.double(b);
+    d=np.sqrt(np.sum(pow(X[:,C.row]-X[:,C.col],2.0),0))
+    scale= pow(sum(C.data)/(b*sum(pow(d,a))),1/a)
+    return scale*X
 def compute_pairwise_distance(curve):
     """
     Compute the pairwise distance matrix of a parametrized curve
@@ -102,6 +126,14 @@ def loglikelihood_Varoquaux(pairwise_distance_matrix,a,b,pairwise_contact_matrix
     L=np.sum(-b*pow(pairwise_distance_matrix,a)+pairwise_contact_matrix*(np.log(b)*a*np.log(pairwise_distance_matrix)))
     return L
 
+def loglikelihood_Varoquaux_with_missing(pairwise_distance_matrix,a,b,pairwise_contact_matrix):
+    """
+    the loglikelihood function using the poisson model proposed in the
+    Varoquaux paper.
+    """
+    rel_id=not np.isnan(pairwise_contact_matrix)
+    L=np.sum(-b*pow(pairwise_distance_matrix[rel_id],a)+pairwise_contact_matrix[rel_id]*(np.log(b)*a*np.log(pairwise_distance_matrix[rel_id])))
+    return L
 def h1penalty(curve,S1):
     '''
     Compute the h1 penalty and its gradient.
@@ -140,7 +172,7 @@ def h1penalty(curve,S1):
     #print h1'
     return h1,gradh1.T
 
-def h2penalty(curve):
+def h2apenalty(curve):
     '''
     Compute the h2 penalty and its gradient.
 
@@ -165,55 +197,195 @@ def h2penalty(curve):
 
     # compute weights according to gaussian
     w=np.sqrt(np.sum(pow(d,2.0),1))
-
     # loop through the terms of the gradient
     for ii in range(n-1):
         if ii>0:
 
             # update the second order penalty
             h2 -= sum(d[ii-1,:]*d[ii,:])/(w[ii-1]*w[ii])
-
+            #print(sum(d[ii-1,:]*d[ii,:]),"py\n")
             # comput the gradient
             if ii==1:
                 # compute the first gradient term
                 gradh2[0,:]=d[0,:]*sum(-d[0,:]*d[1,:])/(pow(w[0],3.0)*w[1])
+                #print(sum(-d[0,:]*d[1,:])/(pow(w[0],3.0)*w[1]),'fpy')
+                #print(d[0,:]*sum(-d[0,:]*d[1,:])/(pow(w[0],3.0)*w[1]),'fpy')
                 gradh2[0,:]+=d[1,:]/(w[0]*w[1])
             elif ii==2:
                     # compute the second gradient term
                     gradh2[1,:]=d[0,:]*(1/(w[0]*w[1])+np.sum(d[0,:]*d[1,:])/(pow(w[0],3.0)*w[1]))
                     gradh2[1,:]+=d[1,:]*(-1/(w[0]*w[1])-np.sum(d[0,:]*d[1,:])/(w[0]*pow(w[1],3))-np.sum(d[1,:]*d[2,:])/(pow(w[1],3.0)*w[2]))
                     gradh2[1,:]+=d[2,:]*(1/(w[1]*w[2]))
+
             else:
                     # compute the i^th gradient term (excluding the first and last two terms)
                     gradh2[ii-1,:]=d[ii-3,:]*(-1/(w[ii-3]*w[ii-2]))
                     gradh2[ii-1,:]+=d[ii-2,:]*(np.sum(d[ii-3,:]*d[ii-2,:])/(w[ii-3]*pow(w[ii-2],3.0))+1/(w[ii-2]*w[ii-1])+np.sum(d[ii-2,:]*d[ii-1,:])/(pow(w[ii-2],3.0)*w[ii-1]))
                     gradh2[ii-1,:]+=d[ii-1,:]*(-1/(w[ii-2]*w[ii-1])-np.sum(d[ii-2,:]*d[ii-1,:])/(w[ii-2]*pow(w[ii-1],3.0))-np.sum(d[ii-1,:]*d[ii,:])/(pow(w[ii-1],3.0)*w[ii]))
                     gradh2[ii-1,:]+=d[ii,:]*(1/(w[ii-1]*w[ii]));
+    '''
+    ii=3;
+    print(   -1/(w[ii-2]*w[ii-1])-np.sum(d[ii-2,:]*d[ii-1,:])/(w[ii-2]*pow(w[ii-1],3.0))-np.sum(d[ii-1,:]*d[ii,:])/(pow(w[ii-1],3.0)*w[ii]),'py')
+    print(   (-1/(w[ii-2]*w[ii-1])-np.sum(d[ii-2,:]*d[ii-1,:])/(w[ii-2]*pow(w[ii-1],3.0))-np.sum(d[ii-1,:]*d[ii,:])/(pow(w[ii-1],3.0)*w[ii])),'py')
+    print (d[ii-1,:]*(-1/(w[ii-2]*w[ii-1])-np.sum(d[ii-2,:]*d[ii-1,:])/(w[ii-2]*pow(w[ii-1],3.0))-np.sum(d[ii-1,:]*d[ii,:])/(pow(w[ii-1],3.0)*w[ii])),'py')
+    '''
+
 
     # compute the next to last gradient term
     gradh2[n-2,:]=d[n-4,:]*(-1/(w[n-4]*w[n-3]))
     gradh2[n-2,:]+=d[n-3,:]*(np.sum(d[n-4,:]*d[n-3,:])/(w[n-4]*pow(w[n-3],3.0))+1/(w[n-3]*w[n-2])+np.sum(d[n-3,:]*d[n-2,:])/(pow(w[n-3],3.0)*w[n-2]))
     gradh2[n-2,:]+=d[n-2,:]*(-1/(w[n-3]*w[n-2])-np.sum(d[n-3,:]*d[n-2,:])/(w[n-3]*pow(w[n-2],3.0)));
 
+
     # compute the last gradient term
     gradh2[n-1,:]=d[n-3,:]*(-1/(w[n-3]*w[n-2]))
-    gradh2[n-1,:]+=d[n-2,:]*(np.sum(d[n-3,:]*d[n-2,:])/(w[n-3]*pow(w[n-2],3.0)));
 
+    gradh2[n-1,:]+=d[n-2,:]*(np.sum(d[n-3,:]*d[n-2,:])/(w[n-3]*pow(w[n-2],3.0)));
     # final scaling adjustment to terms
     h2=h2/(n-2)
     gradh2=gradh2/(n-2)
-
+    #print(d[n-3,:]*(-1/(w[n-3]*w[n-2])),'py')
+    #print(d[n-2,:]*(np.sum(d[n-3,:]*d[n-2,:])/(w[n-3]*pow(w[n-2],3.0))),'py')
     if transpose: # if the curve was transposed, to fit the function, transpose it again the match the original input
         gradh2=gradh2.T
-    #print h2
     return h2,gradh2
+def h2bpenalty(curve,pairwise_difference_x=None,pairwise_difference_y=None,pairwise_difference_z=None,pairwise_distance=None):
+    '''
+    Compute the h2b penalty and its gradient.
 
+    the average \cos(\theta_i), where \theta_i is the angle between the
+    triplet (x_{i-1},x_i,x_{i+1}).
+    '''
+
+    # makes sure the curve is oriented correctly
+
+    d,length=np.shape(curve)
+    number_of_pairs=length*(length-1)/2
+    if pairwise_distance is None: #if the do not already have the pairwise distance matrix computed, then compute it
+            diff_x=np.array(ssd.squareform(pdist(np.array([curve[0,:]]).transpose(),dif)),dtype=np.float64)
+            diff_y=np.array(ssd.squareform(pdist(np.array([curve[1,:]]).transpose(),dif)),dtype=np.float64)
+            diff_z=np.array(ssd.squareform(pdist(np.array([curve[2,:]]).transpose(),dif)),dtype=np.float64)
+            #reindex pairwise difference
+            index=np.array([triu_ind_to_ij(ind) for ind in range(number_of_pairs)])
+            pairwise_difference_x=diff_x[index[:,0],index[:,1]]
+            pairwise_difference_y=diff_y[index[:,0],index[:,1]]
+            pairwise_difference_z=diff_z[index[:,0],index[:,1]]
+            dsqr=pow(pairwise_difference_x,2.0)+pow(pairwise_difference_y,2.0)+pow(pairwise_difference_z,2.0)
+            pairwise_distance=np.sqrt(dsqr)
+    adjacent_differences=np.array(curve[:,1:]-curve[:,:-1],dtype=DTYPE)
+    #np.nansum(differences)
+    adjacent_squared_distances=DTYPE(0.0);
+    for ii in range(3):
+        adjacent_squared_distances+=adjacent_differences[ii,:]*adjacent_differences[ii,:]
+    adjacent_distances=np.sqrt(adjacent_squared_distances)
+
+    x_gradient=[0]*length
+    y_gradient=[0]*length
+    z_gradient=[0]*length
+    series=[0]*1
+    h2b_alpha=10.0
+    average_adjacent_distance=np.average(adjacent_distances)
+    h2b_F=[0]*number_of_pairs
+    h2b_G=[0]*number_of_pairs
+    h2b_H=[0]*number_of_pairs
+    run_h2b_computations(
+        length,
+        number_of_pairs,
+        h2b_alpha,
+        average_adjacent_distance,
+        pairwise_distance,
+        h2b_F,
+        h2b_G,
+        h2b_H,
+        series
+        )
+    gradient_h2b(
+        1.0,
+        length,
+        number_of_pairs,
+        h2b_alpha,
+        h2b_F,
+        h2b_G,
+        h2b_H,
+        average_adjacent_distance,
+        pairwise_difference_x,
+        pairwise_difference_y,
+        pairwise_difference_z,
+        pairwise_distance,
+        x_gradient,
+        y_gradient,
+        z_gradient
+        )
+    return series[0],np.array([x_gradient,y_gradient,z_gradient])
+def h2cpenalty(curve,pairwise_difference_x=None,pairwise_difference_y=None,pairwise_difference_z=None,pairwise_distance=None):
+    '''
+    Compute the h2b penalty and its gradient.
+
+    the average \cos(\theta_i), where \theta_i is the angle between the
+    triplet (x_{i-1},x_i,x_{i+1}).
+    '''
+    d,length=np.shape(curve)
+    number_of_pairs=int(length*(length-1)/2)
+    if pairwise_distance is None: #if the do not already have the pairwise distance matrix computed, then compute it
+            diff_x=np.array(ssd.squareform(pdist(np.array([curve[0,:]]).transpose(),dif)),dtype=np.float64)
+            diff_y=np.array(ssd.squareform(pdist(np.array([curve[1,:]]).transpose(),dif)),dtype=np.float64)
+            diff_z=np.array(ssd.squareform(pdist(np.array([curve[2,:]]).transpose(),dif)),dtype=np.float64)
+            #reindex pairwise difference
+            index=np.array([triu_ind_to_ij(ind) for ind in range(number_of_pairs)])
+            pairwise_difference_x=diff_x[index[:,0],index[:,1]]
+            pairwise_difference_y=diff_y[index[:,0],index[:,1]]
+            pairwise_difference_z=diff_z[index[:,0],index[:,1]]
+            dsqr=pow(pairwise_difference_x,2.0)+pow(pairwise_difference_y,2.0)+pow(pairwise_difference_z,2.0)
+            pairwise_distance=np.sqrt(dsqr)
+    adjacent_differences=np.array(curve[:,1:]-curve[:,:-1],dtype=DTYPE)
+    #np.nansum(differences)
+    adjacent_squared_distances=DTYPE(0.0);
+    for ii in range(3):
+        adjacent_squared_distances+=adjacent_differences[ii,:]*adjacent_differences[ii,:]
+    adjacent_distances=np.sqrt(adjacent_squared_distances)
+
+    x_gradient=[0]*length
+    y_gradient=[0]*length
+    z_gradient=[0]*length
+    series=[0]*1
+    h2c_alpha=10.0
+    average_adjacent_distance=np.average(adjacent_distances)
+    h2c_F=[0]*number_of_pairs
+    h2c_radius=1.0
+    run_h2c_computations(
+        length,
+        number_of_pairs,
+        h2c_radius,
+        average_adjacent_distance,
+        pairwise_distance,
+        h2c_F,
+        series
+        )
+    gradient_h2c(
+        1.0,
+        length,
+        number_of_pairs,
+        h2c_alpha,
+        h2c_F,
+        h2c_radius,
+        average_adjacent_distance,
+        pairwise_difference_x,
+        pairwise_difference_y,
+        pairwise_difference_z,
+        pairwise_distance,
+        x_gradient,
+        y_gradient,
+        z_gradient
+        )
+    return series[0],np.array([x_gradient,y_gradient,z_gradient])
 def h4penalty(curve,radius=1.0):
     '''
     Compute the h4 lamina penalty and its gradient.
 
     '''
     # makes sure the curve is oriented correctly
+    if pairwise_distance_matrix is None: #if the do not already have the pairwise distance matrix computed, then compute it
+        pairwise_distance_matrix=compute_pairwise_distance(curve)
     n,p=np.shape(curve)
     transpose=False
     if p>n:
@@ -257,9 +429,9 @@ def penalized_log_likelihood(curve,t,pairwise_contact_matrix,a,b,term_weights,sq
     R1=0    # initialize first order term
     R2=0    # initialize second order term
     Q=0     # initialize parametrization penalty term
-    S=0     # initialize shape_prior term
+    S=0     # initialize shape prior term
     if term_weights[0]!=0:
-        L=term_weights[0]*loglikelihood_Varoquaux(pairwise_distance_matrix,a,b,pairwise_contact_matrix)
+        L=term_weights[0]*loglikelihood_Varoquaux_with_missing(pairwise_distance_matrix,a,b,pairwise_contact_matrix)
     if (term_weights[1]!=0)&(term_weights[2]==0):
         R1=term_weights[1]*srvf.length(curve,t)
     if (term_weights[2]!=0):
@@ -314,48 +486,31 @@ def analytical_data_gradient0(curve,pairwise_contact_matrix,a,b,index):
     #R_1,R_2=srvf.roughness2(curve,t)
     #e=lambda[0]*e_data+lambda[1]*R_1+lambda[2]*R_2
     return e_data,nabla_data
-def analytical_data_gradient(curve,pairwise_contact_matrix,a,b,offdiag=1,idxmiss=None,idxlist=None):
+def analytical_data_gradient(X,C,a,b,offdiag=1,idxmiss=None,idxlist=None):
     '''
     compute log-likelihood gradient analytically
     '''
-    if idxlist is not None:
-        idxmiss = None
-    if idxmiss is None:
-        idxmiss=np.array([],dtype='int')
-    X=np.delete(curve,idxmiss,1)
-    C=np.delete(pairwise_contact_matrix,idxmiss,0)
-    C=np.delete(C,idxmiss,1)
     [p,n]=np.shape(X)
-
-    if idxlist is None:
-        idxlist=listIndices(n,offdiag)
-
-    differences=np.array(X[:,idxlist[:,0]]-X[:,idxlist[:,1]],dtype=DTYPE)
+    differences=np.array(X[:,C.row]-X[:,C.col],dtype=DTYPE)
     #np.nansum(differences)
     squared_distances=DTYPE(0.0);
     for ii in range(p):
         squared_distances+=differences[ii,:]*differences[ii,:]
     distances=np.sqrt(squared_distances)
+
     #np.nansum(distances)
     a=DTYPE(a)
     b=DTYPE(b)
     bda=b*pow(distances,a)
     #ind=np.tril(np.ones((n,n))==1,-offdiag)
-    coef=(C[idxlist[:,0],idxlist[:,1]]-bda)/squared_distances
+    coef=(C.data-bda)/squared_distances
     gradE_data=np.zeros((p,n),dtype=DTYPE)
     for ii in range(p):
         gradmatrix=np.zeros((n,n),dtype=DTYPE)
-        gradmatrix[idxlist[:,0],idxlist[:,1]]=coef*differences[ii,:]
+        gradmatrix[C.row,C.col]=coef*differences[ii,:]
         gradE_data[ii,:]=-a*(np.sum(gradmatrix,0).T-np.sum(gradmatrix,1))
 
-    if len(idxmiss)>0:
-        n+=len(idxmiss)
-        temp=np.zeros((p,n),dtype=DTYPE)
-        list0=np.array(range(n),dtype='int')
-        list0=np.delete(list0,idxmiss)
-        temp[:,list0]=gradE_data
-        gradE_data=temp
-    E_data=np.sum(a*C[idxlist[:,0],idxlist[:,1]]*np.log(distances)-bda,dtype=DTYPE)
+    E_data=np.sum(a*C.data*np.log(distances)-bda,dtype=DTYPE)
 
     return E_data,gradE_data
 def create_S1(n):
@@ -398,7 +553,7 @@ def energy_roughness(curve):
 
 def energy_shape_prior(curve,shape_model):
     '''
-    compute energy and gradient of the shape_prior
+    compute energy and gradient of the shape prior
     '''
     curve,m=srvf.center_curve(curve)
     shape_model,m=srvf.center_curve(shape_model)
@@ -467,6 +622,7 @@ def energy_scale_invariant_second_roughness_gradient(curve,S=None):
     E=s/LL
     gradE=np.array(S*np.matrix(curve.T)).T/LL-2*term.T*s/(LL*L)
     return E,gradE;
+
 class opt_E():
     '''
     Primary optimization manager for simba3d
@@ -474,12 +630,23 @@ class opt_E():
     This class manages defaults and data storage for the results. Basically,
     it is a wraper for the scipy optimizer, but it stores results and manages
     input parameters.
-
     '''
-    def __init__(self,data,parameters=None,options=None):
+    def __init__(self,data,parameters=None,options=None,threads=None):
         '''
         initialize the energy optimization object
         '''
+        if threads is None:
+            self.threads=1;
+        else:
+            self.threads=threads
+        self.use_cython=True
+        self.use_python=False
+        if (self.use_cython & cython_loaded):
+            self.energy_jacobian=self.energy_jacobian_cython
+        else:
+            self.energy_jacobian=self.energy_jacobian_native
+        if (self.use_cython& cython_loaded & self.use_python):
+            self.energy_jacobian=self.energy_jacobian_compare_both
 
         self.n=10;  # number of node points this should be overided by user data
         self.d=3;   # this might be overided by user data, but right now I think it only works for dimension d=3
@@ -515,19 +682,34 @@ class opt_E():
             #print "Default data weight  ="
             #print self.term_weights['data']
         if "h1" not in self.term_weights: # scale and intensity invariant "first order"-like penalty
-            if "uniform_spacing" not in self.term_weights:
+            if "uniform spacing" not in self.term_weights:
                 self.term_weights['h1']=DTYPE(0.0 )   # weight for the h1 penalty
                 print("Default population h1 weight  =")
                 print(self.term_weights['h1'])
             else:
-                self.term_weights['h1']=DTYPE(self.term_weights['uniform_spacing'])
-        if "h2" not in self.term_weights: # scale and intensity invariant "second order"-like penalty
+                self.term_weights['h1']=DTYPE(self.term_weights['uniform spacing'])
+        if "h2a" not in self.term_weights: # scale and intensity invariant "second order"-like penalty
             if "smoothing" not in self.term_weights:
-                self.term_weights['h2']=DTYPE(0.0)    # weight for the h2 penalty
-                print("Default population h2 weight  =")
-                print(self.term_weights['h2'])
+                self.term_weights['h2a']=DTYPE(0.0)    # weight for the h2 penalty
+                print("Default h2a weight  =")
+                print(self.term_weights['h2a'])
             else:
-                self.term_weights['h2']=DTYPE(self.term_weights['smoothing'])
+                self.term_weights['h2a']=DTYPE(self.term_weights['smoothing'])
+
+        if "h2b" not in self.term_weights: # scale and intensity invariant "second order"-like penalty
+            if "continuous pairwise repulsion" not in self.term_weights:
+                self.term_weights['h2b']=DTYPE(0.0)    # weight for the h2 penalty
+                print("Default h2b weight  =")
+                print(self.term_weights['h2b'])
+            else:
+                 self.term_weights['h2b']=DTYPE(self.term_weights['continuous pairwise repulsion'])
+        if "h2c" not in self.term_weights: # scale and intensity invariant "second order"-like penalty
+            if "pairwise repulsion" not in self.term_weights:
+                self.term_weights['h2c']=DTYPE(0.0)    # weight for the h2 penalty
+                print("Default h2c weight  =")
+                print(self.term_weights['h2c'])
+            else:
+                 self.term_weights['h2c']=DTYPE(self.term_weights['pairwise repulsion'])
         if "h4" not in self.term_weights: # scale and intensity invariant "second order"-like penalty
             if "lamina" not in self.term_weights:
                 self.term_weights['h4']=DTYPE(0.0)    # weight for the h2 penalty
@@ -535,15 +717,14 @@ class opt_E():
                 print( self.term_weights['h4'])
             else:
                 self.term_weights['h4']=DTYPE(self.term_weights['lamina'])
-        if "population_prior" not in self.term_weights:
-            self.term_weights['population_prior']=DTYPE(0.0)    # weight for the population matrix prior
-            print( "Default population_prior weight  =")
-            print( self.term_weights['population_prior'])
-        if "shape_prior" not in self.term_weights:
-            self.term_weights['shape_prior']=DTYPE(0.0)    # weight for the shape_prior
-            print( "Default shape_prior weight  =")
-            print( self.term_weights['shape_prior'])
-
+        if "population prior" not in self.term_weights:
+            self.term_weights['population prior']=DTYPE(0.0)    # weight for the population matrix prior
+            print( "Default population prior weight  =")
+            print( self.term_weights['population prior'])
+        if "shape prior" not in self.term_weights:
+            self.term_weights['shape prior']=DTYPE(0.0)    # weight for the shape prior
+            print( "Default shape prior weight  =")
+            print( self.term_weights['shape prior'])
         # set defaults for unsuported penalties
         # scale and intensity dependent penalties are no longer supported
         if "firstroughness" not in self.term_weights: # depends on scale of curve and total number of interaction in data
@@ -563,133 +744,7 @@ class opt_E():
             self.term_weights['scaledsecondroughness']=0.0    # weight for the second order roughness invaraint scale of curve but dependent on intesity of interaction
             #print "Default scaledsecondroughness weight  ="
             #print self.term_weights['scaledsecondroughness']
-
-
-        # set data and defaults ###############################################
-        # pairwise contact matrix
-        if 'sparse_pairwise_contact_matrix' in data:
-          print( data['sparse_pairwise_contact_matrix'])
-          if 'pairwise_contact_matrix' not in data:
-              # this is done the dumb way for now
-              data['pairwise_contact_matrix'] = data['sparse_pairwise_contact_matrix'].toarray()
-              data['pairwise_contact_matrix'] = data['pairwise_contact_matrix']+data['pairwise_contact_matrix'].transpose()
-
-        if 'pairwise_contact_matrix' not in data: # if no pairwise contact matrix is given
-            data['pairwise_contact_matrix'] =0 # set to zero
-            if self.term_weights['data']!=0:
-                self.term_weights['data']=0
-                print("\nNo pairwise interaction matrix proivded for data term!\n")
-        else:
-            # treat negative values as observed zeros
-            data['pairwise_contact_matrix'][data['pairwise_contact_matrix']<0]=0
-            self.pairwise_contact_matrix=self.term_weights['data']*data['pairwise_contact_matrix']
-            (m,n)=np.shape(self.pairwise_contact_matrix)
-            self.n=min([m,n])
-        # population contact matrix
-        if 'sparse_population_contact_matrix' in data:
-          print( data['sparse_population_contact_matrix'])
-          if 'population_contact_matrix' not in data:
-              # this is done the dumb way for now
-              data['population_contact_matrix'] =data['sparse_population_contact_matrix'].toarray()
-              data['population_contact_matrix'] = data['population_contact_matrix']+data['population_contact_matrix'].transpose()
-        if 'population_contact_matrix' not in data: # if no population contact matrix is given
-            self.population_contact_matrix=0
-            if self.term_weights['population_prior']!=0:
-                self.term_weights['population_prior']=0
-                print("No population matrix provided for data prior!\n")
-        else:
-            # treat negative values as observed zeros
-            data['population_contact_matrix'][data['population_contact_matrix']<0]=0
-            self.population_contact_matrix=data['population_contact_matrix']
-            (m,n)=np.shape(self.pairwise_contact_matrix)
-            self.n=min([m,n])
-        # shape_prior model data
-        if 'prior_shape_model' not in data:
-            self.prior_shape_model=None
-            if self.term_weights['shape_prior']!=0:
-                self.term_weights['shape_prior']=0
-                print( "No prior shape model provided for shape_prior!\n")
-        else:
-            self.prior_shape_model=data['prior_shape_model']
-        if 'initialized_curve' not in data:
-            if 'seed' in options:
-                rng=np.random.RandomState(options['seed'])
-                data['initialized_curve']=rng.normal(0,1,self.n*self.d).reshape([self.d,self.n])
-            else:
-                data['initialized_curve']=np.random.rand(self.n*self.d).reshape([self.d,self.n])
-            print("No initialized_curve provided, using randomized curve!\n")
-            print('Number of points: '+str(self.n))
-            print('Curve dimension: '+str(self.d))
-        self.initialized_curve=data['initialized_curve']
-
-        # check that initialized curve has correct dimension
-        (mm,nn)=np.shape(self.initialized_curve)
-        if (nn!=n): # if dimension does not match then interpolate
-            print("\nInitialized curve has "+str(nn)+" nodes, "+
-                "but data has "+str(n)+" nodes!")
-            print("Interpolating initialized curve to match data dimension!\n")
-            t0=np.linspace(0,1,nn)
-            t=np.linspace(0,1,n)
-            self.initialized_curve=srvf.interp(t0,self.initialized_curve,t)
-
-        # time parameterization
-        if 't' not in data:
-            data['t']=np.linspace(0,1,self.n)
-        self.t=data['t']
-
-
-        '''index is no longer used, it has been replaced with pairwise_combinations
-        # index of contact matrix to use in calculation of log-likelihood term
-        if 'index' not in data:
-            data['index']=np.triu(np.ones((self.n,self.n)),1)==1
-            # print "No index provided for log-likelihood term!\n"
-        '''
-
-        # temporarily retroactively assign equvialent index until a fix can be made
-        self.index=np.triu(np.ones((self.n,self.n)),1)==1
-
-        # population matrix prior  adjustment #################################
-        Ndata=sum(data['pairwise_contact_matrix'][self.index] )+10e-16
-        Nprior=1
-        if self.term_weights['population_prior']:
-            Nprior=sum(self.population_contact_matrix[self.index] )+10e-16
-            self.pairwise_contact_matrix+=self.term_weights['population_prior']*(Ndata/Nprior)*self.population_contact_matrix
-
-        if 1:
-            self.b=(self.term_weights['data']+self.term_weights['population_prior']*Ndata/Nprior)*self.b
-            self.Ndata=Ndata
-        else:
-            self.b=(self.term_weights['population_prior']*Ndata/Nprior)*self.b
-            # adjust weights
-            self.term_weights['scaledfirstroughness']*=Ndata
-            self.term_weights['scaledsecondroughness']*=Ndata
-            self.term_weights['data']*=Ndata # scale by amount of data observed to keep tuning parameters comparible
-            self.Ndata=1
-        self.pairwise_contact_matrix[np.identity(n)==1]=0;
-
-        # set missing indexes #################################################
-        # threshold value for the row sum to consider the index as a missing value
-        # this is used only if the user does not manually specify the missing indexes
-        if 'missing_rowsum_threshold' not in data:
-            data['missing_rowsum_threshold']=0
-        self.missing_rowsum_threshold=data['missing_rowsum_threshold']
-        # Index the nodes that are missing
-        # specifies which nodes do not have enough observed data
-        if 'index_mississing' not in data:
-            ans=np.where((np.sum(self.pairwise_contact_matrix,0)<=self.missing_rowsum_threshold))
-            data['index_mississing']=ans[0]
-        self.index_mississing=data['index_mississing']
-        # How many off from the diagonal can we start reading
-        if 'off_diagonal' not in data:
-            data['off_diagonal']=1
-        self.off_diagonal=data['off_diagonal']
-        # A list of all pairwise combinations added in the data term
-        # This speeds up the calculation considerably to store it.
-        if 'pairwise_combinations' not in data:
-            data['pairwise_combinations']=listIndices(self.n-len(data['index_mississing']),self.off_diagonal)
-        self.pairwise_combinations=data['pairwise_combinations']
-
-
+        self.initialize_gradient_manager()
         # set options #########################################################
         if 'maxitr' not in options:
             options['maxitr']=100000
@@ -697,7 +752,7 @@ class opt_E():
         self.maxitr=options['maxitr']
         if 'display' not in options:
             options['display']=False
-            print( 'display_output: '+str(options['display']))
+            print( 'display output: '+str(options['display']))
         self.display=options['display']
         if 'store' not in options:
             options['store']=False
@@ -710,16 +765,38 @@ class opt_E():
             #options['method']='Newton-CG'
             print( 'Optimization Method: '+options['method'])
         self.method= options['method']
-        if 'gradient_tolerance' not in options:
-            options['gradient_tolerance']=1e-5   # default for MatLab and Scipy Optimize
+        if 'gradient tolerance' not in options:
+            options['gradient tolerance']=1e-5   # default for MatLab and Scipy Optimize
             print( 'store iterative values: '+str(options['store']))
-        self.gtol=options['gradient_tolerance']
-        if 'minimum_energy' not in options:
-            options['minimum_energy']=-np.inf  # stop if minimum_energy is obtained
-        self.minimum_energy= options['minimum_energy']
+        self.gtol=options['gradient tolerance']
+        if 'minimum energy' not in options:
+            options['minimum energy']=-np.inf  # stop if minimum energy is obtained
+        self.minimum_energy= options['minimum energy']
+        # ######################################################################
+
+
+        # process data for the gradient manager
+        self.n=None
+        self.pairwise_contact_matrix=None
+        self.set_contact_data(data)
+
+        self.initialized_curve=None
+        if 'initialized_curve' not in data:
+            if 'seed' in options:
+                rng=np.random.RandomState(options['seed'])
+                data['initialized_curve']=rng.normal(0,1,self.n*self.d).reshape([self.d,self.n])
+            else:
+                data['initialized_curve']=np.random.rand(self.n*self.d).reshape([self.d,self.n])
+            print("No initialized_curve provided, using randomized curve!\n")
+            print('Number of points: '+str(self.n))
+            print('Curve dimension: '+str(self.d))
+        self.initialized_curve=data['initialized_curve']
+
+        if self.term_weights['data']!=0:
+            self.initialized_curve=scale_initialized_curve(self.initialized_curve,self.pairwise_contact_matrix,self.a,self.b)
+
         # store useful variables ##############################################
         self.shp=np.shape(self.initialized_curve)
-        print( self.shp)
         self.XK=None;
         if self.store:
             self.XK=np.zeros([self.maxitr,np.prod(self.shp)])
@@ -744,8 +821,6 @@ class opt_E():
         self.aniitr=0
 
         # rescale initialized curve
-        if self.term_weights['data']!=0:
-            self.initialized_curve=scale_initialized_curve(self.initialized_curve,self.pairwise_contact_matrix,self.a,self.b,self.index,self.index_mississing)
 
         self.start_time=None
         self.end_time=None
@@ -753,7 +828,139 @@ class opt_E():
         # run optimizer when initilaized
         if 0:
             self.run();
-    def energy_jacobian(self,curve,*args):
+
+
+        #
+        self.set_optimization_options(options)
+        if 'initialized_curve' not in data:
+            if 'seed' in options:
+                rng=np.random.RandomState(options['seed'])
+                data['initialized_curve']=rng.normal(0,1,self.n*self.d).reshape([self.d,self.n])
+            else:
+                data['initialized_curve']=np.random.rand(self.n*self.d).reshape([self.d,self.n])
+            print("No initialized_curve provided, using randomized curve!\n")
+            print('Number of points: '+str(self.n))
+            print('Curve dimension: '+str(self.d))
+        self.initialized_curve=data['initialized_curve']
+        self.shp=np.shape(self.initialized_curve)
+
+        # run optimizer when initilaized
+        if 0:
+            self.run();
+    def initialize_gradient_manager(self):
+        term_parameters={
+            "poisson_weight":self.term_weights['data'],
+            'poisson_parameter_a': self.a,
+            'poisson_parameter_b': self.b,
+            "h1_weight":self.term_weights['h1'],
+            "h2a_weight":self.term_weights['h2a'],
+            "h2b_weight":self.term_weights['h2b'],
+            "h2c_weight":self.term_weights['h2c']
+            }
+        self.gradient_manager=gradient_manager(term_parameters,self.threads)
+    def set_contact_data(self,data):
+        C=None
+        Cpop=None
+        Cdense=None
+        Cpopdense=None
+        if 'sparse_pairwise_contact_matrix' in data:
+            '''
+            In this case a sparse matrix is provided.
+
+            entries not explicitly mentions are treates as missing
+            '''
+            C=data['sparse_pairwise_contact_matrix']
+            m,n=C.shape
+        if 'sparse_population_contact_matrix' in data:
+            Cpop=data['sparse_population_contact_matrix']
+            m,n=Cpop.shape
+        if 'pairwise_contact_matrix' in data:
+            '''
+            In this case a dense matrix is provided as a numpy array.
+
+            The nans are treated a missing values in this setting.
+
+            I need to convert the matrix into sparse upper triangular matrix form.
+            '''
+            Cdense=data['pairwise_contact_matrix']
+
+            (m,n)=np.shape(Cdense)
+            if m!=n:
+                print('The dimension of the matrix does not match, please make sure your matrix is defined correctly.')
+            n=min(m,n)
+
+        if 'population_contact_matrix' in data:
+            '''
+            a dense population contact matrix is provided
+            '''
+            Cpopdense=data['population_contact_matrix']
+            (m,n)=np.shape(Cpopdense)
+            if m!=n:
+                print('The dimension of the matrix does not match, please make sure your matrix is defined correctly.')
+            n=min(m,n)
+
+        self.n=n
+        #
+        if (C is None)&(Cdense is not None) :
+                '''
+                If you are here, then a dense matrix was provided for the contact data
+                '''
+                pairwise_combinations=listIndices(self.n,1)
+                pairwise_combinations=np.array([pair for pair in pairwise_combinations if not  np.isnan(Cdense[pair[0],pair[1]])])
+                C=sp.coo_matrix((Cdense[pairwise_combinations[:,0],pairwise_combinations[:,1]],(pairwise_combinations[:,0],pairwise_combinations[:,1])),shape=(n,n))
+        if (Cpop is None)&(Cpopdense is not None) :
+                '''
+                If you are here, then a dense matrix was provided for the contact data
+                '''
+                pairwise_combinations=listIndices(self.n,1)
+                pairwise_combinations=np.array([pair for pair in pairwise_combinations if not  np.isnan(Cpopdense[pair[0],pair[1]])])
+                Cpop=sp.coo_matrix((Cpopdense[pairwise_combinations[:,0], pairwise_combinations[:,1]],( pairwise_combinations[:,0], pairwise_combinations[:,1])),shape=(self.n,self.n))
+        # population matrix prior  adjustment #################################
+        self.Ndata=sum(C.data)+10e-16
+        Nprior=1
+        if self.term_weights['population prior']:
+            Nprior=sum(Cpop.data)+10e-16
+            self.pairwise_contact_matrix=sp.coo_matrix(C+self.term_weights['population prior']*(self.Ndata/Nprior)*Cpop)
+        else:
+            self.pairwise_contact_matrix=sp.coo_matrix(C)
+        self.b=(self.term_weights['data']+self.term_weights['population prior']*self.Ndata/Nprior)*self.b
+
+        self.gradient_manager.set_contact_data(self.pairwise_contact_matrix.row,self.pairwise_contact_matrix.col,self.pairwise_contact_matrix.data)
+    def set_optimization_options(self,options):
+        # set options #########################################################
+        if 'maxitr' not in options:
+            options['maxitr']=100000
+            print( 'Maximum number of iterations: '+str(options['maxitr']))
+        self.maxitr=options['maxitr']
+        if 'display' not in options:
+            options['display']=False
+            print( 'display output: '+str(options['display']))
+        self.display=options['display']
+        if 'store' not in options:
+            options['store']=False
+            print( 'store iterative values: '+str(options['store']))
+        self.store=options['store']
+        if 'method' not in options:
+            #options['method']='Nelder-Mead'
+            options['method']='BFGS'
+            #options['method']='CG'
+            #options['method']='Newton-CG'
+            print( 'Optimization Method: '+options['method'])
+        self.method= options['method']
+        if 'gradient tolerance' not in options:
+            options['gradient tolerance']=1e-5   # default for MatLab and Scipy Optimize
+            print( 'store iterative values: '+str(options['store']))
+        self.gtol=options['gradient tolerance']
+        if 'minimum energy' not in options:
+            options['minimum energy']=-np.inf  # stop if minimum energy is obtained
+        self.minimum_energy= options['minimum energy']
+        self.e_current=None;
+        self.itr=0;
+        self.e=np.zeros(self.maxitr)
+        self.XK=None;
+        if 0:#self.store:
+            self.XK=np.zeros([self.maxitr,np.prod(self.shp)])
+    def energy_jacobian_native(self,curve,*args):
         '''
         analytically compute energy and jacobian energy
         '''
@@ -761,14 +968,14 @@ class opt_E():
         # compute data term
         e_data=0
         gradient_data=0
-        if (self.term_weights['data']!=0)|(self.term_weights['population_prior']!=0):
-            e_data,gradient_data=analytical_data_gradient(curve.reshape(shp),self.pairwise_contact_matrix,self.a,self.b,offdiag=self.off_diagonal,idxmiss=self.index_mississing,idxlist=self.pairwise_combinations)
+        if (self.term_weights['data']!=0)|(self.term_weights['population prior']!=0):
+            e_data,gradient_data=analytical_data_gradient(curve.reshape(shp),self.pairwise_contact_matrix,self.a,self.b)
             gradient_data=gradient_data.flatten()
 
         # compute shape terms
         e_shape=0 # initialize the energy
         gradient_shape=0 # initialize the gradient
-        if (self.term_weights["shape_prior"]!=0):
+        if (self.term_weights["shape prior"]!=0):
             e_shape,gradient_shape=energy_shape_prior(curve.reshape(shp),self.prior_shape_model)
             gradient_shape=gradient_shape.flatten()
 
@@ -778,11 +985,23 @@ class opt_E():
         if (self.term_weights["h1"]!=0):
             [e_h1,gradient_h1]=h1penalty(curve.reshape(shp),self.S1)
             gradient_h1=gradient_h1.flatten()
-        e_h2=0   # initialize the energy
-        gradient_h2=0 # initialize the gradient
-        if (self.term_weights["h2"]!=0):
-            [e_h2,gradient_h2]=h2penalty(curve.reshape(shp))
-            gradient_h2=gradient_h2.flatten()
+        e_h2a=0   # initialize the energy
+        gradient_h2a=0 # initialize the gradient
+        if (self.term_weights["h2a"]!=0):
+            [e_h2a,gradient_h2a]=h2apenalty(curve.reshape(shp))
+            gradient_h2a=gradient_h2a.flatten()
+        # compute the continous pairwise repulsion penalty
+        e_h2b=0   # initialize the energy
+        gradient_h2b=0 # initialize the gradient
+        if (self.term_weights["h2b"]!=0):
+            [e_h2b,gradient_h2b]=h2bpenalty(curve.reshape(shp))
+            gradient_h2b=gradient_h2b.flatten()
+        # compute the pairwise repulsion penalty
+        e_h2c=0   # initialize the energy
+        gradient_h2c=0 # initialize the gradient
+        if (self.term_weights["h2c"]!=0):
+            [e_h2c,gradient_h2c]=h2cpenalty(curve.reshape(shp))
+            gradient_h2c=gradient_h2c.flatten()
         # compute the lamina penalty
         e_h4=0   # initialize the energy
         gradient_h4=0 # initialize the gradient
@@ -813,8 +1032,10 @@ class opt_E():
         e=DTYPE(0.0);
         e-=e_data/self.Ndata # data term
         e+=self.term_weights["h1"]*e_h1# scaled first order roughness terms
-        e+=self.term_weights["h2"]*e_h2# scaled second order roughness terms
-        e+=self.term_weights["shape_prior"]*e_shape# first order roughness terms
+        e+=self.term_weights["h2a"]*e_h2a# scaled second order roughness terms
+        e+=self.term_weights["h2b"]*e_h2b# scaled second order roughness terms
+        e+=self.term_weights["h2c"]*e_h2c# scaled second order roughness terms
+        e+=self.term_weights["shape prior"]*e_shape# first order roughness terms
         e+=self.term_weights["h4"]*e_h4# lamina penalty
         # add unsupported penalties
         e+=self.term_weights["firstroughness"]*e_r1# first order roughness terms
@@ -828,15 +1049,54 @@ class opt_E():
         gradient=DTYPE(0.0);
         gradient-=gradient_data/self.Ndata# data term
         gradient+=self.term_weights["h1"]*gradient_h1 # the h1 term
-        gradient+=self.term_weights["h2"]*gradient_h2 # the h2 term
+        gradient+=self.term_weights["h2a"]*gradient_h2a # the h2a term
+        gradient+=self.term_weights["h2b"]*gradient_h2b # the h2b term
+        gradient+=self.term_weights["h2c"]*gradient_h2c # the h2c term
         gradient+=self.term_weights["h4"]*gradient_h4 # the h4 term
-        gradient+=self.term_weights["shape_prior"]*gradient_shape # shape_prior (needs scaled)
+        gradient+=self.term_weights["shape prior"]*gradient_shape # shape prior (needs scaled)
         # add unsupported penalties
         gradient+=gradient_roughness # roughness terms
         gradient+=self.term_weights["scaledfirstroughness"]*gradient_scaled_first_roughness # scaled second order roughness term
         gradient+=self.term_weights["scaledsecondroughness"]*gradient_scaled_second_roughness # scaled second order roughness term
-        return e,gradient
+        return self.e_current,gradient
+    def energy_jacobian_cython(self,curve,*args):
+        '''
+        analytically compute energy and jacobian energy
+        '''
+        (x,y,z)=curve.reshape(self.shp)
+        # allocate memory for the numpy array
+        gradient0=np.zeros((3,len(x)))
 
+        self.e_current=self.gradient_manager.compute_gradient(x,y,z,gradient0[0,:],gradient0[1,:],gradient0[2,:])
+
+        return self.e_current,gradient0.flatten()
+
+    def energy_jacobian_compare_both(self,curve,*args):
+        tic=time.time()
+        e0,gradient0=self.energy_jacobian_native(curve)
+        toc=time.time()
+        native_time=toc-tic
+        tic=time.time()
+        e,gradient=self.energy_jacobian_cython(curve)
+        toc=time.time()
+        cython_time=toc-tic
+        print('native python',native_time)
+        print('cython time  ',cython_time)
+        print(e0-e)
+        g0=gradient0.reshape(self.shp)
+        g=gradient.reshape(self.shp)
+
+        sqdif=np.sum(pow((g0-g),2),0)
+        m=np.max( sqdif)
+        print(np.sqrt(m))
+        worst,=np.nonzero(sqdif==m)
+        print(worst[0],'py')
+
+        #print(gradient0[worst[0],:],'py')
+        print(g0[:,worst[0]],'py')
+        print(g[:,worst[0]],'cy')
+        #keyboard()
+        return self.e_current,gradient
     def accelerate_gradient_ascent_algorithm(self,cbfun=None,options=None,delta0=None):
         if options is None:
             options={   'maxiter':self.maxitr,
@@ -992,7 +1252,7 @@ class opt_E():
             if (self.method== 'AGM'):
                 self.accelerate_gradient_ascent_algorithm(cbfun,options)
             else:
-                self.result=minimize(self.energy_jacobian,self.initialized_curve.flatten(),args=(self),method=self.method,tol=None,jac=True,options=options,callback=cbfun)
+                self.result=minimize(self.energy_jacobian,self.initialized_curve.flatten().tolist(),args=(self),method=self.method,tol=None,jac=True,options=options,callback=cbfun)
                 #self.estimated_curve=self.result.x.reshape(self.shp)
         except stop_optimizing_exception:
             self.result=None;
@@ -1009,7 +1269,7 @@ class opt_E():
          e,gradient=self.energy_jacobian(curve,*args)
          return gradient;
     def check_jacobian(self):
-        return check_grad(self.just_energy,self.just_gradient,self.initialized_curve.flatten())
+        return check_grad(self.just_energy,self.just_gradient,self.initialized_curve.flatten().tolist())
     def get_data(self,i):
         '''
         get_data function call for creating animation

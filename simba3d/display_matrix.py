@@ -13,7 +13,7 @@ import numpy as np
 from scipy.io import loadmat, savemat
 from scipy.sparse import coo_matrix
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from difflib import SequenceMatcher
 
@@ -38,7 +38,9 @@ def printhelp():
     print('-c or --colormap <colormap name> pink, jet, bone, winter, summer, ...')
     print('-d or --dense flag which indicates a dense matrix input is provided')
     print('-q or --quantile-color-scale <value> value is an integer between 0 and 100 specifying the upper threshold quantile for the color limit')
-    print('-p or --print-each <outputdir> <summaryname> <format as png,eps, or jpg> print each image individually')'
+    print('-p or --print-each <outputdir> <summaryname> <format as png,eps, or jpg> print each image individually')
+
+    #print '-f or --filter <string parameter name> <minimum value> <maximum value>'
 
 def main(args=None):
     """
@@ -121,13 +123,13 @@ def main(args=None):
                  #keyboard()
              elif (ext=='.mat'):
                  data=loadmat(inputfile)
-                 for key in list(data):
+                 for key in data.keys():
                      if '__' not in key:
                          matrix=data[key]
              elif (ext=='.json'):
                  with open(inputfile, 'r') as jsonfile:
                      data=json.load(jsonfile)
-                 for key in list(data):
+                 for key in data.keys():
                      if '__' not in key:
                          matrix=data[key]
              q=np.percentile(matrix,p)

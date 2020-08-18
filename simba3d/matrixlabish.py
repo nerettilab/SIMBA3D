@@ -1,5 +1,5 @@
 """
-An assortment of low level functions that I use. Some of them resemble
+An assortment of low level functions that I use. Some of them resemble 
 functions similiar to a popular matrix laboratory.
 """
 import code
@@ -20,13 +20,13 @@ def significant_figures(x,sig=4):
         dec=int(np.floor(np.log10(abs(x))))-sig
         xround=np.round(x,-dec)
         return str(int(xround*pow(10,-dec)))+'e'+str(dec)
-
+         
 def float_range(start, step, stop):
     ''' Function that mimics the start:step:stop '''
-    # like a:b:c
+    # like a:b:c 
     arg=[]
     for i in count():
-        yld = start + step*i
+        yld = start + step*i        
         if yld > stop:
             break
         else:
@@ -47,7 +47,7 @@ def keyboard(banner=None):
     try:
         code.interact(banner=banner, local=namespace)
     except SystemExit:
-        return
+        return 
 def distancematrix(p0,p1=None,getangles=False):
     """given two sets of points p0 (mX2 array) and p1 (nX2 array), compute the pairwise distance matrix D (mXn arra)"""
     if p1 is None:
@@ -79,8 +79,8 @@ def differencematrix(p0,p1=None):
 cls=lambda: os.system('cls')
 whos=lambda: [v for v in globals().keys() if not v.startswith('_')]
 
-class getlines:
-    """
+class getlines:    
+    """ 
     like getpts, but with line in between
     """
     def __init__(self,fig):
@@ -88,7 +88,7 @@ class getlines:
         self.x = []
         self.y = []
         self.fig=fig
-        self.cid1 = self.line.figure.canvas.mpl_connect('button_press_event', self.on_click)
+        self.cid1 = self.line.figure.canvas.mpl_connect('button_press_event', self.on_click)        
         self.cid2 = self.line.figure.canvas.mpl_connect('key_press_event', self.on_key)
         self.go=True
         print('Press Enter when you have finished getting points.')
@@ -108,8 +108,8 @@ class getlines:
             self.go=False
     def __call__(self, event):
         if event.inaxes!=self.line.axes: return
-class getpts:
-    """
+class getpts:    
+    """ 
     like getpts
     """
     def __init__(self,fig):
@@ -117,7 +117,7 @@ class getpts:
         self.x = []
         self.y = []
         self.fig=fig
-        self.cid1 = self.line.figure.canvas.mpl_connect('button_press_event', self.on_click)
+        self.cid1 = self.line.figure.canvas.mpl_connect('button_press_event', self.on_click)        
         self.cid2 = self.line.figure.canvas.mpl_connect('key_press_event', self.on_key)
         self.go=True
         print('Press Enter when you have finished getting points.')
@@ -134,7 +134,7 @@ class getpts:
             self.go=False
     def __call__(self, event):
         if event.inaxes!=self.line.axes: return
-class getptstk:
+class getptstk:    
     """
     like getpts
     """
@@ -144,7 +144,7 @@ class getptstk:
         self.y = []
         self.tk=tk
         self.fig=fig
-        self.cid1 = self.line.figure.canvas.mpl_connect('button_press_event', self.on_click)
+        self.cid1 = self.line.figure.canvas.mpl_connect('button_press_event', self.on_click)        
         self.cid2 = self.line.figure.canvas.mpl_connect('key_press_event', self.on_key)
         self.go=True
         print('Press Enter when you have finished getting points.')
@@ -162,7 +162,7 @@ class getptstk:
             self.fig.canvas.mpl_disconnect(self.cid2)
             self.go=False
     def __call__(self, event):
-        if event.inaxes!=self.line.axes:
+        if event.inaxes!=self.line.axes: 
             return
 def file_len(fname):
     """

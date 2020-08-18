@@ -36,7 +36,8 @@ def printhelp():
     print document options for the simba3d taskrun command
     '''
     print('To apply multiprocessing to a list of tasks specify # of cores and a json tasklist')
-    print('\t-c <number_of_cores> ')
+    print('\t-c <number_of_parallel_instances> ')
+    print('\t-t <number_of_threads> ')
     print('\t-i <json_tasklist_file>')
     print('')
     print('Alternatively, to specify a single run, specify file and parameter options:')
@@ -58,18 +59,18 @@ def printhelp():
             }
     parameter_option_descriptions={
             '--lambda_1_value or --term_weight_uniform_spacing <value>':
-                'set value weight for the uniform_spacing penalty',
+                'set value weight for the uniform spacing penalty',
             '--lambda_2_value or --term_weight_smoothing <value>':
                 'set value weight for the uniform smoothing penalty',
             '--lambda_3_value or --term_weight_population_prior <value>':
-                'set value weight for the population_prior penalty'
+                'set value weight for the population prior penalty'
                 }
     print('File and Directory options:')
-    for option in list(filename_option_descriptions):
+    for option in filename_option_descriptions.keys():
         print('\t'+option)
         print('\t\t'+filename_option_descriptions[option])
     print('Parameter options:')
-    for option in list(parameter_option_descriptions):
+    for option in parameter_option_descriptions.keys():
         print('\t'+option)
         print('\t\t'+parameter_option_descriptions[option])
 #%%
@@ -130,11 +131,11 @@ def main(args=None):
                 'term_weights'   :
                     {
                     'data'             : 1.0e0,      # weight for the data term
-                    'uniform_spacing'  : 0.0, # scaled first order penalty
+                    'uniform spacing'  : 0.0, # scaled first order penalty
                     'smoothing'        : 0.0, # scaled second order penalty
                     'lamina'           : 0.0, # keep curve within unit length
-                    'population_prior' : 0.0,    # weight for the population matrix prior
-                    'shape_prior'      : 0.0,    # weight for the shape_prior
+                    'population prior' : 0.0,    # weight for the population matrix prior
+                    'shape prior'      : 0.0,    # weight for the shape prior
 
                     # below are unsupported penalties
                     #'firstroughness'   :0.0e3,   # weight for the fist order roughness
@@ -160,6 +161,7 @@ def main(args=None):
    if len(args)==1:
        printhelp()
        sys.exit()
+   threads=4;       
    while ii < len(args):
        if args[ii]== '-h':
            printhelp()
@@ -212,10 +214,10 @@ def main(args=None):
            task['parameters']['term_weights']['data']=np.float(args[ii] )
        elif args[ii]== '--lambda_1_value':
            ii+=1
-           task['parameters']['term_weights']['uniform_spacing']=np.float(args[ii] )
+           task['parameters']['term_weights']['uniform spacing']=np.float(args[ii] )
        elif args[ii]== '--term_weight_uniform_spacing':
            ii+=1
-           task['parameters']['term_weights']['uniform_spacing']=np.float(args[ii])
+           task['parameters']['term_weights']['uniform spacing']=np.float(args[ii])
        elif args[ii]== '--lambda_2_value':
            ii+=1
            task['parameters']['term_weights']['smoothing']=np.float(args[ii] )
@@ -224,14 +226,14 @@ def main(args=None):
            task['parameters']['term_weights']['smoothing']=np.float(args[ii] )
        elif args[ii]== '--lambda_3_value':
            ii+=1
-           task['parameters']['term_weights']['population_prior']=np.float(args[ii])
+           task['parameters']['term_weights']['population prior']=np.float(args[ii])
        elif args[ii]== '--term_weight_population_prior':
            ii+=1
-           task['parameters']['term_weights']['population_prior']=np.float(args[ii]   )
+           task['parameters']['term_weights']['population prior']=np.float(args[ii]   )
        ii+=1
    print('Input file is ', inputfiles)
-   print('number of cores', str(cores))
-
+   print('number of processess', str(cores))
+   print('number of threads', str(threads))
    if not inputfiles:
        # check that the file already exist
 

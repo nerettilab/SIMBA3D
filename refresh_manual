@@ -1,0 +1,5 @@
+#!/bin/bash
+# update the manual
+cd doc
+make html
+

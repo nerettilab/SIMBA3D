@@ -32,6 +32,7 @@ import simba3d.srvf_open_curve_Rn as srvf
 from simba3d.uuid_check import check_tasks_index, load_result,get_outputfilepath
 from simba3d.pdb_support import make_pdb_file
 
+import scipy.sparse as sp
 
 def create_downsampled_matrices(data):
     """
@@ -66,6 +67,56 @@ def create_downsampled_matrices(data):
         C[k+1]= C[k+1]+A.T
         k=k+1
     return C;
+def convert_modern_task(task):
+    # define the defaults here
+    if 'parameters' not in task:
+        task['parameters']= {
+                                'a':-3.0,
+                                'b':1.0
+                            }
+    if 'term_weights' not in task['parameters']:
+        task['parameters']['term_weights']= {
+                    'data'             : 1.0e0,      # weight for the data term
+                    'uniform spacing'  : 0.0, # scaled first order penalty
+                    'smoothing'        : 0.0, # scaled second order penalty
+                    'continuous pairwise repulsion' : 0.0, # scaled second order penalty
+                    'pairwise repulsion' : 0.0, # scaled second order penalty
+                    'population prior' : 0.0,    # weight for the population matrix prior
+                    'shape prior'      : 0.0,    # weight for the shape prior
+                    # below are unsupported penalties
+                    #'firstroughness'   :0.0e3,   # weight for the fist order roughness
+                    #'secondroughness'  :0.0e-16,   # weight for the second order roughness
+                    #'scaledfirstroughness'  :0.0,   # weight for the scaled second order roughness
+                    #'scaledsecondroughness' :0.0,   # weight for the scaled second order roughness
+                    #'parameterization' :0, # not implemented
+                    }
+
+    if 'file_names' not in task:
+        task['file_names']={'inputdir':'.'}
+    if 'options' not in task:
+        task['options']={
+                #"method": "BFGS",
+                "method": "L-BFGS-B",
+                "display": True,
+                "maxitr": 100000
+                }
+    # loop through the keys
+    for key in task.keys():
+        parts=key.split('_')
+        if parts[0]=='parameters':
+            if '_term_weights_' in key:
+                newkey=' '.join(parts[3:])
+                task['parameters']['term_weights'][newkey]=task[key]
+            else:
+                newkey=' '.join(parts[1:])
+                task['parameters'][newkey]=task[key]
+        if 'file_names_'in key:
+            newkey='_'.join(parts[2:])
+            task['file_names'][newkey]=task[key]
+        if 'options_'in key:
+            newkey='_'.join(parts[2:])
+            task['options'][newkey]=task[key]
+    return task
 
 def load_sparse_matrix(inputfile):
     ext=inputfile.split('.')[-1]
@@ -98,16 +149,20 @@ def load_sparse_matrix(inputfile):
                 print("The third value should be the number of entries (integer)")
                 print("This input is optional, so SIMBA3d should still read the data")
                 print("You can actually leave it blank without issue")
-
-
             if number_of_entries is None:
                 lines=csvfile.readlines();
                 for line in lines:
                     linesplit=line.split(',')
                     try:
-                        iii.append(int(linesplit[0]))
-                        jjj.append(int(linesplit[1]))
-                        vvv.append(float(linesplit[2]))
+                        if not np.isnan(float(linesplit[2])):
+                            if float(linesplit[2])>=0:
+                                iii.append(int(linesplit[0]))
+                                jjj.append(int(linesplit[1]))
+                                vvv.append(float(linesplit[2]))
+                            else:
+                                print('negatives treated as missing',linesplit)
+                        else:
+                            print('nans treated as missing',linesplit)
                     except:
                         print("Unable to read line :\n"+line)
                         print("The first two values should be the row and column index (integer).")
@@ -122,9 +177,15 @@ def load_sparse_matrix(inputfile):
                         print("If you don't know how may entries you have, then just leave it blank at the top of your csv file.\n")
                     linesplit=line.split(',')
                     try:
-                        iii.append(int(linesplit[0]))
-                        jjj.append(int(linesplit[1]))
-                        vvv.append(float(linesplit[2]))
+                        if not np.isnan(float(linesplit[2])):
+                            if float(linesplit[2])>=0:
+                                iii.append(int(linesplit[0]))
+                                jjj.append(int(linesplit[1]))
+                                vvv.append(float(linesplit[2]))
+                            else:
+                                print('negatives treated as missing',linesplit)
+                        else:
+                            print('nans treated as missing',linesplit)
                     except:
                         print("Unable to read line :\n"+line)
                         print("The first two values should be the row and column index (integer).")
@@ -185,39 +246,38 @@ def load_sparse_matrix(inputfile):
 
 
 def save_matrices(inputdir,data_matrix_file,outputdir=None):
-    if (outputdir==None):
-        """
-        if the user does not specify the outputdir, assume the ouput and input
-        directory are the same.
-        """
-        outputdir=inputdir
-        file_name,file_extension=os.path.splitext(data_matrix_file)
-        # load the data matrix to down sample
-        if file_extension =='.npy':
-            data=np.load(os.path.join(inputdir,data_matrix_file))
-        elif file_extension =='.mat':
-            data=loadmat(os.path.join(inputdir,data_matrix_file))
-        # create the down sampled matrices
-        Crev=create_downsampled_matrices(data)
-        multires_filenames=[]
-        res=[]
-        reversed_index=list(reversed(range(len(Crev))))
-        C=[]
-        # loop through the downsampled matrices in reverse order
-        for ii in range(len(Crev)):
-            C.append(Crev[reversed_index[ii]])
-            # store the resolutions for automating the tasklist generation
-            res.append(len(C[ii]))
+    """
+    This saves a downsampled versions of a matrix npy file.
 
-            # store the file names for automating the tasklist generation
-            multires_filenames.append(file_name+'_'+str(res[ii])+'x'+str(res[ii])+file_extension)
-            # save the multiresolution matrices to the desired directory
-            print('Saving '+multires_filenames[ii])
-            if file_extension =='.npy':
-                np.save(os.path.join(outputdir,multires_filenames[ii]),C[ii])
-            elif file_extension =='.mat':
-                savemat(os.path.join(outputdir,multires_filenames[ii]),C[ii])
-        return res,multires_filenames
+    You tell it the directory and the name of the file, and this will create the
+    down sampled matrix files for the multiresolution warm-starts.
+    """
+    if (outputdir==None):
+      """
+      if the user does not specify the outputdir, assume the ouput and input
+      directory are the same.
+      """
+      outputdir=inputdir
+    # load the data matrix to down sample
+    data=np.load(os.path.join(inputdir,data_matrix_file))
+    # create the down sampled matrices
+    Crev=create_downsampled_matrices(data)
+    multires_filenames=[]
+    res=[]
+    reversed_index=list(reversed(range(len(Crev))))
+    C=[]
+    # loop through the downsampled matrices in reverse order
+    for ii in range(len(Crev)):
+        C.append(Crev[reversed_index[ii]])
+        # store the resolutions for automating the tasklist generation
+        res.append(len(C[ii]))
+        file_name,file_extension=os.path.splitext(data_matrix_file)
+        # store the file names for automating the tasklist generation
+        multires_filenames.append(file_name+'_'+str(res[ii])+'x'+str(res[ii])+file_extension)
+        # save the multiresolution matrices to the desired directory
+        print('Saving '+multires_filenames[ii])
+        np.save(os.path.join(outputdir,multires_filenames[ii]),C[ii])
+    return res,multires_filenames
 
 
 def jsonify(data):
@@ -247,7 +307,7 @@ def jsonify(data):
     return serialized_summary
 
 
-import scipy.sparse as sp
+
 
 
 
@@ -277,9 +337,6 @@ def save_data(outputfilepath,summary):
 
 
     return outputfilepath
-
-
-    return outputfilepath
 def convert(filename,ext_out=".json"):
     """
     convert .npz simba3d result into some other supported format
@@ -302,7 +359,7 @@ def convert(filename,ext_out=".json"):
     else:
         print("\tCould not load "+filename)
 
-def run_tasks(tasks,resume=True):
+def run_tasks(tasks,resume=True,threads=None):
     '''
     plural task runner.
 
@@ -312,9 +369,11 @@ def run_tasks(tasks,resume=True):
     Ther resume option tells simba3d to skip over tasks with uuid's that have
     already been ran.
     '''
-    #keyboard()
+
     if type(tasks) is dict: # if a dicitonary is passed in, but it in a list so we know the layer
         tasks=[tasks]
+    for task in tasks:
+        task=convert_modern_task(task)
     if 'uuid' in tasks[0]:
       UUID=tasks[0]["uuid"] # if the task has a uuid use that
     else:
@@ -325,67 +384,24 @@ def run_tasks(tasks,resume=True):
             tasks[ii]["uuid"]=UUID+'_'+str(ii)
         if 'taskname' not in tasks[ii]:
             tasks[ii]['taskname']= "unnamed task" # give the task a more intuitive name
-        # convert simplified user input into the older format
-
-        if 'file_names' not in list(tasks[ii]):
-            tasks[ii]['file_names']=dict()
-            for key in list(tasks[ii]):
-                if 'file_names_' in key:
-                    subkey=key.split('file_names_')[1]
-                    subkey="_".join(subkey.split(" "))
-                    tasks[ii]['file_names'][subkey]=tasks[ii][key]
-                    tasks[ii].pop(key,None)
-        if 'options' not in list(tasks[ii]):
-            tasks[ii]['options']=dict()
-            for key in list(tasks[ii]):
-                if 'options_' in key:
-                    subkey=key.split('options_')[1]
-                    subkey="_".join(subkey.split(" "))
-                    tasks[ii]['options'][subkey]=tasks[ii][key]
-                    tasks[ii].pop(key,None)
-        if 'index_parameters' not in tasks[ii].keys():
-            tasks[ii]['index_parameters']=dict()
-            for key in list(tasks[ii]):
-                if 'index_parameters_' in key:
-                    subkey=key.split('index_parameters_')[1]
-                    subkey="_".join(subkey.split(" "))
-                    tasks[ii]['index_parameters'][subkey]=tasks[ii][key]
-                    tasks[ii].pop(key,None)
-        if 'parameters' not in tasks[ii].keys():
-            tasks[ii]['parameters']=dict()
-            for key in list(tasks[ii]):
-                if 'parameters_' in key:
-                    subkey=key.split('parameters_')[1]
-                    subkey="_".join(subkey.split(" "))
-                    if 'term_weights_' not in key:
-                        tasks[ii]['parameters'][subkey]=tasks[ii][key]
-                        tasks[ii].pop(key,None)
-        if 'term_weights' not in list(tasks[ii]['parameters']):
-            tasks[ii]['parameters']['term_weights']=dict()
-            for key in list(tasks[ii]):
-                if 'parameters_term_weights_' in key:
-                    subkey=key.split('parameters_term_weights_')[1]
-                    subkey="_".join(subkey.split(" "))
-                    tasks[ii]['parameters']['term_weights'][subkey]=tasks[ii][key]
-                    tasks[ii].pop(key,None)
     if resume:
         index_remaining=check_tasks_index(tasks) # find which tasks still need to run
         print(index_remaining)
     else:
         index_remaining=range(len(tasks))
+
     usewarmstarts=False # default setting for warmstarts
+
+
     for ii in index_remaining: # loop through remaining tasks
-        print("--------------------------------------------")
-        print("RUN:"+str(ii))
-        print("Remaining:",index_remaining)
         if 'uuid' not in tasks[ii]: # make sure the task has a uuid
           tasks[ii]["uuid"]=UUID+'_'+str(ii)
         if ii==0:
-          outputfilepath=run_task(tasks[0])   # run the first task
+          outputfilepath=run_task(tasks[0],threads=threads)   # run the first task
         else:
             if 'usewarmstarts' in tasks[ii]:
+
                 usewarmstarts=tasks[ii]['usewarmstarts'] # if usewarmstarts parameter is set then use that value
-            print("warmstarts",usewarmstarts)
             if usewarmstarts:
                 print("Using warmstarts sequentially from previous task")
                 if 'uuid' not in tasks[ii]:
@@ -427,10 +443,10 @@ def run_tasks(tasks,resume=True):
                     tasks[ii]['data']['initialized_curve']=initialized_curve
                 else:
                     tasks[ii]['data']={'initialized_curve' : initialized_curve}
-            outputfilepath=run_task(tasks[ii])
+            outputfilepath=run_task(tasks[ii],threads=threads)
 
 
-def run_task(task):
+def run_task(task,threads=None):
     """
     run a singular task
     """
@@ -451,25 +467,8 @@ def run_task(task):
          sig= task['sigma']
     else:
         sig=.005;
-    if 'parameters' not in task:
-        task['parameters']= {
-                'a'              : -3.0,
-                'b'              : 1.0, # not identifiable with unconstrained scale
-                    }
-    if 'term_weights' not in task['parameters']:
-        task['parameters']['term_weights']= {
-                    'data'             : 1.0e0,      # weight for the data term
-                    'uniform spacing'  : 0.0, # scaled first order penalty
-                    'smoothing'        : 0.0, # scaled second order penalty
-                    'population_prior' : 0.0,    # weight for the population matrix prior
-                    'shape_prior'      : 0.0,    # weight for the shape_prior
-                    # below are unsupported penalties
-                    #'firstroughness'   :0.0e3,   # weight for the fist order roughness
-                    #'secondroughness'  :0.0e-16,   # weight for the second order roughness
-                    #'scaledfirstroughness'  :0.0,   # weight for the scaled second order roughness
-                    #'scaledsecondroughness' :0.0,   # weight for the scaled second order roughness
-                    #'parameterization' :0, # not implemented
-                    }
+
+
     if 'store_task' not in task: # set default for store_task
         task['store_task']=True # store the task in the output file
 
@@ -478,6 +477,8 @@ def run_task(task):
     term_weights=[]
     for term in term_types:
         term_weights.append(np.array(parameters['term_weights'][term],dtype=np.double))
+
+
     if 'inputdir' not in task['file_names']:
         task['file_names']['inputdir']='./'
     inputdir=task['file_names']['inputdir']
@@ -560,13 +561,10 @@ def run_task(task):
                 }
     if 'seed' in task:
         options['seed']=task['seed']
-    # option to make a pdf file to be viewed in Chrimera
-    make_pdb_file_too=False
-    if 'make_pdb_file' in task:
-        make_pdb_file_too=task['make_pdb_file']
+
     start=time.time()
 
-    result=opt.opt_E(data,parameters,options)
+    result=opt.opt_E(data,parameters,options,threads=threads)
     print("Running ...")
     print("\tTaskname: "+task['taskname'])
     if 'uuid' in task:
@@ -591,11 +589,6 @@ def run_task(task):
 
     summary=summarize_results(result,task)
 
-
-    if (make_pdb_file_too == True):
-        pdbfilepath=os.path.splitext(outputfilepath)[0]+".pdb"
-        print("saving results to file:"+pdbfilepath)
-        save_data(pdbfilepath,summary)
     print("saving results to file:"+outputfilepath)
     return save_data(outputfilepath,summary)
 
@@ -625,12 +618,12 @@ def summarize_results(result,task):
         summary['nonspecified_zeros_as_missing']=task['nonspecified_zeros_as_missing']
     if 'uuid'in task:
         summary['uuid']=task['uuid']
-    for term in  list(result.term_weights):
-        summary['weight_'+term.replace(' ','_')]= result.term_weights[term]
-        print(term+' = '+str(summary['weight_'+term.replace(' ','_')]))
+    for term in  result.term_weights.keys():
+        summary['parameters_term_weights_'+term.replace(' ','_')]= result.term_weights[term]
+        print(term+' = '+str(summary['parameters_term_weights_'+term.replace(' ','_')]))
     return summary
 
-def mp_worker(task):
+def mp_worker(task,threads=None):
     if 'taskname' in task:
         taskname=task['taskname']
     else:
@@ -640,7 +633,7 @@ def mp_worker(task):
     # place task here and pass in parameters
     t= time.time()
     #keyboard()
-    run_tasks(task)
+    run_tasks(task,threads=threads)
     elapsed=time.time()-t
     print('\nProcess %s \tDone \t %s seconds elapsed' % (taskname, elapsed))
 
@@ -678,9 +671,20 @@ def load_data(task):
                     data[datatype]=data[datatype][datatype]
              if type(data[datatype])==type(list()):
                     data[datatype]=np.array(data[datatype],dtype=np.float)
-
-                     #keyboard()
-                     # special treatement here
+        if 'pairwise_contact_matrix' in data:
+            # deal with negatives treating them as missing
+            if np.sum(data['pairwise_contact_matrix']<0)>0:
+                print("negatives values found in pairwise_contact_matrix and will be treated as missing")
+                data['pairwise_contact_matrix'][data['pairwise_contact_matrix']<0]=np.nan
+            # deal with negatives treating them as observed zeros
+            #data['pairwise_contact_matrix'][data['pairwise_contact_matrix']<0]=0
+        if 'population_contact_matrix' in data:
+            # deal with negatives treating them as missing
+            if np.sum(data['population_contact_matrix']<0)>0:
+                print("negatives values found in population_contact_matrix and will be treated as missing")
+                data['population_contact_matrix'][data['population_contact_matrix']<0]=np.nan
+            # deal with negatives treating them as observed zeros
+            #data['pairwise_contact_matrix'][data['pairwise_contact_matrix']<0]=0
     return data
 
 

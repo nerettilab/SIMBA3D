@@ -1,0 +1,20 @@
+[[
+    {
+    "taskname":"sparse_csv",
+    "file_names_initialized_curve":"init.csv",
+    "file_names_inputdir":"data_inputs",
+    "file_names_sparse_pairwise_contact_matrix":"sparse_csv_format.csv",
+    "options_display": false,
+    "options_gradient tolerance": 1e-05,
+    "options_maxitr": 100,
+    "options_method": "default",
+    "options_store": false,
+    "parameters_a": -3.0,
+    "parameters_b": 1.0,
+    "parameters_term_weights_data": 1.0,
+    "parameters_term_weights_population_prior": 0.0,
+    "parameters_term_weights_shape_prior": 0.0,
+    "parameters_term_weights_smoothing": 1.0,
+    "parameters_term_weights_uniform_spacing": 1.0
+    }
+]]

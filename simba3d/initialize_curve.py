@@ -2,7 +2,7 @@
 """
 A simple tool for creating initalized curves for SIMBA3D
 
-Currently it only uses gaussain random noise, but in the future more 
+Currently it only uses gaussain random noise, but in the future more
 initialization methods may be implemented.
 
 @author: Michael Rosenthal
@@ -13,7 +13,7 @@ import sys
 import numpy as np
 from scipy.io import loadmat, savemat
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from difflib import SequenceMatcher
 try: import simplejson as json # try to import simplejson
@@ -52,17 +52,17 @@ def initialize_template(n,d,rng=None):
     '''
     if rng is None:
         '''
-        If the random number generator is none, then the user did not set the 
+        If the random number generator is none, then the user did not set the
         seed.
         '''
         return np.random.rand(n*d).reshape([d,n])
     else:
         '''
-        If the random number generator is not none, then the user did not set 
+        If the random number generator is not none, then the user did not set
         the seed.
         '''
         return rng.normal(0,1,n*d).reshape([d,n])
-        
+
 
 def main(args=None):
     """
@@ -117,16 +117,16 @@ def main(args=None):
                 curve=initialize_gaussian(n,d,rng)
             # add your method here
             if method is 'template':
-                curve=initialize_template(n,d,rng)  
+                curve=initialize_template(n,d,rng)
             #
-            
-            # write output to file         
+
+            # write output to file
             if ext == '.csv':
                 np.savetxt(outputfile,curve.T,delimiter=',')
             if ext == '.json':
                 with open(outputfile, 'w') as jsonfile:
                      json.dump(mp.jsonify({'initialized_curve':curve}),jsonfile)
                      #
-            
+
 if __name__ == "__main__":
    main()

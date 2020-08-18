@@ -12,7 +12,7 @@ import sys
 import numpy as np
 from scipy.io import loadmat, savemat
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from difflib import SequenceMatcher
 
@@ -146,10 +146,12 @@ def main(args=None):
     for inputfile in inputfiles:
         summary=mp.load_result(inputfile)
         if result_passes_filter(summary,param_name,param_min,param_max):
+            #print summary.keys()
             if 'uuid' in summary:
               print(summary['uuid'])
             if 'E_evol'in summary:
                 energy.append(summary['E_evol'])
+                #print summary.keys()
             if 'X_evol'in summary:
                 X0=np.array(summary['X_evol'][-1]) # get the last curve
                 # get dimension

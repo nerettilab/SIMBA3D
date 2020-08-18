@@ -26,13 +26,13 @@ except ImportError: import json #otherwise import json
 
 
 
-
+        
 def get_tag_name(task):
     '''
     Gets a tag name (this may go away in future versions)
     '''
     tag=''
-    for penalty in list(task['parameters']['term_weights']):
+    for penalty in task['parameters']['term_weights'].keys():
 
         f=task['parameters']['term_weights'][penalty]
         if f !=0.0:
@@ -164,7 +164,7 @@ def check_tasks(tasks):
     uuid_finished_tasks=[]
     results_dirs=[]
     for task in tasks:
-
+        
         get_outputfilepath(task);
         results_dir='.'
         if 'outputdir' in task['file_names']:
@@ -221,28 +221,28 @@ def check_tasks_index(tasks):
     index=[];
     for task in tasks:
         results_dir='.'
-
+        
         if type(task) != type(list()):
             task=[task]
         number_of_subtasks=len(task)
         number_of_subtasks_complete=0
         # check to see if they give a unique file name or uuid
-        for subtask in task:
+        for subtask in task: 
             output=get_outputfilepath(subtask)
             if os.path.isfile(output):
                 summary=load_result(output)
                 '''
                 If the file exists and you can load it, then say the task is
                 complete. I don't want to force people to use the uuid anymore.
-                It is a difficult sell and it makes it more difficult to
+                It is a difficult sell and it makes it more difficult to 
                 explain. I want to more gently suggest it because I think it
                 will make it easier for people to search for a specific result
-                later. Also, if we want to coordinate tasks detributed over a
+                later. Also, if we want to coordinate tasks detributed over a 
                 network it will be really important to have that in there so
                 that tasks do not get duplicated.
                 '''
                 number_of_subtasks_complete+=1
-
+                
                 # check for the uuid too
                 if 'uuid' in subtask:
                     if 'uuid' in summary:
