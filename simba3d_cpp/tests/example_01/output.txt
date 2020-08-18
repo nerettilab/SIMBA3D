@@ -1,0 +1,12 @@
+TeNa  < options >  [first number] [second number]
+Will not eat what you feed it.
+Options:
+  -h    : print help
+  -v    : returns version number
+TeNa Version: 00.01.00
+tena refuses to eat 1!
+tena refuses to eat 2!
+tena refuses to eat 3!
+tena refuses to eat 1!
+tena refuses to eat 2!
+tena refuses to eat hat!

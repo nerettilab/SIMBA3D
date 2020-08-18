@@ -1,0 +1,1 @@
+The ratch script will copy the target executable and then run it

@@ -1,0 +1,76 @@
+import os
+env=Environment()
+env['CPPPATH']=[
+		'.', #search for cpp files in the main directory
+		'src'#search for cpp files in the src directory
+		]
+env['LIBPATH']=[
+		#'/use/lib', # standard location for libraries on linux system
+		'./lib' # locally packaged libraries distributed with the code
+		] 
+env['LIBS']=[
+            #'tiff',
+            #'png'
+            'pthread'
+            ]
+env['CXXFLAGS']=[#"-pthread",
+                #//"-std=c++11"
+                ]
+env['CCFLAGS']=[
+                #'-O2'# optimization level  2
+                #'-O3' # optimization level  3
+                '-g' # debug mode 
+                ]
+env['LINKFLAGS']=[]
+
+# compile shared objects from the source library
+obj=[]
+indir='src'
+for fn in os.listdir(indir):
+  if fn.endswith('.cpp'):
+    filename=os.path.join(indir,fn)
+    obj.append(env.Object(os.path.join(os.path.join(indir,'build'),
+     '.'.join(fn.split('.')[:-1])),filename))
+
+# compile the scrap applications to the bin directory
+indir='src/scrap/'
+outdir='bin/scrap/'
+for fn in os.listdir(indir):
+  if fn.endswith('.cpp'):
+    outfile=os.path.join(outdir,'.'.join(fn.split('.')[:-1]))
+    binobj=[obj]
+    binobj.append(env.Object(os.path.join(indir,fn)))
+    env.Program(outfile,binobj,LIBS=env['LIBS'],LIBPATH=env['LIBPATH'])     
+
+# compile the test applications to the bin directory
+indir='src/tests/'
+outdir='bin/tests/'
+for fn in os.listdir(indir):
+  if fn.endswith('.cpp'):
+    outfile=os.path.join(outdir,'.'.join(fn.split('.')[:-1]))
+    binobj=[obj]
+    binobj.append(env.Object(os.path.join(indir,fn)))
+    env.Program(outfile,binobj,LIBS=env['LIBS'],LIBPATH=env['LIBPATH'])     
+
+
+# compile the example applications to the bin directory
+indir='src/examples/'
+outdir='bin/examples/'
+for fn in os.listdir(indir):
+  if fn.endswith('.cpp'):
+    outfile=os.path.join(outdir,'.'.join(fn.split('.')[:-1]))
+    binobj=[obj]
+    binobj.append(env.Object(os.path.join(indir,fn)))
+    env.Program(outfile,binobj,LIBS=env['LIBS'],LIBPATH=env['LIBPATH'])     
+
+
+
+# compile the program applications to the bin directory
+indir='src/programs/'
+outdir='bin/programs/'
+for fn in os.listdir(indir):
+  if fn.endswith('.cpp'):
+    outfile=os.path.join(outdir,'.'.join(fn.split('.')[:-1]))
+    binobj=[obj]
+    binobj.append(env.Object(os.path.join(indir,fn)))
+    env.Program(outfile,binobj,LIBS=env['LIBS'],LIBPATH=env['LIBPATH'])
